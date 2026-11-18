@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
-<meta name="theme-color" content="#19221d">
+<meta name="theme-color" content="#242522">
 <meta name="description" content="Le Studio MIR est en construction. Découvrez le reste du site et notre boutique.">
 <title>Studio MIR — En construction</title>
 <style>
@@ -39,8 +39,8 @@ html[data-mir-studio-public-state=construction] .art path[stroke="#27392b"]{stro
 <link rel="stylesheet" href="mir-public-menu.css?v=2">
 <script defer src="mir-public-menu.js?v=public-shell-3"></script>
 
-<link rel="stylesheet" href="mir-prestige.css?v=1"><script defer src="mir-prestige.js?v=1"></script></head>
-<body>
+<link rel="stylesheet" href="mir-prestige.css?v=1"><script defer src="mir-prestige.js?v=1"></script><link rel="stylesheet" href="mir-studio-doors.css?v=20261118"></head>
+<body data-mir-studio-door="construction">
 <a href="#contenu" class="skip" data-fr="Aller au contenu" data-en="Skip to content">Aller au contenu</a>
 <header class="site-header mir-client-header mir-home-header" data-mir-public-shell>
 <a class="brand mir-client-brand" href="index.html" aria-label="Les Revêtements MIR — accueil" data-fr-aria-label="Les Revêtements MIR — accueil" data-en-aria-label="Les Revêtements MIR — home"><img src="assets/MIR-logo-officiel-original.svg" alt="Les Revêtements MIR" width="364" height="91"></a>
@@ -53,7 +53,7 @@ html[data-mir-studio-public-state=construction] .art path[stroke="#27392b"]{stro
 <p class="description" data-fr="Le Studio se prépare. En attendant, explorez nos réalisations et nos matériaux sans quitter le site MIR." data-en="Our Studio is being prepared. In the meantime, explore our projects and materials on the MIR website.">Le Studio se prépare. En attendant, explorez nos réalisations et nos matériaux sans quitter le site MIR.</p>
 <nav class="actions" aria-label="Navigation du Studio" data-fr-aria-label="Navigation du Studio" data-en-aria-label="Studio navigation"><a class="action primary" href="index.html" data-fr="Retour au site" data-en="Back to the website">Retour au site</a><a class="action secondary" href="boutique.html" data-fr="Voir la boutique" data-en="Browse the shop">Voir la boutique</a></nav>
 </section></main>
-<footer>Les Revêtements MIR · Québec</footer>
+<footer class="mir-studio-door-footer"><a href="index.html" aria-label="Accueil MIR" data-fr-aria-label="Accueil MIR" data-en-aria-label="MIR home"><img src="assets/MIR-logo-officiel-original.svg" width="364" height="91" alt="Les Revêtements MIR"></a><div><p data-fr="Votre maison. Les bons matériaux. Les bons détails." data-en="Your home. The right materials. The right details.">Votre maison. Les bons matériaux. Les bons détails.</p><p>Les Revêtements MIR · Québec</p></div></footer>
 <script>
 (()=>{'use strict';const KEY='mir-client-locale-v1';const buttons=[...document.querySelectorAll('[data-mir-locale]')];function render(lang){if(lang!=='en-CA')lang='fr-CA';document.documentElement.lang=lang;document.title=lang==='en-CA'?'MIR Studio — Under construction':'Studio MIR — En construction';document.querySelector('meta[name="description"]').content=lang==='en-CA'?'The MIR Studio is under construction. Browse our website and shop.':'Le Studio MIR est en construction. Découvrez le reste du site et notre boutique.';document.querySelectorAll('[data-fr][data-en]').forEach(el=>{el.textContent=el.dataset[lang==='en-CA'?'en':'fr'];});document.querySelectorAll('[data-fr-aria-label][data-en-aria-label]').forEach(el=>el.setAttribute('aria-label',lang==='en-CA'?el.dataset.enAriaLabel:el.dataset.frAriaLabel));const group=document.querySelector('.languages');group.setAttribute('aria-label',lang==='en-CA'?'Client website language':'Langue du site client');buttons.forEach(b=>{const on=b.dataset.mirLocale===lang;b.setAttribute('aria-pressed',String(on));b.setAttribute('aria-label',b.lang==='en-CA'?(on?'English (Canada), selected':'Anglais canadien'):(on?'Français canadien, sélectionné':'French (Canada)'));});}let chosen='fr-CA';try{chosen=localStorage.getItem(KEY)==='en-CA'?'en-CA':'fr-CA';}catch{}render(chosen);buttons.forEach(button=>button.addEventListener('click',()=>{const next=button.dataset.mirLocale;try{localStorage.setItem(KEY,next);}catch{}render(next);}));addEventListener('storage',event=>{if(event.key===KEY)render(event.newValue);});})();
 </script>

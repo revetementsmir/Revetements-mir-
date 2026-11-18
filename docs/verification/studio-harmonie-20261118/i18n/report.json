@@ -1,0 +1,11 @@
+{
+  "checks": [
+    "guards exit before any DOM access for embed, admin, atelier and unrelated page",
+    "import labels, real invalid-file validation, simulated progress/cautions and French restoration",
+    "volume labels and roundtrip; every control value/option identifier/checkbox preserved",
+    "material labels translated; all source names, colour names, titles and links unchanged",
+    "stable observers and engine state"
+  ],
+  "errors": [],
+  "blocked": []
+}

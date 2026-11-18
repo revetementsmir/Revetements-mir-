@@ -1,0 +1,67 @@
+/* Secondary Studio entrances only. No engine, geometry or source colours change. */
+body[data-mir-studio-door]{
+ --door-ink:#242522;--door-paper:#f4f1ea;--door-sand:#bda889;--door-muted:#c6c3ba;--door-line:#59594f;
+ background:var(--door-ink);color:var(--door-paper);font-family:"DM Sans",Arial,Helvetica,sans-serif
+}
+body[data-mir-studio-door] :focus-visible{outline:2px solid var(--door-sand);outline-offset:4px}
+body[data-mir-studio-door] .mir-studio-door-footer{display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;margin:28px 0 0;padding:22px 0;border-top:1px solid var(--door-line);color:var(--door-muted);background:transparent;font:400 12px/1.6 "DM Sans",Arial,sans-serif;letter-spacing:0;text-transform:none}
+body[data-mir-studio-door] .mir-studio-door-footer a{display:inline-flex;align-items:center;min-height:44px}
+body[data-mir-studio-door] .mir-studio-door-footer img{display:block;width:120px;height:auto}
+body[data-mir-studio-door] .mir-studio-door-footer p{margin:0}
+
+/* The existing demonstrator keeps its controls and its illustrative materials. */
+body.mir-prestige[data-mir-studio-door=demo]{--ivory:#242522;--ink:#f4f1ea;--green:#bda889;--line:#59594f;--muted:#c6c3ba;--paper:#2d2e29;--soft:#38382f;--tool-muted:#c6c3ba;--tool-line:#59594f}
+body.mir-prestige[data-mir-studio-door=demo]>.mir-studio-demo-notice{padding:13px max(24px,calc((100vw - 1344px)/2))!important;background:#2d2e29!important;color:var(--door-muted);font:400 13px/1.65 "DM Sans",Arial,sans-serif!important;border-bottom:1px solid #ffffff15}
+body.mir-prestige[data-mir-studio-door=demo]>.mir-studio-demo-notice a{color:var(--door-paper);text-underline-offset:3px}
+body.mir-prestige[data-mir-studio-door=demo] main{max-width:1440px;padding:38px 48px 24px}
+body.mir-prestige[data-mir-studio-door=demo] .intro h1{color:var(--door-paper);font:400 clamp(32px,3.3vw,48px)/1.12 "DM Sans",Arial,sans-serif;letter-spacing:-.04em}
+body.mir-prestige[data-mir-studio-door=demo] .intro :is(.eyebrow,.description),body.mir-prestige[data-mir-studio-door=demo] .demo-stamp{color:var(--door-muted)}
+body.mir-prestige[data-mir-studio-door=demo] .demo-stamp:before,body.mir-prestige[data-mir-studio-door=demo] .control-heading:before{background:var(--door-sand)}
+body.mir-prestige[data-mir-studio-door=demo] :is(.control-heading,.rotation-head,.rotation-head label){color:var(--door-paper)}
+body.mir-prestige[data-mir-studio-door=demo] :is(.controls,.viewer){background:#2d2e29;border:1px solid var(--door-line);border-radius:2px}
+body.mir-prestige[data-mir-studio-door=demo] .stage{background:radial-gradient(ellipse at center,#f4f1ea,#e4dfd4)}
+body.mir-prestige[data-mir-studio-door=demo] .stage :is(.stage-label,.stage-label strong,.stage-label span,.view-note,.compass){color:var(--door-ink)}
+body.mir-prestige[data-mir-studio-door=demo] .stage .quiet-btn{background:#f4f1eae8;color:var(--door-ink);border-color:#b6b1a4}
+body.mir-prestige[data-mir-studio-door=demo] .stage .quiet-btn[aria-pressed=true]{background:var(--door-ink);color:var(--door-paper);border-color:var(--door-ink)}
+body.mir-prestige[data-mir-studio-door=demo] :is(.measure-strip,.rotation){background:transparent;border-color:var(--door-line)}
+body.mir-prestige[data-mir-studio-door=demo] :is(.measure small,.measure span,.rotation-head output,.viewer-caption,.viewer-caption strong,.step-no,.material-hint,.generic-note,.color-title output,.summary-label,.summary-row,.summary-row b,.export-note,.requirements p,.requirements strong,.disclaimer){color:var(--door-muted)}
+body.mir-prestige[data-mir-studio-door=demo] :is(.measure+.measure,.summary){border-color:var(--door-line)}
+body.mir-prestige[data-mir-studio-door=demo] :is(.rotate-arrow,.preset,.zone-label,.material-label,.reset){color:var(--door-paper);background:#34352f;border-color:#737267;min-height:40px}
+body.mir-prestige[data-mir-studio-door=demo] .preset[aria-pressed=true],body.mir-prestige[data-mir-studio-door=demo] .radio-input:checked+.zone-label{background:#494438;border-color:var(--door-sand)}
+body.mir-prestige[data-mir-studio-door=demo] .radio-input:checked+.material-label{border-color:var(--door-sand);box-shadow:0 0 0 1px var(--door-sand)}
+body.mir-prestige[data-mir-studio-door=demo] .radio-input:checked+.color-label{border-color:var(--door-sand)}
+body.mir-prestige[data-mir-studio-door=demo] .radio-input:focus-visible+label{outline:2px solid var(--door-sand);outline-offset:3px}
+body.mir-prestige[data-mir-studio-door=demo] .radio-input:checked+.zone-label .zone-dot{background:var(--door-sand);border-color:var(--door-sand)}
+body.mir-prestige[data-mir-studio-door=demo] .zone-icon{border-color:var(--door-muted)}
+body.mir-prestige[data-mir-studio-door=demo] .zone-icon:after,body.mir-prestige[data-mir-studio-door=demo] .zone-icon.gable{background:var(--door-sand)}
+body.mir-prestige[data-mir-studio-door=demo] input[type=range]{accent-color:var(--door-sand)}
+body.mir-prestige[data-mir-studio-door=demo] .export{background:var(--door-sand);border-color:var(--door-sand);color:var(--door-ink);font-size:12px}
+body.mir-prestige[data-mir-studio-door=demo] .export:hover{background:#cfbea4}
+body.mir-prestige[data-mir-studio-door=demo] .requirements{background:transparent;border:0;border-top:1px solid var(--door-line);padding:20px 0}
+body.mir-prestige[data-mir-studio-door=demo] .requirements h2{color:var(--door-paper);font-size:16px;font-weight:400}
+
+/* Public holding screen: identity only; the tools remain unavailable here. */
+html[data-mir-studio-public-state=construction] body[data-mir-studio-door=construction]{--ink:#f4f1ea;--green:#bda889;--soft:#242522;--line:#59594f;--muted:#c6c3ba;color-scheme:dark}
+html[data-mir-studio-public-state=construction] body[data-mir-studio-door] main{padding:60px 32px 80px;min-height:620px}
+html[data-mir-studio-public-state=construction] body[data-mir-studio-door] :is(h1,.eyebrow){color:var(--door-paper)}
+html[data-mir-studio-public-state=construction] body[data-mir-studio-door] .soon{color:var(--door-sand)}
+html[data-mir-studio-public-state=construction] body[data-mir-studio-door] .description{color:var(--door-muted)}
+html[data-mir-studio-public-state=construction] body[data-mir-studio-door] .action.primary{background:var(--door-sand);color:var(--door-ink);border-color:var(--door-sand)}
+html[data-mir-studio-public-state=construction] body[data-mir-studio-door] .action.secondary{background:transparent;color:var(--door-paper);border-color:#8f8b7e}
+html[data-mir-studio-public-state=construction] body[data-mir-studio-door] .art ellipse{fill:#393a32}
+html[data-mir-studio-public-state=construction] body[data-mir-studio-door] .art path[stroke="#9cad9b"]{stroke:#c6c3ba}
+html[data-mir-studio-public-state=construction] body[data-mir-studio-door] .art path[stroke="#477d34"]{stroke:#bda889}
+html[data-mir-studio-public-state=construction] body[data-mir-studio-door] .art g[fill="#e7eee2"]{fill:#ded4c3;stroke:#bda889}
+html[data-mir-studio-public-state=construction] body[data-mir-studio-door] .art path[fill="#27392b"]{fill:#f4f1ea}
+html[data-mir-studio-public-state=construction] body[data-mir-studio-door] .art path[stroke="#27392b"]{stroke:#f4f1ea}
+html[data-mir-studio-public-state=construction] body[data-mir-studio-door] .mir-studio-door-footer{margin:0 clamp(22px,5vw,72px);padding:20px 0;text-align:left}
+@media(max-width:1000px){body.mir-prestige[data-mir-studio-door=demo] main{padding:30px 24px}}
+@media(max-width:600px){
+ body.mir-prestige[data-mir-studio-door=demo] main{padding:28px 18px 20px}
+ body.mir-prestige[data-mir-studio-door=demo]>.mir-studio-demo-notice{padding:12px 18px!important;font-size:12px!important}
+ body.mir-prestige[data-mir-studio-door=demo] :is(.rotate-arrow,.preset,.actions button){min-height:44px}
+ body[data-mir-studio-door] .mir-studio-door-footer{gap:14px;font-size:11px}
+ html[data-mir-studio-public-state=construction] body[data-mir-studio-door] main{padding:30px 22px 45px;min-height:0}
+ html[data-mir-studio-public-state=construction] body[data-mir-studio-door] .mir-studio-door-footer{display:grid;grid-template-columns:100px minmax(0,1fr)}
+ html[data-mir-studio-public-state=construction] body[data-mir-studio-door] .mir-studio-door-footer img{width:100px}
+}

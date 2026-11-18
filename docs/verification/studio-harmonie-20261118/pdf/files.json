@@ -1,0 +1,90 @@
+{
+  "generatedAt": "2026-11-18T14:03:44.641Z",
+  "files": [
+    {
+      "file": "before/export-faces.json",
+      "bytes": 86354,
+      "sha256": "0cdff72a5fc36d93de04590293d408c817d99bb06101798a5914654ab8afa2a9"
+    },
+    {
+      "file": "before/page-01.png",
+      "bytes": 578739,
+      "sha256": "9f8a577d70e4cab0e6e515d6721954bbe7cf11b446f2be2509838b710f762a7b"
+    },
+    {
+      "file": "before/result.json",
+      "bytes": 495,
+      "sha256": "c6d0faa3bb7ea7aa58d7c3f2ed52504968bdf498eaf842b0d905eee63f001871"
+    },
+    {
+      "file": "before/studio-before-fr.pdf",
+      "bytes": 2464619,
+      "sha256": "714981b6682b9441f49041ce5e370269809622a1d9798f9b9633794e84af49aa"
+    },
+    {
+      "file": "after/layout-detailed-fr.json",
+      "bytes": 86291,
+      "sha256": "8316f09b223079a1466edf4b0bcba21a5339454b34c1cd917fb3d8c1d7f79b88"
+    },
+    {
+      "file": "after/layout-simple-en.json",
+      "bytes": 15326,
+      "sha256": "334a24a095e88dac1fa2ba2d06c4b1babc58ba356b15bb90d09c8f4f30341f83"
+    },
+    {
+      "file": "after/layout-simple-fr.json",
+      "bytes": 15328,
+      "sha256": "2385dd8ee6f86524c9de554a0da00218c1f501d327208bdff0d7ecde9dce9a70"
+    },
+    {
+      "file": "after/page-detailed-fr-06.png",
+      "bytes": 479214,
+      "sha256": "99ba83c34b487f8bacdd9090a979aec05bff400be3ee79ef41d4e56e3f7b1318"
+    },
+    {
+      "file": "after/page-simple-01.png",
+      "bytes": 336453,
+      "sha256": "0be50a53307a4e8394036c7ea943cf6fe81c652b6286e9c2764aaca23a220d95"
+    },
+    {
+      "file": "after/page-simple-04.png",
+      "bytes": 167143,
+      "sha256": "30f7a2ce524f96282831f4e6145e8d2e6a20d8fde067c8cda4d02e12229b542d"
+    },
+    {
+      "file": "after/page-simple-en-01.png",
+      "bytes": 335668,
+      "sha256": "6f94182f6d8b863906e36d41546840b93e811d9e6434853b2b01c37d5184d7e0"
+    },
+    {
+      "file": "after/result-detailed-fr.json",
+      "bytes": 446,
+      "sha256": "0e9161aab3650d85363e95f1deb9ac937b4edb9d7ba1543d520e10ed08476175"
+    },
+    {
+      "file": "after/result-simple-en.json",
+      "bytes": 383,
+      "sha256": "79199271018771998e47fac57298ba0df3c65d997fcc6f550fa560c7478b12b3"
+    },
+    {
+      "file": "after/result-simple-fr.json",
+      "bytes": 377,
+      "sha256": "98d030c962c70642fb31d032779c7b175165bd4e367fb49eb6aea6f6de42bf26"
+    },
+    {
+      "file": "after/studio-detailed-fr.pdf",
+      "bytes": 3217665,
+      "sha256": "ec026e2dab9edc4c8ae26952cd37d3168547e44104fe7a42814077854c174ac4"
+    },
+    {
+      "file": "after/studio-simple-en.pdf",
+      "bytes": 1323827,
+      "sha256": "f21ac0c756698c956284fa99b8b327b3b855c1790d591b466ea6b9ca6faf9971"
+    },
+    {
+      "file": "after/studio-simple-fr.pdf",
+      "bytes": 1332030,
+      "sha256": "7504bef2cf37f5ed77beaaf9d183c4109eba7d017f1682528c0f92e47a9e4670"
+    }
+  ]
+}

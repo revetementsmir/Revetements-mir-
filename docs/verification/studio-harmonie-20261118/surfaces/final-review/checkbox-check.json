@@ -1,0 +1,46 @@
+[
+  {
+    "width": 1440,
+    "height": 900,
+    "lang": "fr-CA",
+    "text": "Inclure les cotes et détails techniques",
+    "checked": true,
+    "focused": true,
+    "outline": "rgb(189, 168, 137) solid 2px",
+    "rect": {
+      "x": 923.53125,
+      "y": 744.390625,
+      "w": 260.140625,
+      "h": 38.1875
+    },
+    "inputRect": {
+      "w": 18,
+      "h": 18
+    },
+    "scrollWidth": 1440,
+    "stateUnchanged": true,
+    "errors": []
+  },
+  {
+    "width": 390,
+    "height": 844,
+    "lang": "en-CA",
+    "text": "Include dimensions and technical details",
+    "checked": true,
+    "focused": true,
+    "outline": "rgb(189, 168, 137) solid 2px",
+    "rect": {
+      "x": 23,
+      "y": 577.875,
+      "w": 276.9375,
+      "h": 38.1875
+    },
+    "inputRect": {
+      "w": 18,
+      "h": 18
+    },
+    "scrollWidth": 390,
+    "stateUnchanged": true,
+    "errors": []
+  }
+]

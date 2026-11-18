@@ -1,0 +1,294 @@
+{
+  "type": "browser-capture-gallery",
+  "baseline": "e0cd92d9e6dd01b3f6697dd7de972df95839c8e1",
+  "captures": [
+    {
+      "file": "docs/verification/studio-harmonie-20261118/secondary/before/studio-1440-fr-CA.png",
+      "title": "Démonstration matières",
+      "page": "studio.html",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "language": "fr-CA",
+      "simulated": false,
+      "phase": "before"
+    },
+    {
+      "file": "docs/verification/studio-harmonie-20261118/secondary/before/studio-1440-en-CA.png",
+      "title": "Démonstration matières",
+      "page": "studio.html",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "language": "en-CA",
+      "simulated": false,
+      "phase": "before"
+    },
+    {
+      "file": "docs/verification/studio-harmonie-20261118/secondary/before/studio-public-1440-fr-CA.png",
+      "title": "Studio public — En construction",
+      "page": "studio-public.html",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "language": "fr-CA",
+      "simulated": false,
+      "phase": "before"
+    },
+    {
+      "file": "docs/verification/studio-harmonie-20261118/secondary/before/studio-public-1440-en-CA.png",
+      "title": "Studio public — En construction",
+      "page": "studio-public.html",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "language": "en-CA",
+      "simulated": false,
+      "phase": "before"
+    },
+    {
+      "file": "docs/verification/studio-harmonie-20261118/secondary/before/studio-834-fr-CA.png",
+      "title": "Démonstration matières",
+      "page": "studio.html",
+      "viewport": {
+        "width": 834,
+        "height": 1194
+      },
+      "language": "fr-CA",
+      "simulated": false,
+      "phase": "before"
+    },
+    {
+      "file": "docs/verification/studio-harmonie-20261118/secondary/before/studio-834-en-CA.png",
+      "title": "Démonstration matières",
+      "page": "studio.html",
+      "viewport": {
+        "width": 834,
+        "height": 1194
+      },
+      "language": "en-CA",
+      "simulated": false,
+      "phase": "before"
+    },
+    {
+      "file": "docs/verification/studio-harmonie-20261118/secondary/before/studio-public-834-fr-CA.png",
+      "title": "Studio public — En construction",
+      "page": "studio-public.html",
+      "viewport": {
+        "width": 834,
+        "height": 1194
+      },
+      "language": "fr-CA",
+      "simulated": false,
+      "phase": "before"
+    },
+    {
+      "file": "docs/verification/studio-harmonie-20261118/secondary/before/studio-public-834-en-CA.png",
+      "title": "Studio public — En construction",
+      "page": "studio-public.html",
+      "viewport": {
+        "width": 834,
+        "height": 1194
+      },
+      "language": "en-CA",
+      "simulated": false,
+      "phase": "before"
+    },
+    {
+      "file": "docs/verification/studio-harmonie-20261118/secondary/before/studio-390-fr-CA.png",
+      "title": "Démonstration matières",
+      "page": "studio.html",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "language": "fr-CA",
+      "simulated": false,
+      "phase": "before"
+    },
+    {
+      "file": "docs/verification/studio-harmonie-20261118/secondary/before/studio-390-en-CA.png",
+      "title": "Démonstration matières",
+      "page": "studio.html",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "language": "en-CA",
+      "simulated": false,
+      "phase": "before"
+    },
+    {
+      "file": "docs/verification/studio-harmonie-20261118/secondary/before/studio-public-390-fr-CA.png",
+      "title": "Studio public — En construction",
+      "page": "studio-public.html",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "language": "fr-CA",
+      "simulated": false,
+      "phase": "before"
+    },
+    {
+      "file": "docs/verification/studio-harmonie-20261118/secondary/before/studio-public-390-en-CA.png",
+      "title": "Studio public — En construction",
+      "page": "studio-public.html",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "language": "en-CA",
+      "simulated": false,
+      "phase": "before"
+    },
+    {
+      "file": "docs/verification/studio-harmonie-20261118/secondary/after/studio-1440-fr-CA.png",
+      "title": "Démonstration matières",
+      "page": "studio.html",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "language": "fr-CA",
+      "simulated": false,
+      "phase": "after"
+    },
+    {
+      "file": "docs/verification/studio-harmonie-20261118/secondary/after/studio-1440-en-CA.png",
+      "title": "Démonstration matières",
+      "page": "studio.html",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "language": "en-CA",
+      "simulated": false,
+      "phase": "after"
+    },
+    {
+      "file": "docs/verification/studio-harmonie-20261118/secondary/after/studio-public-1440-fr-CA.png",
+      "title": "Studio public — En construction",
+      "page": "studio-public.html",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "language": "fr-CA",
+      "simulated": false,
+      "phase": "after"
+    },
+    {
+      "file": "docs/verification/studio-harmonie-20261118/secondary/after/studio-public-1440-en-CA.png",
+      "title": "Studio public — En construction",
+      "page": "studio-public.html",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "language": "en-CA",
+      "simulated": false,
+      "phase": "after"
+    },
+    {
+      "file": "docs/verification/studio-harmonie-20261118/secondary/after/studio-834-fr-CA.png",
+      "title": "Démonstration matières",
+      "page": "studio.html",
+      "viewport": {
+        "width": 834,
+        "height": 1194
+      },
+      "language": "fr-CA",
+      "simulated": false,
+      "phase": "after"
+    },
+    {
+      "file": "docs/verification/studio-harmonie-20261118/secondary/after/studio-834-en-CA.png",
+      "title": "Démonstration matières",
+      "page": "studio.html",
+      "viewport": {
+        "width": 834,
+        "height": 1194
+      },
+      "language": "en-CA",
+      "simulated": false,
+      "phase": "after"
+    },
+    {
+      "file": "docs/verification/studio-harmonie-20261118/secondary/after/studio-public-834-fr-CA.png",
+      "title": "Studio public — En construction",
+      "page": "studio-public.html",
+      "viewport": {
+        "width": 834,
+        "height": 1194
+      },
+      "language": "fr-CA",
+      "simulated": false,
+      "phase": "after"
+    },
+    {
+      "file": "docs/verification/studio-harmonie-20261118/secondary/after/studio-public-834-en-CA.png",
+      "title": "Studio public — En construction",
+      "page": "studio-public.html",
+      "viewport": {
+        "width": 834,
+        "height": 1194
+      },
+      "language": "en-CA",
+      "simulated": false,
+      "phase": "after"
+    },
+    {
+      "file": "docs/verification/studio-harmonie-20261118/secondary/after/studio-390-fr-CA.png",
+      "title": "Démonstration matières",
+      "page": "studio.html",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "language": "fr-CA",
+      "simulated": false,
+      "phase": "after"
+    },
+    {
+      "file": "docs/verification/studio-harmonie-20261118/secondary/after/studio-390-en-CA.png",
+      "title": "Démonstration matières",
+      "page": "studio.html",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "language": "en-CA",
+      "simulated": false,
+      "phase": "after"
+    },
+    {
+      "file": "docs/verification/studio-harmonie-20261118/secondary/after/studio-public-390-fr-CA.png",
+      "title": "Studio public — En construction",
+      "page": "studio-public.html",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "language": "fr-CA",
+      "simulated": false,
+      "phase": "after"
+    },
+    {
+      "file": "docs/verification/studio-harmonie-20261118/secondary/after/studio-public-390-en-CA.png",
+      "title": "Studio public — En construction",
+      "page": "studio-public.html",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "language": "en-CA",
+      "simulated": false,
+      "phase": "after"
+    }
+  ]
+}

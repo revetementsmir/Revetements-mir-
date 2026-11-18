@@ -1,7 +1,7 @@
-name: MIR — Studio 03 TEST
+name: MIR — Studio et PDF TEST
 on:
   push:
-    branches: [codex/studio-03-matieres-bas-20261118]
+    branches: [codex/studio-03-matieres-bas-20261118, codex/studio-harmonie-pdf-20261118]
   workflow_dispatch:
 permissions:
   contents: read
@@ -44,5 +44,53 @@ jobs:
         with:
           name: mir-studio03-proof-${{ github.sha }}
           path: /tmp/mir-studio03-proof/
+          retention-days: 14
+          if-no-files-found: error
+
+  harmony:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      MIR_CHROMIUM_BIN: /usr/bin/google-chrome
+      MIR_STUDIO_HARMONY_OUT: /tmp/mir-studio-harmony-proof
+      MIR_STUDIO_SECONDARY_OUT: /tmp/mir-studio-secondary-proof
+      MIR_STUDIO_I18N_OUT: /tmp/mir-studio-i18n-proof
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install isolated browser tools
+        run: npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund playwright@1.58.2 pngjs@7
+      - name: PDF routing guards and preservation of legacy exports
+        run: |
+          node tests/mir-studio-pdf-contract.cjs
+          node tests/mir-studio-harmonie-pdf.cjs
+      - name: Localized dialogs, source names and field preservation
+        run: node tests/mir-studio-dialog-i18n.cjs
+      - name: Capture Studio windows before and after
+        run: |
+          MIR_STUDIO_HARMONY_PHASE=before node tests/mir-studio-harmonie-browser.cjs
+          MIR_STUDIO_HARMONY_PHASE=after node tests/mir-studio-harmonie-browser.cjs
+      - name: Secondary client entrances, French and English
+        run: |
+          MIR_STUDIO_SECONDARY_PHASE=before node tests/mir-studio-secondary-browser.cjs
+          MIR_STUDIO_SECONDARY_PHASE=after node tests/mir-studio-secondary-browser.cjs
+      - name: Build and verify read-only TEST surfaces
+        run: |
+          node scripts/build-prestige-preview.cjs
+          MIR_STUDIO_HARMONY_PHASE=preview node tests/mir-studio-harmonie-browser.cjs
+      - name: Save actual browser and PDF evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mir-studio-harmony-proof-${{ github.sha }}
+          path: |
+            /tmp/mir-studio-harmony-proof/
+            /tmp/mir-studio-secondary-proof/
+            /tmp/mir-studio-i18n-proof/
           retention-days: 14
           if-no-files-found: error

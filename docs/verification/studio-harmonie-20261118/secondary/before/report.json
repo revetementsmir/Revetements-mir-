@@ -1,0 +1,214 @@
+{
+  "phase": "before",
+  "baseline": "e0cd92d9e6dd01b3f6697dd7de972df95839c8e1",
+  "checks": [
+    {
+      "route": "studio.html",
+      "width": 1440,
+      "lang": "fr-CA",
+      "status": "PASS"
+    },
+    {
+      "route": "studio.html",
+      "width": 1440,
+      "lang": "en-CA",
+      "status": "PASS"
+    },
+    {
+      "route": "studio-public.html",
+      "width": 1440,
+      "lang": "fr-CA",
+      "status": "PASS"
+    },
+    {
+      "route": "studio-public.html",
+      "width": 1440,
+      "lang": "en-CA",
+      "status": "PASS"
+    },
+    {
+      "route": "studio.html",
+      "width": 834,
+      "lang": "fr-CA",
+      "status": "PASS"
+    },
+    {
+      "route": "studio.html",
+      "width": 834,
+      "lang": "en-CA",
+      "status": "PASS"
+    },
+    {
+      "route": "studio-public.html",
+      "width": 834,
+      "lang": "fr-CA",
+      "status": "PASS"
+    },
+    {
+      "route": "studio-public.html",
+      "width": 834,
+      "lang": "en-CA",
+      "status": "PASS"
+    },
+    {
+      "route": "studio.html",
+      "width": 390,
+      "lang": "fr-CA",
+      "status": "PASS"
+    },
+    {
+      "route": "studio.html",
+      "width": 390,
+      "lang": "en-CA",
+      "status": "PASS"
+    },
+    {
+      "route": "studio-public.html",
+      "width": 390,
+      "lang": "fr-CA",
+      "status": "PASS"
+    },
+    {
+      "route": "studio-public.html",
+      "width": 390,
+      "lang": "en-CA",
+      "status": "PASS"
+    }
+  ],
+  "captures": [
+    {
+      "file": "docs/verification/studio-harmonie-20261118/secondary/before/studio-1440-fr-CA.png",
+      "title": "Démonstration matières",
+      "page": "studio.html",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "language": "fr-CA",
+      "simulated": false
+    },
+    {
+      "file": "docs/verification/studio-harmonie-20261118/secondary/before/studio-1440-en-CA.png",
+      "title": "Démonstration matières",
+      "page": "studio.html",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "language": "en-CA",
+      "simulated": false
+    },
+    {
+      "file": "docs/verification/studio-harmonie-20261118/secondary/before/studio-public-1440-fr-CA.png",
+      "title": "Studio public — En construction",
+      "page": "studio-public.html",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "language": "fr-CA",
+      "simulated": false
+    },
+    {
+      "file": "docs/verification/studio-harmonie-20261118/secondary/before/studio-public-1440-en-CA.png",
+      "title": "Studio public — En construction",
+      "page": "studio-public.html",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "language": "en-CA",
+      "simulated": false
+    },
+    {
+      "file": "docs/verification/studio-harmonie-20261118/secondary/before/studio-834-fr-CA.png",
+      "title": "Démonstration matières",
+      "page": "studio.html",
+      "viewport": {
+        "width": 834,
+        "height": 1194
+      },
+      "language": "fr-CA",
+      "simulated": false
+    },
+    {
+      "file": "docs/verification/studio-harmonie-20261118/secondary/before/studio-834-en-CA.png",
+      "title": "Démonstration matières",
+      "page": "studio.html",
+      "viewport": {
+        "width": 834,
+        "height": 1194
+      },
+      "language": "en-CA",
+      "simulated": false
+    },
+    {
+      "file": "docs/verification/studio-harmonie-20261118/secondary/before/studio-public-834-fr-CA.png",
+      "title": "Studio public — En construction",
+      "page": "studio-public.html",
+      "viewport": {
+        "width": 834,
+        "height": 1194
+      },
+      "language": "fr-CA",
+      "simulated": false
+    },
+    {
+      "file": "docs/verification/studio-harmonie-20261118/secondary/before/studio-public-834-en-CA.png",
+      "title": "Studio public — En construction",
+      "page": "studio-public.html",
+      "viewport": {
+        "width": 834,
+        "height": 1194
+      },
+      "language": "en-CA",
+      "simulated": false
+    },
+    {
+      "file": "docs/verification/studio-harmonie-20261118/secondary/before/studio-390-fr-CA.png",
+      "title": "Démonstration matières",
+      "page": "studio.html",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "language": "fr-CA",
+      "simulated": false
+    },
+    {
+      "file": "docs/verification/studio-harmonie-20261118/secondary/before/studio-390-en-CA.png",
+      "title": "Démonstration matières",
+      "page": "studio.html",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "language": "en-CA",
+      "simulated": false
+    },
+    {
+      "file": "docs/verification/studio-harmonie-20261118/secondary/before/studio-public-390-fr-CA.png",
+      "title": "Studio public — En construction",
+      "page": "studio-public.html",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "language": "fr-CA",
+      "simulated": false
+    },
+    {
+      "file": "docs/verification/studio-harmonie-20261118/secondary/before/studio-public-390-en-CA.png",
+      "title": "Studio public — En construction",
+      "page": "studio-public.html",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "language": "en-CA",
+      "simulated": false
+    }
+  ],
+  "blocked": [],
+  "errors": []
+}

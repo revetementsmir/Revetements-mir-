@@ -1,0 +1,18 @@
+{
+  "errors": [],
+  "name": "MIR_Etude_annotee_4_elevations.pdf",
+  "pages": 8,
+  "kinds": [
+    "presentation",
+    "presentation",
+    "presentation",
+    "presentation",
+    "annotated",
+    "technical",
+    "technical",
+    "technical"
+  ],
+  "sourceRows": 52,
+  "stateBeforeSha256": "c355e4a272eb062b66a2fd1c86161cdc1b0d5c198f8848cc25604aee912ae044",
+  "stateAfterSha256": "c355e4a272eb062b66a2fd1c86161cdc1b0d5c198f8848cc25604aee912ae044"
+}

@@ -1,0 +1,2919 @@
+{
+  "renderer": "studio-client-1",
+  "locale": "fr-CA",
+  "paper": "A3 landscape",
+  "includeTechnical": true,
+  "sourceTitle": "MIR · étude des quatre élévations",
+  "sourceSubtitle": "Choix fabricants, calepinage et estimations à calibrer — sans valeur de construction",
+  "sourceFaces": [
+    {
+      "key": "front",
+      "name": "Avant",
+      "summary": [
+        "Élévation Avant · estimation sur tracé d’étude, à valider avant commande.",
+        "Surface nette de façade : 614,8 pi². Retours 3D traités séparément dans les métrés.",
+        "Ouvertures : 8. Dimensions de pièces arrondies au 1/16 po ; échelle uniforme à confirmer.",
+        "Images de nuanciers officiels si disponibles ; textures illustratives, échantillons physiques à valider.",
+        "Pignon gauche : James Hardie · HardiePanel Lisse · Blanc arctique · 117,4 pi².",
+        "  pignon_gauche:cell-1-1 : 23 po × 9 3/4 po · coupe spéciale à valider",
+        "  pignon_gauche:cell-2-1 : 117 7/8 po × 48 po · coupe spéciale à valider",
+        "  pignon_gauche:cell-2-2 : 17 15/16 po × 15 11/16 po · coupe spéciale à valider",
+        "  pignon_gauche:cell-3-1 : 120 po × 48 po · coupe spéciale à valider",
+        "  pignon_gauche:cell-3-2 : 20 1/8 po × 48 po · coupe spéciale à valider",
+        "  pignon_gauche:cell-4-1 : 120 po × 48 po · coupe spéciale à valider",
+        "  pignon_gauche:cell-4-2 : 20 5/16 po × 48 po · coupe spéciale à valider",
+        "  pignon_gauche:cell-5-1 : 120 po × 48 po · coupe spéciale à valider",
+        "  pignon_gauche:cell-5-2 : 20 1/2 po × 48 po · coupe spéciale à valider",
+        "  pignon_gauche:cell-6-1 : 120 po × 48 po · coupe spéciale à valider",
+        "  pignon_gauche:cell-6-2 : 20 11/16 po × 48 po · coupe spéciale à valider",
+        "Pignon droit : James Hardie · HardiePanel Lisse · Blanc arctique · 121,3 pi².",
+        "  pignon_droit:cell-1-1 : 23 5/8 po × 9 3/4 po · coupe spéciale à valider",
+        "  pignon_droit:cell-2-1 : 117 7/8 po × 48 po · coupe spéciale à valider",
+        "  pignon_droit:cell-2-2 : 21 13/16 po × 18 po · coupe spéciale à valider",
+        "  pignon_droit:cell-3-1 : 120 po × 48 po · coupe spéciale à valider",
+        "  pignon_droit:cell-3-2 : 23 po × 48 po · coupe spéciale à valider",
+        "  pignon_droit:cell-4-1 : 120 po × 48 po · coupe spéciale à valider",
+        "  pignon_droit:cell-4-2 : 23 po × 48 po",
+        "  pignon_droit:cell-5-1 : 120 po × 48 po · coupe spéciale à valider",
+        "  pignon_droit:cell-5-2 : 23 po × 48 po",
+        "  pignon_droit:cell-6-1 : 120 po × 48 po · coupe spéciale à valider",
+        "  pignon_droit:cell-6-2 : 23 po × 48 po",
+        "Accent gauche : MAC Métal architectural · Norwood · Bouleau Fumé · 26,7 pi².",
+        "Accent droit : MAC Métal architectural · Norwood · Bouleau Fumé · 27,9 pi².",
+        "Centre · étage : CanExel · Ridgewood D-5 · Charbon · 99,6 pi².",
+        "Centre · rez-de-chaussée : CanExel · Ridgewood D-5 · Charbon · 82,4 pi².",
+        "Cloison centrale · chant revêtu : James Hardie · HardiePanel Lisse · Blanc arctique · 7,4 pi².",
+        "  pilier:cell-1-1 : 10 13/16 po × 3 po",
+        "  pilier:cell-2-1 : 10 13/16 po × 48 po",
+        "  pilier:cell-3-1 : 10 13/16 po × 48 po",
+        "Soubassement · maçonnerie : Générique · Brique classique · Rouge argile · 132 pi²."
+      ]
+    },
+    {
+      "key": "right",
+      "name": "Droite",
+      "summary": [
+        "Élévation Droite · estimation sur tracé d’étude, à valider avant commande.",
+        "Surface nette de façade : 593,5 pi². Retours 3D traités séparément dans les métrés.",
+        "Ouvertures : 5. Dimensions de pièces arrondies au 1/16 po ; échelle uniforme à confirmer.",
+        "Images de nuanciers officiels si disponibles ; textures illustratives, échantillons physiques à valider.",
+        "Mur latéral droit : CanExel · Ridgewood D-5 · Charbon · 593,5 pi²."
+      ]
+    },
+    {
+      "key": "back",
+      "name": "Arrière",
+      "summary": [
+        "Élévation Arrière · estimation sur tracé d’étude, à valider avant commande.",
+        "Surface nette de façade : 670,7 pi². Retours 3D traités séparément dans les métrés.",
+        "Ouvertures : 8. Dimensions de pièces arrondies au 1/16 po ; échelle uniforme à confirmer.",
+        "Images de nuanciers officiels si disponibles ; textures illustratives, échantillons physiques à valider.",
+        "Façade arrière : CanExel · Ridgewood D-5 · Charbon · 670,7 pi²."
+      ]
+    },
+    {
+      "key": "left",
+      "name": "Gauche",
+      "summary": [
+        "Élévation Gauche · estimation sur tracé d’étude, à valider avant commande.",
+        "Surface nette de façade : 595,4 pi². Retours 3D traités séparément dans les métrés.",
+        "Ouvertures : 5. Dimensions de pièces arrondies au 1/16 po ; échelle uniforme à confirmer.",
+        "Images de nuanciers officiels si disponibles ; textures illustratives, échantillons physiques à valider.",
+        "Mur latéral gauche : CanExel · Ridgewood D-5 · Charbon · 595,4 pi²."
+      ]
+    }
+  ],
+  "sourceRows": [
+    {
+      "faceKey": "front",
+      "faceIndex": 0,
+      "index": 0,
+      "sourceText": "Élévation Avant · estimation sur tracé d’étude, à valider avant commande.",
+      "fragments": [
+        {
+          "page": 6,
+          "lines": [
+            "Élévation Avant · estimation sur tracé d’étude, à valider avant commande."
+          ],
+          "positions": [
+            {
+              "x": 170,
+              "y": 519,
+              "width": 1045.955322265625
+            }
+          ],
+          "continued": false
+        }
+      ]
+    },
+    {
+      "faceKey": "front",
+      "faceIndex": 0,
+      "index": 1,
+      "sourceText": "Surface nette de façade : 614,8 pi². Retours 3D traités séparément dans les métrés.",
+      "fragments": [
+        {
+          "page": 6,
+          "lines": [
+            "Surface nette de façade : 614,8 pi². Retours 3D traités séparément dans les métrés."
+          ],
+          "positions": [
+            {
+              "x": 170,
+              "y": 579,
+              "width": 1180.1043701171875
+            }
+          ],
+          "continued": false
+        }
+      ]
+    },
+    {
+      "faceKey": "front",
+      "faceIndex": 0,
+      "index": 2,
+      "sourceText": "Ouvertures : 8. Dimensions de pièces arrondies au 1/16 po ; échelle uniforme à confirmer.",
+      "fragments": [
+        {
+          "page": 6,
+          "lines": [
+            "Ouvertures : 8. Dimensions de pièces arrondies au 1/16 po ; échelle uniforme à confirmer."
+          ],
+          "positions": [
+            {
+              "x": 170,
+              "y": 639,
+              "width": 1262.26611328125
+            }
+          ],
+          "continued": false
+        }
+      ]
+    },
+    {
+      "faceKey": "front",
+      "faceIndex": 0,
+      "index": 3,
+      "sourceText": "Images de nuanciers officiels si disponibles ; textures illustratives, échantillons physiques à valider.",
+      "fragments": [
+        {
+          "page": 6,
+          "lines": [
+            "Images de nuanciers officiels si disponibles ; textures illustratives, échantillons physiques à valider."
+          ],
+          "positions": [
+            {
+              "x": 170,
+              "y": 699,
+              "width": 1400.0555419921875
+            }
+          ],
+          "continued": false
+        }
+      ]
+    },
+    {
+      "faceKey": "front",
+      "faceIndex": 0,
+      "index": 4,
+      "sourceText": "Pignon gauche : James Hardie · HardiePanel Lisse · Blanc arctique · 117,4 pi².",
+      "fragments": [
+        {
+          "page": 6,
+          "lines": [
+            "Pignon gauche : James Hardie · HardiePanel Lisse · Blanc arctique · 117,4 pi²."
+          ],
+          "positions": [
+            {
+              "x": 170,
+              "y": 759,
+              "width": 1061.85302734375
+            }
+          ],
+          "continued": false
+        }
+      ]
+    },
+    {
+      "faceKey": "front",
+      "faceIndex": 0,
+      "index": 5,
+      "sourceText": "  pignon_gauche:cell-1-1 : 23 po × 9 3/4 po · coupe spéciale à valider",
+      "fragments": [
+        {
+          "page": 6,
+          "lines": [
+            "pignon_gauche:cell-1-1 : 23 po × 9 3/4 po · coupe spéciale à valider"
+          ],
+          "positions": [
+            {
+              "x": 170,
+              "y": 819,
+              "width": 964.697021484375
+            }
+          ],
+          "continued": false
+        }
+      ]
+    },
+    {
+      "faceKey": "front",
+      "faceIndex": 0,
+      "index": 6,
+      "sourceText": "  pignon_gauche:cell-2-1 : 117 7/8 po × 48 po · coupe spéciale à valider",
+      "fragments": [
+        {
+          "page": 6,
+          "lines": [
+            "pignon_gauche:cell-2-1 : 117 7/8 po × 48 po · coupe spéciale à valider"
+          ],
+          "positions": [
+            {
+              "x": 170,
+              "y": 879,
+              "width": 989.6119384765625
+            }
+          ],
+          "continued": false
+        }
+      ]
+    },
+    {
+      "faceKey": "front",
+      "faceIndex": 0,
+      "index": 7,
+      "sourceText": "  pignon_gauche:cell-2-2 : 17 15/16 po × 15 11/16 po · coupe spéciale à valider",
+      "fragments": [
+        {
+          "page": 6,
+          "lines": [
+            "pignon_gauche:cell-2-2 : 17 15/16 po × 15 11/16 po · coupe spéciale à valider"
+          ],
+          "positions": [
+            {
+              "x": 170,
+              "y": 939,
+              "width": 1069.4058837890625
+            }
+          ],
+          "continued": false
+        }
+      ]
+    },
+    {
+      "faceKey": "front",
+      "faceIndex": 0,
+      "index": 8,
+      "sourceText": "  pignon_gauche:cell-3-1 : 120 po × 48 po · coupe spéciale à valider",
+      "fragments": [
+        {
+          "page": 6,
+          "lines": [
+            "pignon_gauche:cell-3-1 : 120 po × 48 po · coupe spéciale à valider"
+          ],
+          "positions": [
+            {
+              "x": 170,
+              "y": 999,
+              "width": 950.8699951171875
+            }
+          ],
+          "continued": false
+        }
+      ]
+    },
+    {
+      "faceKey": "front",
+      "faceIndex": 0,
+      "index": 9,
+      "sourceText": "  pignon_gauche:cell-3-2 : 20 1/8 po × 48 po · coupe spéciale à valider",
+      "fragments": [
+        {
+          "page": 6,
+          "lines": [
+            "pignon_gauche:cell-3-2 : 20 1/8 po × 48 po · coupe spéciale à valider"
+          ],
+          "positions": [
+            {
+              "x": 170,
+              "y": 1059,
+              "width": 997.9609375
+            }
+          ],
+          "continued": false
+        }
+      ]
+    },
+    {
+      "faceKey": "front",
+      "faceIndex": 0,
+      "index": 10,
+      "sourceText": "  pignon_gauche:cell-4-1 : 120 po × 48 po · coupe spéciale à valider",
+      "fragments": [
+        {
+          "page": 6,
+          "lines": [
+            "pignon_gauche:cell-4-1 : 120 po × 48 po · coupe spéciale à valider"
+          ],
+          "positions": [
+            {
+              "x": 170,
+              "y": 1119,
+              "width": 951.991943359375
+            }
+          ],
+          "continued": false
+        }
+      ]
+    },
+    {
+      "faceKey": "front",
+      "faceIndex": 0,
+      "index": 11,
+      "sourceText": "  pignon_gauche:cell-4-2 : 20 5/16 po × 48 po · coupe spéciale à valider",
+      "fragments": [
+        {
+          "page": 6,
+          "lines": [
+            "pignon_gauche:cell-4-2 : 20 5/16 po × 48 po · coupe spéciale à valider"
+          ],
+          "positions": [
+            {
+              "x": 170,
+              "y": 1179,
+              "width": 1018.7509765625
+            }
+          ],
+          "continued": false
+        }
+      ]
+    },
+    {
+      "faceKey": "front",
+      "faceIndex": 0,
+      "index": 12,
+      "sourceText": "  pignon_gauche:cell-5-1 : 120 po × 48 po · coupe spéciale à valider",
+      "fragments": [
+        {
+          "page": 6,
+          "lines": [
+            "pignon_gauche:cell-5-1 : 120 po × 48 po · coupe spéciale à valider"
+          ],
+          "positions": [
+            {
+              "x": 170,
+              "y": 1239,
+              "width": 951.134033203125
+            }
+          ],
+          "continued": false
+        }
+      ]
+    },
+    {
+      "faceKey": "front",
+      "faceIndex": 0,
+      "index": 13,
+      "sourceText": "  pignon_gauche:cell-5-2 : 20 1/2 po × 48 po · coupe spéciale à valider",
+      "fragments": [
+        {
+          "page": 6,
+          "lines": [
+            "pignon_gauche:cell-5-2 : 20 1/2 po × 48 po · coupe spéciale à valider"
+          ],
+          "positions": [
+            {
+              "x": 170,
+              "y": 1299,
+              "width": 997.9940185546875
+            }
+          ],
+          "continued": false
+        }
+      ]
+    },
+    {
+      "faceKey": "front",
+      "faceIndex": 0,
+      "index": 14,
+      "sourceText": "  pignon_gauche:cell-6-1 : 120 po × 48 po · coupe spéciale à valider",
+      "fragments": [
+        {
+          "page": 6,
+          "lines": [
+            "pignon_gauche:cell-6-1 : 120 po × 48 po · coupe spéciale à valider"
+          ],
+          "positions": [
+            {
+              "x": 170,
+              "y": 1359,
+              "width": 952.0250244140625
+            }
+          ],
+          "continued": false
+        }
+      ]
+    },
+    {
+      "faceKey": "front",
+      "faceIndex": 0,
+      "index": 15,
+      "sourceText": "  pignon_gauche:cell-6-2 : 20 11/16 po × 48 po · coupe spéciale à valider",
+      "fragments": [
+        {
+          "page": 6,
+          "lines": [
+            "pignon_gauche:cell-6-2 : 20 11/16 po × 48 po · coupe spéciale à valider"
+          ],
+          "positions": [
+            {
+              "x": 170,
+              "y": 1419,
+              "width": 1019.179931640625
+            }
+          ],
+          "continued": false
+        }
+      ]
+    },
+    {
+      "faceKey": "front",
+      "faceIndex": 0,
+      "index": 16,
+      "sourceText": "Pignon droit : James Hardie · HardiePanel Lisse · Blanc arctique · 121,3 pi².",
+      "fragments": [
+        {
+          "page": 6,
+          "lines": [
+            "Pignon droit : James Hardie · HardiePanel Lisse · Blanc arctique · 121,3 pi²."
+          ],
+          "positions": [
+            {
+              "x": 170,
+              "y": 1479,
+              "width": 1022.228271484375
+            }
+          ],
+          "continued": false
+        }
+      ]
+    },
+    {
+      "faceKey": "front",
+      "faceIndex": 0,
+      "index": 17,
+      "sourceText": "  pignon_droit:cell-1-1 : 23 5/8 po × 9 3/4 po · coupe spéciale à valider",
+      "fragments": [
+        {
+          "page": 6,
+          "lines": [
+            "pignon_droit:cell-1-1 : 23 5/8 po × 9 3/4 po · coupe spéciale à valider"
+          ],
+          "positions": [
+            {
+              "x": 170,
+              "y": 1539,
+              "width": 981.4403076171875
+            }
+          ],
+          "continued": false
+        }
+      ]
+    },
+    {
+      "faceKey": "front",
+      "faceIndex": 0,
+      "index": 18,
+      "sourceText": "  pignon_droit:cell-2-1 : 117 7/8 po × 48 po · coupe spéciale à valider",
+      "fragments": [
+        {
+          "page": 6,
+          "lines": [
+            "pignon_droit:cell-2-1 : 117 7/8 po × 48 po · coupe spéciale à valider"
+          ],
+          "positions": [
+            {
+              "x": 170,
+              "y": 1599,
+              "width": 949.9913330078125
+            }
+          ],
+          "continued": false
+        }
+      ]
+    },
+    {
+      "faceKey": "front",
+      "faceIndex": 0,
+      "index": 19,
+      "sourceText": "  pignon_droit:cell-2-2 : 21 13/16 po × 18 po · coupe spéciale à valider",
+      "fragments": [
+        {
+          "page": 6,
+          "lines": [
+            "pignon_droit:cell-2-2 : 21 13/16 po × 18 po · coupe spéciale à valider"
+          ],
+          "positions": [
+            {
+              "x": 170,
+              "y": 1659,
+              "width": 961.904296875
+            }
+          ],
+          "continued": false
+        }
+      ]
+    },
+    {
+      "faceKey": "front",
+      "faceIndex": 0,
+      "index": 20,
+      "sourceText": "  pignon_droit:cell-3-1 : 120 po × 48 po · coupe spéciale à valider",
+      "fragments": [
+        {
+          "page": 6,
+          "lines": [
+            "pignon_droit:cell-3-1 : 120 po × 48 po · coupe spéciale à valider"
+          ],
+          "positions": [
+            {
+              "x": 170,
+              "y": 1719,
+              "width": 911.2493896484375
+            }
+          ],
+          "continued": false
+        }
+      ]
+    },
+    {
+      "faceKey": "front",
+      "faceIndex": 0,
+      "index": 21,
+      "sourceText": "  pignon_droit:cell-3-2 : 23 po × 48 po · coupe spéciale à valider",
+      "fragments": [
+        {
+          "page": 6,
+          "lines": [
+            "pignon_droit:cell-3-2 : 23 po × 48 po · coupe spéciale à valider"
+          ],
+          "positions": [
+            {
+              "x": 170,
+              "y": 1779,
+              "width": 907.223388671875
+            }
+          ],
+          "continued": false
+        }
+      ]
+    },
+    {
+      "faceKey": "front",
+      "faceIndex": 0,
+      "index": 22,
+      "sourceText": "  pignon_droit:cell-4-1 : 120 po × 48 po · coupe spéciale à valider",
+      "fragments": [
+        {
+          "page": 6,
+          "lines": [
+            "pignon_droit:cell-4-1 : 120 po × 48 po · coupe spéciale à valider"
+          ],
+          "positions": [
+            {
+              "x": 170,
+              "y": 1839,
+              "width": 912.371337890625
+            }
+          ],
+          "continued": false
+        }
+      ]
+    },
+    {
+      "faceKey": "front",
+      "faceIndex": 0,
+      "index": 23,
+      "sourceText": "  pignon_droit:cell-4-2 : 23 po × 48 po",
+      "fragments": [
+        {
+          "page": 7,
+          "lines": [
+            "pignon_droit:cell-4-2 : 23 po × 48 po"
+          ],
+          "positions": [
+            {
+              "x": 170,
+              "y": 519,
+              "width": 539.83251953125
+            }
+          ],
+          "continued": false
+        }
+      ]
+    },
+    {
+      "faceKey": "front",
+      "faceIndex": 0,
+      "index": 24,
+      "sourceText": "  pignon_droit:cell-5-1 : 120 po × 48 po · coupe spéciale à valider",
+      "fragments": [
+        {
+          "page": 7,
+          "lines": [
+            "pignon_droit:cell-5-1 : 120 po × 48 po · coupe spéciale à valider"
+          ],
+          "positions": [
+            {
+              "x": 170,
+              "y": 579,
+              "width": 911.513427734375
+            }
+          ],
+          "continued": false
+        }
+      ]
+    },
+    {
+      "faceKey": "front",
+      "faceIndex": 0,
+      "index": 25,
+      "sourceText": "  pignon_droit:cell-5-2 : 23 po × 48 po",
+      "fragments": [
+        {
+          "page": 7,
+          "lines": [
+            "pignon_droit:cell-5-2 : 23 po × 48 po"
+          ],
+          "positions": [
+            {
+              "x": 170,
+              "y": 639,
+              "width": 538.9744873046875
+            }
+          ],
+          "continued": false
+        }
+      ]
+    },
+    {
+      "faceKey": "front",
+      "faceIndex": 0,
+      "index": 26,
+      "sourceText": "  pignon_droit:cell-6-1 : 120 po × 48 po · coupe spéciale à valider",
+      "fragments": [
+        {
+          "page": 7,
+          "lines": [
+            "pignon_droit:cell-6-1 : 120 po × 48 po · coupe spéciale à valider"
+          ],
+          "positions": [
+            {
+              "x": 170,
+              "y": 699,
+              "width": 912.4044189453125
+            }
+          ],
+          "continued": false
+        }
+      ]
+    },
+    {
+      "faceKey": "front",
+      "faceIndex": 0,
+      "index": 27,
+      "sourceText": "  pignon_droit:cell-6-2 : 23 po × 48 po",
+      "fragments": [
+        {
+          "page": 7,
+          "lines": [
+            "pignon_droit:cell-6-2 : 23 po × 48 po"
+          ],
+          "positions": [
+            {
+              "x": 170,
+              "y": 759,
+              "width": 539.865478515625
+            }
+          ],
+          "continued": false
+        }
+      ]
+    },
+    {
+      "faceKey": "front",
+      "faceIndex": 0,
+      "index": 28,
+      "sourceText": "Accent gauche : MAC Métal architectural · Norwood · Bouleau Fumé · 26,7 pi².",
+      "fragments": [
+        {
+          "page": 7,
+          "lines": [
+            "Accent gauche : MAC Métal architectural · Norwood · Bouleau Fumé · 26,7 pi²."
+          ],
+          "positions": [
+            {
+              "x": 170,
+              "y": 819,
+              "width": 1097.4744873046875
+            }
+          ],
+          "continued": false
+        }
+      ]
+    },
+    {
+      "faceKey": "front",
+      "faceIndex": 0,
+      "index": 29,
+      "sourceText": "Accent droit : MAC Métal architectural · Norwood · Bouleau Fumé · 27,9 pi².",
+      "fragments": [
+        {
+          "page": 7,
+          "lines": [
+            "Accent droit : MAC Métal architectural · Norwood · Bouleau Fumé · 27,9 pi²."
+          ],
+          "positions": [
+            {
+              "x": 170,
+              "y": 879,
+              "width": 1056.886474609375
+            }
+          ],
+          "continued": false
+        }
+      ]
+    },
+    {
+      "faceKey": "front",
+      "faceIndex": 0,
+      "index": 30,
+      "sourceText": "Centre · étage : CanExel · Ridgewood D-5 · Charbon · 99,6 pi².",
+      "fragments": [
+        {
+          "page": 7,
+          "lines": [
+            "Centre · étage : CanExel · Ridgewood D-5 · Charbon · 99,6 pi²."
+          ],
+          "positions": [
+            {
+              "x": 170,
+              "y": 939,
+              "width": 874.14697265625
+            }
+          ],
+          "continued": false
+        }
+      ]
+    },
+    {
+      "faceKey": "front",
+      "faceIndex": 0,
+      "index": 31,
+      "sourceText": "Centre · rez-de-chaussée : CanExel · Ridgewood D-5 · Charbon · 82,4 pi².",
+      "fragments": [
+        {
+          "page": 7,
+          "lines": [
+            "Centre · rez-de-chaussée : CanExel · Ridgewood D-5 · Charbon · 82,4 pi²."
+          ],
+          "positions": [
+            {
+              "x": 170,
+              "y": 999,
+              "width": 1043.6123046875
+            }
+          ],
+          "continued": false
+        }
+      ]
+    },
+    {
+      "faceKey": "front",
+      "faceIndex": 0,
+      "index": 32,
+      "sourceText": "Cloison centrale · chant revêtu : James Hardie · HardiePanel Lisse · Blanc arctique · 7,4 pi².",
+      "fragments": [
+        {
+          "page": 7,
+          "lines": [
+            "Cloison centrale · chant revêtu : James Hardie · HardiePanel Lisse · Blanc arctique · 7,4 pi²."
+          ],
+          "positions": [
+            {
+              "x": 170,
+              "y": 1059,
+              "width": 1266.1129150390625
+            }
+          ],
+          "continued": false
+        }
+      ]
+    },
+    {
+      "faceKey": "front",
+      "faceIndex": 0,
+      "index": 33,
+      "sourceText": "  pilier:cell-1-1 : 10 13/16 po × 3 po",
+      "fragments": [
+        {
+          "page": 7,
+          "lines": [
+            "pilier:cell-1-1 : 10 13/16 po × 3 po"
+          ],
+          "positions": [
+            {
+              "x": 170,
+              "y": 1119,
+              "width": 451.776123046875
+            }
+          ],
+          "continued": false
+        }
+      ]
+    },
+    {
+      "faceKey": "front",
+      "faceIndex": 0,
+      "index": 34,
+      "sourceText": "  pilier:cell-2-1 : 10 13/16 po × 48 po",
+      "fragments": [
+        {
+          "page": 7,
+          "lines": [
+            "pilier:cell-2-1 : 10 13/16 po × 48 po"
+          ],
+          "positions": [
+            {
+              "x": 170,
+              "y": 1179,
+              "width": 480.61810302734375
+            }
+          ],
+          "continued": false
+        }
+      ]
+    },
+    {
+      "faceKey": "front",
+      "faceIndex": 0,
+      "index": 35,
+      "sourceText": "  pilier:cell-3-1 : 10 13/16 po × 48 po",
+      "fragments": [
+        {
+          "page": 7,
+          "lines": [
+            "pilier:cell-3-1 : 10 13/16 po × 48 po"
+          ],
+          "positions": [
+            {
+              "x": 170,
+              "y": 1239,
+              "width": 481.47613525390625
+            }
+          ],
+          "continued": false
+        }
+      ]
+    },
+    {
+      "faceKey": "front",
+      "faceIndex": 0,
+      "index": 36,
+      "sourceText": "Soubassement · maçonnerie : Générique · Brique classique · Rouge argile · 132 pi².",
+      "fragments": [
+        {
+          "page": 7,
+          "lines": [
+            "Soubassement · maçonnerie : Générique · Brique classique · Rouge argile · 132 pi²."
+          ],
+          "positions": [
+            {
+              "x": 170,
+              "y": 1299,
+              "width": 1155.4122314453125
+            }
+          ],
+          "continued": false
+        }
+      ]
+    },
+    {
+      "faceKey": "right",
+      "faceIndex": 1,
+      "index": 0,
+      "sourceText": "Élévation Droite · estimation sur tracé d’étude, à valider avant commande.",
+      "fragments": [
+        {
+          "page": 7,
+          "lines": [
+            "Élévation Droite · estimation sur tracé d’étude, à valider avant commande."
+          ],
+          "positions": [
+            {
+              "x": 170,
+              "y": 1495,
+              "width": 1050.4639892578125
+            }
+          ],
+          "continued": false
+        }
+      ]
+    },
+    {
+      "faceKey": "right",
+      "faceIndex": 1,
+      "index": 1,
+      "sourceText": "Surface nette de façade : 593,5 pi². Retours 3D traités séparément dans les métrés.",
+      "fragments": [
+        {
+          "page": 7,
+          "lines": [
+            "Surface nette de façade : 593,5 pi². Retours 3D traités séparément dans les métrés."
+          ],
+          "positions": [
+            {
+              "x": 170,
+              "y": 1555,
+              "width": 1187.822265625
+            }
+          ],
+          "continued": false
+        }
+      ]
+    },
+    {
+      "faceKey": "right",
+      "faceIndex": 1,
+      "index": 2,
+      "sourceText": "Ouvertures : 5. Dimensions de pièces arrondies au 1/16 po ; échelle uniforme à confirmer.",
+      "fragments": [
+        {
+          "page": 7,
+          "lines": [
+            "Ouvertures : 5. Dimensions de pièces arrondies au 1/16 po ; échelle uniforme à confirmer."
+          ],
+          "positions": [
+            {
+              "x": 170,
+              "y": 1615,
+              "width": 1262.03515625
+            }
+          ],
+          "continued": false
+        }
+      ]
+    },
+    {
+      "faceKey": "right",
+      "faceIndex": 1,
+      "index": 3,
+      "sourceText": "Images de nuanciers officiels si disponibles ; textures illustratives, échantillons physiques à valider.",
+      "fragments": [
+        {
+          "page": 7,
+          "lines": [
+            "Images de nuanciers officiels si disponibles ; textures illustratives, échantillons physiques à valider."
+          ],
+          "positions": [
+            {
+              "x": 170,
+              "y": 1675,
+              "width": 1400.0555419921875
+            }
+          ],
+          "continued": false
+        }
+      ]
+    },
+    {
+      "faceKey": "right",
+      "faceIndex": 1,
+      "index": 4,
+      "sourceText": "Mur latéral droit : CanExel · Ridgewood D-5 · Charbon · 593,5 pi².",
+      "fragments": [
+        {
+          "page": 7,
+          "lines": [
+            "Mur latéral droit : CanExel · Ridgewood D-5 · Charbon · 593,5 pi²."
+          ],
+          "positions": [
+            {
+              "x": 170,
+              "y": 1735,
+              "width": 912.9879760742188
+            }
+          ],
+          "continued": false
+        }
+      ]
+    },
+    {
+      "faceKey": "back",
+      "faceIndex": 2,
+      "index": 0,
+      "sourceText": "Élévation Arrière · estimation sur tracé d’étude, à valider avant commande.",
+      "fragments": [
+        {
+          "page": 8,
+          "lines": [
+            "Élévation Arrière · estimation sur tracé d’étude, à valider avant commande."
+          ],
+          "positions": [
+            {
+              "x": 170,
+              "y": 519,
+              "width": 1059.62548828125
+            }
+          ],
+          "continued": false
+        }
+      ]
+    },
+    {
+      "faceKey": "back",
+      "faceIndex": 2,
+      "index": 1,
+      "sourceText": "Surface nette de façade : 670,7 pi². Retours 3D traités séparément dans les métrés.",
+      "fragments": [
+        {
+          "page": 8,
+          "lines": [
+            "Surface nette de façade : 670,7 pi². Retours 3D traités séparément dans les métrés."
+          ],
+          "positions": [
+            {
+              "x": 170,
+              "y": 579,
+              "width": 1187.78515625
+            }
+          ],
+          "continued": false
+        }
+      ]
+    },
+    {
+      "faceKey": "back",
+      "faceIndex": 2,
+      "index": 2,
+      "sourceText": "Ouvertures : 8. Dimensions de pièces arrondies au 1/16 po ; échelle uniforme à confirmer.",
+      "fragments": [
+        {
+          "page": 8,
+          "lines": [
+            "Ouvertures : 8. Dimensions de pièces arrondies au 1/16 po ; échelle uniforme à confirmer."
+          ],
+          "positions": [
+            {
+              "x": 170,
+              "y": 639,
+              "width": 1262.26611328125
+            }
+          ],
+          "continued": false
+        }
+      ]
+    },
+    {
+      "faceKey": "back",
+      "faceIndex": 2,
+      "index": 3,
+      "sourceText": "Images de nuanciers officiels si disponibles ; textures illustratives, échantillons physiques à valider.",
+      "fragments": [
+        {
+          "page": 8,
+          "lines": [
+            "Images de nuanciers officiels si disponibles ; textures illustratives, échantillons physiques à valider."
+          ],
+          "positions": [
+            {
+              "x": 170,
+              "y": 699,
+              "width": 1400.0555419921875
+            }
+          ],
+          "continued": false
+        }
+      ]
+    },
+    {
+      "faceKey": "back",
+      "faceIndex": 2,
+      "index": 4,
+      "sourceText": "Façade arrière : CanExel · Ridgewood D-5 · Charbon · 670,7 pi².",
+      "fragments": [
+        {
+          "page": 8,
+          "lines": [
+            "Façade arrière : CanExel · Ridgewood D-5 · Charbon · 670,7 pi²."
+          ],
+          "positions": [
+            {
+              "x": 170,
+              "y": 759,
+              "width": 893.468505859375
+            }
+          ],
+          "continued": false
+        }
+      ]
+    },
+    {
+      "faceKey": "left",
+      "faceIndex": 3,
+      "index": 0,
+      "sourceText": "Élévation Gauche · estimation sur tracé d’étude, à valider avant commande.",
+      "fragments": [
+        {
+          "page": 8,
+          "lines": [
+            "Élévation Gauche · estimation sur tracé d’étude, à valider avant commande."
+          ],
+          "positions": [
+            {
+              "x": 170,
+              "y": 955,
+              "width": 1076.521484375
+            }
+          ],
+          "continued": false
+        }
+      ]
+    },
+    {
+      "faceKey": "left",
+      "faceIndex": 3,
+      "index": 1,
+      "sourceText": "Surface nette de façade : 595,4 pi². Retours 3D traités séparément dans les métrés.",
+      "fragments": [
+        {
+          "page": 8,
+          "lines": [
+            "Surface nette de façade : 595,4 pi². Retours 3D traités séparément dans les métrés."
+          ],
+          "positions": [
+            {
+              "x": 170,
+              "y": 1015,
+              "width": 1189.189697265625
+            }
+          ],
+          "continued": false
+        }
+      ]
+    },
+    {
+      "faceKey": "left",
+      "faceIndex": 3,
+      "index": 2,
+      "sourceText": "Ouvertures : 5. Dimensions de pièces arrondies au 1/16 po ; échelle uniforme à confirmer.",
+      "fragments": [
+        {
+          "page": 8,
+          "lines": [
+            "Ouvertures : 5. Dimensions de pièces arrondies au 1/16 po ; échelle uniforme à confirmer."
+          ],
+          "positions": [
+            {
+              "x": 170,
+              "y": 1075,
+              "width": 1262.03515625
+            }
+          ],
+          "continued": false
+        }
+      ]
+    },
+    {
+      "faceKey": "left",
+      "faceIndex": 3,
+      "index": 3,
+      "sourceText": "Images de nuanciers officiels si disponibles ; textures illustratives, échantillons physiques à valider.",
+      "fragments": [
+        {
+          "page": 8,
+          "lines": [
+            "Images de nuanciers officiels si disponibles ; textures illustratives, échantillons physiques à valider."
+          ],
+          "positions": [
+            {
+              "x": 170,
+              "y": 1135,
+              "width": 1400.0555419921875
+            }
+          ],
+          "continued": false
+        }
+      ]
+    },
+    {
+      "faceKey": "left",
+      "faceIndex": 3,
+      "index": 4,
+      "sourceText": "Mur latéral gauche : CanExel · Ridgewood D-5 · Charbon · 595,4 pi².",
+      "fragments": [
+        {
+          "page": 8,
+          "lines": [
+            "Mur latéral gauche : CanExel · Ridgewood D-5 · Charbon · 595,4 pi²."
+          ],
+          "positions": [
+            {
+              "x": 170,
+              "y": 1195,
+              "width": 953.9760131835938
+            }
+          ],
+          "continued": false
+        }
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "number": 1,
+      "kind": "presentation",
+      "faceKey": "front",
+      "text": [
+        {
+          "text": "STUDIO MIR · VOTRE PROJET",
+          "x": 2876,
+          "y": 108,
+          "font": "600 26px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 346.86724853515625
+        },
+        {
+          "text": "Avant",
+          "x": 100,
+          "y": 270,
+          "font": "600 68px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 175.38381958007812
+        },
+        {
+          "text": "MATIÈRES · COULEURS",
+          "x": 100,
+          "y": 1723,
+          "font": "600 27px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 283.06512451171875
+        },
+        {
+          "text": "James Hardie · HardiePanel Lisse — Blanc arctique",
+          "x": 100,
+          "y": 1768,
+          "font": "32px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 700.9933471679688,
+          "role": "material-excerpt"
+        },
+        {
+          "text": "MAC Métal architectural · Norwood — Bouleau Fumé",
+          "x": 100,
+          "y": 1809,
+          "font": "32px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 729.5693359375,
+          "role": "material-excerpt"
+        },
+        {
+          "text": "CanExel · Ridgewood D-5 — Charbon",
+          "x": 100,
+          "y": 1850,
+          "font": "32px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 522.0970458984375,
+          "role": "material-excerpt"
+        },
+        {
+          "text": "1 autre choix — Choix complets, cotes et quantités : voir les annexes.",
+          "x": 100,
+          "y": 1910,
+          "font": "25px \"DM Sans\", Arial, sans-serif",
+          "color": "#c6c1b7",
+          "width": 780.763916015625
+        },
+        {
+          "text": "Échelle d’impression variable · dimensions et pose à valider avant fabrication.",
+          "x": 100,
+          "y": 2010,
+          "font": "23px \"DM Sans\", Arial, sans-serif",
+          "color": "#c6c1b7",
+          "width": 816.1320190429688
+        },
+        {
+          "text": "Document de travail, sans valeur de construction.",
+          "x": 100,
+          "y": 2047,
+          "font": "23px \"DM Sans\", Arial, sans-serif",
+          "color": "#c6c1b7",
+          "width": 523.1580810546875
+        },
+        {
+          "text": "01 / 08",
+          "x": 2876,
+          "y": 2032,
+          "font": "600 26px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 84.55206298828125
+        }
+      ],
+      "drawing": {
+        "x": 432.1666666666665,
+        "y": 353.9999999999999,
+        "width": 2111.666666666667,
+        "height": 1267.0000000000002,
+        "source": "presentation-svg",
+        "svgLength": 34456
+      }
+    },
+    {
+      "number": 2,
+      "kind": "presentation",
+      "faceKey": "right",
+      "text": [
+        {
+          "text": "STUDIO MIR · VOTRE PROJET",
+          "x": 2876,
+          "y": 108,
+          "font": "600 26px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 346.86724853515625
+        },
+        {
+          "text": "Droite",
+          "x": 100,
+          "y": 270,
+          "font": "600 68px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 182.0245361328125
+        },
+        {
+          "text": "MATIÈRES · COULEURS",
+          "x": 100,
+          "y": 1805,
+          "font": "600 27px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 283.06512451171875
+        },
+        {
+          "text": "CanExel · Ridgewood D-5 — Charbon",
+          "x": 100,
+          "y": 1850,
+          "font": "32px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 522.0970458984375,
+          "role": "material-excerpt"
+        },
+        {
+          "text": "Choix complets, cotes et quantités : voir les annexes.",
+          "x": 100,
+          "y": 1910,
+          "font": "25px \"DM Sans\", Arial, sans-serif",
+          "color": "#c6c1b7",
+          "width": 603.953857421875
+        },
+        {
+          "text": "Échelle d’impression variable · dimensions et pose à valider avant fabrication.",
+          "x": 100,
+          "y": 2010,
+          "font": "23px \"DM Sans\", Arial, sans-serif",
+          "color": "#c6c1b7",
+          "width": 816.1320190429688
+        },
+        {
+          "text": "Document de travail, sans valeur de construction.",
+          "x": 100,
+          "y": 2047,
+          "font": "23px \"DM Sans\", Arial, sans-serif",
+          "color": "#c6c1b7",
+          "width": 523.1580810546875
+        },
+        {
+          "text": "02 / 08",
+          "x": 2876,
+          "y": 2032,
+          "font": "600 26px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 90.48367309570312
+        }
+      ],
+      "drawing": {
+        "x": 623.1707920792079,
+        "y": 354,
+        "width": 1729.6584158415842,
+        "height": 1349,
+        "source": "presentation-svg",
+        "svgLength": 10612
+      }
+    },
+    {
+      "number": 3,
+      "kind": "presentation",
+      "faceKey": "back",
+      "text": [
+        {
+          "text": "STUDIO MIR · VOTRE PROJET",
+          "x": 2876,
+          "y": 108,
+          "font": "600 26px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 346.86724853515625
+        },
+        {
+          "text": "Arrière",
+          "x": 100,
+          "y": 270,
+          "font": "600 68px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 204.53488159179688
+        },
+        {
+          "text": "MATIÈRES · COULEURS",
+          "x": 100,
+          "y": 1805,
+          "font": "600 27px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 283.06512451171875
+        },
+        {
+          "text": "CanExel · Ridgewood D-5 — Charbon",
+          "x": 100,
+          "y": 1850,
+          "font": "32px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 522.0970458984375,
+          "role": "material-excerpt"
+        },
+        {
+          "text": "Choix complets, cotes et quantités : voir les annexes.",
+          "x": 100,
+          "y": 1910,
+          "font": "25px \"DM Sans\", Arial, sans-serif",
+          "color": "#c6c1b7",
+          "width": 603.953857421875
+        },
+        {
+          "text": "Échelle d’impression variable · dimensions et pose à valider avant fabrication.",
+          "x": 100,
+          "y": 2010,
+          "font": "23px \"DM Sans\", Arial, sans-serif",
+          "color": "#c6c1b7",
+          "width": 816.1320190429688
+        },
+        {
+          "text": "Document de travail, sans valeur de construction.",
+          "x": 100,
+          "y": 2047,
+          "font": "23px \"DM Sans\", Arial, sans-serif",
+          "color": "#c6c1b7",
+          "width": 523.1580810546875
+        },
+        {
+          "text": "03 / 08",
+          "x": 2876,
+          "y": 2032,
+          "font": "600 26px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 91.28607177734375
+        }
+      ],
+      "drawing": {
+        "x": 457.97536945812817,
+        "y": 354,
+        "width": 2060.0492610837437,
+        "height": 1349,
+        "source": "presentation-svg",
+        "svgLength": 13137
+      }
+    },
+    {
+      "number": 4,
+      "kind": "presentation",
+      "faceKey": "left",
+      "text": [
+        {
+          "text": "STUDIO MIR · VOTRE PROJET",
+          "x": 2876,
+          "y": 108,
+          "font": "600 26px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 346.86724853515625
+        },
+        {
+          "text": "Gauche",
+          "x": 100,
+          "y": 270,
+          "font": "600 68px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 236.64027404785156
+        },
+        {
+          "text": "MATIÈRES · COULEURS",
+          "x": 100,
+          "y": 1805,
+          "font": "600 27px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 283.06512451171875
+        },
+        {
+          "text": "CanExel · Ridgewood D-5 — Charbon",
+          "x": 100,
+          "y": 1850,
+          "font": "32px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 522.0970458984375,
+          "role": "material-excerpt"
+        },
+        {
+          "text": "Choix complets, cotes et quantités : voir les annexes.",
+          "x": 100,
+          "y": 1910,
+          "font": "25px \"DM Sans\", Arial, sans-serif",
+          "color": "#c6c1b7",
+          "width": 603.953857421875
+        },
+        {
+          "text": "Échelle d’impression variable · dimensions et pose à valider avant fabrication.",
+          "x": 100,
+          "y": 2010,
+          "font": "23px \"DM Sans\", Arial, sans-serif",
+          "color": "#c6c1b7",
+          "width": 816.1320190429688
+        },
+        {
+          "text": "Document de travail, sans valeur de construction.",
+          "x": 100,
+          "y": 2047,
+          "font": "23px \"DM Sans\", Arial, sans-serif",
+          "color": "#c6c1b7",
+          "width": 523.1580810546875
+        },
+        {
+          "text": "04 / 08",
+          "x": 2876,
+          "y": 2032,
+          "font": "600 26px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 92.35208129882812
+        }
+      ],
+      "drawing": {
+        "x": 596.4579207920792,
+        "y": 354,
+        "width": 1783.0841584158416,
+        "height": 1349,
+        "source": "presentation-svg",
+        "svgLength": 10656
+      }
+    },
+    {
+      "number": 5,
+      "kind": "annotated",
+      "faceKey": "front",
+      "text": [
+        {
+          "text": "STUDIO MIR · VOTRE PROJET",
+          "x": 2876,
+          "y": 108,
+          "font": "600 26px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 346.86724853515625
+        },
+        {
+          "text": "Annexe · Avant",
+          "x": 100,
+          "y": 270,
+          "font": "600 68px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 445.2337951660156
+        },
+        {
+          "text": "Dessin annoté d’origine · les quantités sont détaillées dans les pages suivantes.",
+          "x": 100,
+          "y": 1925,
+          "font": "26px \"DM Sans\", Arial, sans-serif",
+          "color": "#c6c1b7",
+          "width": 932.666259765625
+        },
+        {
+          "text": "Échelle d’impression variable · dimensions et pose à valider avant fabrication.",
+          "x": 100,
+          "y": 2010,
+          "font": "23px \"DM Sans\", Arial, sans-serif",
+          "color": "#c6c1b7",
+          "width": 816.1320190429688
+        },
+        {
+          "text": "Document de travail, sans valeur de construction.",
+          "x": 100,
+          "y": 2047,
+          "font": "23px \"DM Sans\", Arial, sans-serif",
+          "color": "#c6c1b7",
+          "width": 523.1580810546875
+        },
+        {
+          "text": "05 / 08",
+          "x": 2876,
+          "y": 2032,
+          "font": "600 26px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 91.78007507324219
+        }
+      ],
+      "drawing": {
+        "x": 236.33333333333326,
+        "y": 354,
+        "width": 2503.3333333333335,
+        "height": 1502,
+        "source": "original-annotated-svg",
+        "svgLength": 41887
+      }
+    },
+    {
+      "number": 6,
+      "kind": "technical",
+      "faceKey": null,
+      "text": [
+        {
+          "text": "STUDIO MIR · VOTRE PROJET",
+          "x": 2876,
+          "y": 108,
+          "font": "600 26px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 346.86724853515625
+        },
+        {
+          "text": "Détails du projet",
+          "x": 100,
+          "y": 270,
+          "font": "600 64px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 458.56817626953125
+        },
+        {
+          "text": "Annexes techniques · mêmes façades, aucune quantité supplémentaire.",
+          "x": 100,
+          "y": 325,
+          "font": "28px \"DM Sans\", Arial, sans-serif",
+          "color": "#c6c1b7",
+          "width": 904.656005859375
+        },
+        {
+          "text": "Avant",
+          "x": 100,
+          "y": 416,
+          "font": "600 38px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 98.83233642578125,
+          "role": "annex-heading"
+        },
+        {
+          "text": "Élévation Avant · estimation sur tracé d’étude, à valider avant commande.",
+          "x": 170,
+          "y": 519,
+          "font": "33px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 1045.955322265625,
+          "role": "source-summary",
+          "faceKey": "front",
+          "sourceIndex": 0
+        },
+        {
+          "text": "01",
+          "x": 100,
+          "y": 519,
+          "font": "600 22px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 22.96807861328125,
+          "role": "source-row-reference"
+        },
+        {
+          "text": "Surface nette de façade : 614,8 pi². Retours 3D traités séparément dans les métrés.",
+          "x": 170,
+          "y": 579,
+          "font": "33px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 1180.1043701171875,
+          "role": "source-summary",
+          "faceKey": "front",
+          "sourceIndex": 1
+        },
+        {
+          "text": "02",
+          "x": 100,
+          "y": 579,
+          "font": "600 22px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 27.987136840820312,
+          "role": "source-row-reference"
+        },
+        {
+          "text": "Ouvertures : 8. Dimensions de pièces arrondies au 1/16 po ; échelle uniforme à confirmer.",
+          "x": 170,
+          "y": 639,
+          "font": "33px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 1262.26611328125,
+          "role": "source-summary",
+          "faceKey": "front",
+          "sourceIndex": 2
+        },
+        {
+          "text": "03",
+          "x": 100,
+          "y": 639,
+          "font": "600 22px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 28.622100830078125,
+          "role": "source-row-reference"
+        },
+        {
+          "text": "Images de nuanciers officiels si disponibles ; textures illustratives, échantillons physiques à valider.",
+          "x": 170,
+          "y": 699,
+          "font": "33px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 1400.0555419921875,
+          "role": "source-summary",
+          "faceKey": "front",
+          "sourceIndex": 3
+        },
+        {
+          "text": "04",
+          "x": 100,
+          "y": 699,
+          "font": "600 22px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 29.4801025390625,
+          "role": "source-row-reference"
+        },
+        {
+          "text": "Pignon gauche : James Hardie · HardiePanel Lisse · Blanc arctique · 117,4 pi².",
+          "x": 170,
+          "y": 759,
+          "font": "33px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 1061.85302734375,
+          "role": "source-summary",
+          "faceKey": "front",
+          "sourceIndex": 4
+        },
+        {
+          "text": "05",
+          "x": 100,
+          "y": 759,
+          "font": "600 22px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 29.128097534179688,
+          "role": "source-row-reference"
+        },
+        {
+          "text": "pignon_gauche:cell-1-1 : 23 po × 9 3/4 po · coupe spéciale à valider",
+          "x": 170,
+          "y": 819,
+          "font": "33px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 964.697021484375,
+          "role": "source-summary",
+          "faceKey": "front",
+          "sourceIndex": 5
+        },
+        {
+          "text": "06",
+          "x": 100,
+          "y": 819,
+          "font": "600 22px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 29.43609619140625,
+          "role": "source-row-reference"
+        },
+        {
+          "text": "pignon_gauche:cell-2-1 : 117 7/8 po × 48 po · coupe spéciale à valider",
+          "x": 170,
+          "y": 879,
+          "font": "33px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 989.6119384765625,
+          "role": "source-summary",
+          "faceKey": "front",
+          "sourceIndex": 6
+        },
+        {
+          "text": "07",
+          "x": 100,
+          "y": 879,
+          "font": "600 22px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 27.077560424804688,
+          "role": "source-row-reference"
+        },
+        {
+          "text": "pignon_gauche:cell-2-2 : 17 15/16 po × 15 11/16 po · coupe spéciale à valider",
+          "x": 170,
+          "y": 939,
+          "font": "33px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 1069.4058837890625,
+          "role": "source-summary",
+          "faceKey": "front",
+          "sourceIndex": 7
+        },
+        {
+          "text": "08",
+          "x": 100,
+          "y": 939,
+          "font": "600 22px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 29.2821044921875,
+          "role": "source-row-reference"
+        },
+        {
+          "text": "pignon_gauche:cell-3-1 : 120 po × 48 po · coupe spéciale à valider",
+          "x": 170,
+          "y": 999,
+          "font": "33px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 950.8699951171875,
+          "role": "source-summary",
+          "faceKey": "front",
+          "sourceIndex": 8
+        },
+        {
+          "text": "09",
+          "x": 100,
+          "y": 999,
+          "font": "600 22px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 29.43609619140625,
+          "role": "source-row-reference"
+        },
+        {
+          "text": "pignon_gauche:cell-3-2 : 20 1/8 po × 48 po · coupe spéciale à valider",
+          "x": 170,
+          "y": 1059,
+          "font": "33px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 997.9609375,
+          "role": "source-summary",
+          "faceKey": "front",
+          "sourceIndex": 9
+        },
+        {
+          "text": "10",
+          "x": 100,
+          "y": 1059,
+          "font": "600 22px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 22.96807861328125,
+          "role": "source-row-reference"
+        },
+        {
+          "text": "pignon_gauche:cell-4-1 : 120 po × 48 po · coupe spéciale à valider",
+          "x": 170,
+          "y": 1119,
+          "font": "33px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 951.991943359375,
+          "role": "source-summary",
+          "faceKey": "front",
+          "sourceIndex": 10
+        },
+        {
+          "text": "11",
+          "x": 100,
+          "y": 1119,
+          "font": "600 22px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 14.916046142578125,
+          "role": "source-row-reference"
+        },
+        {
+          "text": "pignon_gauche:cell-4-2 : 20 5/16 po × 48 po · coupe spéciale à valider",
+          "x": 170,
+          "y": 1179,
+          "font": "33px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 1018.7509765625,
+          "role": "source-summary",
+          "faceKey": "front",
+          "sourceIndex": 11
+        },
+        {
+          "text": "12",
+          "x": 100,
+          "y": 1179,
+          "font": "600 22px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 20.064071655273438,
+          "role": "source-row-reference"
+        },
+        {
+          "text": "pignon_gauche:cell-5-1 : 120 po × 48 po · coupe spéciale à valider",
+          "x": 170,
+          "y": 1239,
+          "font": "33px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 951.134033203125,
+          "role": "source-summary",
+          "faceKey": "front",
+          "sourceIndex": 12
+        },
+        {
+          "text": "13",
+          "x": 100,
+          "y": 1239,
+          "font": "600 22px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 20.570068359375,
+          "role": "source-row-reference"
+        },
+        {
+          "text": "pignon_gauche:cell-5-2 : 20 1/2 po × 48 po · coupe spéciale à valider",
+          "x": 170,
+          "y": 1299,
+          "font": "33px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 997.9940185546875,
+          "role": "source-summary",
+          "faceKey": "front",
+          "sourceIndex": 13
+        },
+        {
+          "text": "14",
+          "x": 100,
+          "y": 1299,
+          "font": "600 22px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 21.428070068359375,
+          "role": "source-row-reference"
+        },
+        {
+          "text": "pignon_gauche:cell-6-1 : 120 po × 48 po · coupe spéciale à valider",
+          "x": 170,
+          "y": 1359,
+          "font": "33px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 952.0250244140625,
+          "role": "source-summary",
+          "faceKey": "front",
+          "sourceIndex": 14
+        },
+        {
+          "text": "15",
+          "x": 100,
+          "y": 1359,
+          "font": "600 22px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 21.076065063476562,
+          "role": "source-row-reference"
+        },
+        {
+          "text": "pignon_gauche:cell-6-2 : 20 11/16 po × 48 po · coupe spéciale à valider",
+          "x": 170,
+          "y": 1419,
+          "font": "33px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 1019.179931640625,
+          "role": "source-summary",
+          "faceKey": "front",
+          "sourceIndex": 15
+        },
+        {
+          "text": "16",
+          "x": 100,
+          "y": 1419,
+          "font": "600 22px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 21.384063720703125,
+          "role": "source-row-reference"
+        },
+        {
+          "text": "Pignon droit : James Hardie · HardiePanel Lisse · Blanc arctique · 121,3 pi².",
+          "x": 170,
+          "y": 1479,
+          "font": "33px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 1022.228271484375,
+          "role": "source-summary",
+          "faceKey": "front",
+          "sourceIndex": 16
+        },
+        {
+          "text": "17",
+          "x": 100,
+          "y": 1479,
+          "font": "600 22px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 19.206069946289062,
+          "role": "source-row-reference"
+        },
+        {
+          "text": "pignon_droit:cell-1-1 : 23 5/8 po × 9 3/4 po · coupe spéciale à valider",
+          "x": 170,
+          "y": 1539,
+          "font": "33px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 981.4403076171875,
+          "role": "source-summary",
+          "faceKey": "front",
+          "sourceIndex": 17
+        },
+        {
+          "text": "18",
+          "x": 100,
+          "y": 1539,
+          "font": "600 22px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 21.230072021484375,
+          "role": "source-row-reference"
+        },
+        {
+          "text": "pignon_droit:cell-2-1 : 117 7/8 po × 48 po · coupe spéciale à valider",
+          "x": 170,
+          "y": 1599,
+          "font": "33px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 949.9913330078125,
+          "role": "source-summary",
+          "faceKey": "front",
+          "sourceIndex": 18
+        },
+        {
+          "text": "19",
+          "x": 100,
+          "y": 1599,
+          "font": "600 22px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 21.384063720703125,
+          "role": "source-row-reference"
+        },
+        {
+          "text": "pignon_droit:cell-2-2 : 21 13/16 po × 18 po · coupe spéciale à valider",
+          "x": 170,
+          "y": 1659,
+          "font": "33px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 961.904296875,
+          "role": "source-summary",
+          "faceKey": "front",
+          "sourceIndex": 19
+        },
+        {
+          "text": "20",
+          "x": 100,
+          "y": 1659,
+          "font": "600 22px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 27.987136840820312,
+          "role": "source-row-reference"
+        },
+        {
+          "text": "pignon_droit:cell-3-1 : 120 po × 48 po · coupe spéciale à valider",
+          "x": 170,
+          "y": 1719,
+          "font": "33px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 911.2493896484375,
+          "role": "source-summary",
+          "faceKey": "front",
+          "sourceIndex": 20
+        },
+        {
+          "text": "21",
+          "x": 100,
+          "y": 1719,
+          "font": "600 22px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 20.064071655273438,
+          "role": "source-row-reference"
+        },
+        {
+          "text": "pignon_droit:cell-3-2 : 23 po × 48 po · coupe spéciale à valider",
+          "x": 170,
+          "y": 1779,
+          "font": "33px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 907.223388671875,
+          "role": "source-summary",
+          "faceKey": "front",
+          "sourceIndex": 21
+        },
+        {
+          "text": "22",
+          "x": 100,
+          "y": 1779,
+          "font": "600 22px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 25.21209716796875,
+          "role": "source-row-reference"
+        },
+        {
+          "text": "pignon_droit:cell-4-1 : 120 po × 48 po · coupe spéciale à valider",
+          "x": 170,
+          "y": 1839,
+          "font": "33px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 912.371337890625,
+          "role": "source-summary",
+          "faceKey": "front",
+          "sourceIndex": 22
+        },
+        {
+          "text": "23",
+          "x": 100,
+          "y": 1839,
+          "font": "600 22px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 25.718093872070312,
+          "role": "source-row-reference"
+        },
+        {
+          "text": "Échelle d’impression variable · dimensions et pose à valider avant fabrication.",
+          "x": 100,
+          "y": 2010,
+          "font": "23px \"DM Sans\", Arial, sans-serif",
+          "color": "#c6c1b7",
+          "width": 816.1320190429688
+        },
+        {
+          "text": "Document de travail, sans valeur de construction.",
+          "x": 100,
+          "y": 2047,
+          "font": "23px \"DM Sans\", Arial, sans-serif",
+          "color": "#c6c1b7",
+          "width": 523.1580810546875
+        },
+        {
+          "text": "06 / 08",
+          "x": 2876,
+          "y": 2032,
+          "font": "600 26px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 92.22207641601562
+        }
+      ],
+      "drawing": null
+    },
+    {
+      "number": 7,
+      "kind": "technical",
+      "faceKey": null,
+      "text": [
+        {
+          "text": "STUDIO MIR · VOTRE PROJET",
+          "x": 2876,
+          "y": 108,
+          "font": "600 26px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 346.86724853515625
+        },
+        {
+          "text": "Détails du projet",
+          "x": 100,
+          "y": 270,
+          "font": "600 64px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 458.56817626953125
+        },
+        {
+          "text": "Annexes techniques · mêmes façades, aucune quantité supplémentaire.",
+          "x": 100,
+          "y": 325,
+          "font": "28px \"DM Sans\", Arial, sans-serif",
+          "color": "#c6c1b7",
+          "width": 904.656005859375
+        },
+        {
+          "text": "Avant · suite, mêmes quantités",
+          "x": 100,
+          "y": 416,
+          "font": "600 38px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 516.66845703125,
+          "role": "annex-heading"
+        },
+        {
+          "text": "pignon_droit:cell-4-2 : 23 po × 48 po",
+          "x": 170,
+          "y": 519,
+          "font": "33px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 539.83251953125,
+          "role": "source-summary",
+          "faceKey": "front",
+          "sourceIndex": 23
+        },
+        {
+          "text": "24",
+          "x": 100,
+          "y": 519,
+          "font": "600 22px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 26.35687255859375,
+          "role": "source-row-reference"
+        },
+        {
+          "text": "pignon_droit:cell-5-1 : 120 po × 48 po · coupe spéciale à valider",
+          "x": 170,
+          "y": 579,
+          "font": "33px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 911.513427734375,
+          "role": "source-summary",
+          "faceKey": "front",
+          "sourceIndex": 24
+        },
+        {
+          "text": "25",
+          "x": 100,
+          "y": 579,
+          "font": "600 22px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 26.224090576171875,
+          "role": "source-row-reference"
+        },
+        {
+          "text": "pignon_droit:cell-5-2 : 23 po × 48 po",
+          "x": 170,
+          "y": 639,
+          "font": "33px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 538.9744873046875,
+          "role": "source-summary",
+          "faceKey": "front",
+          "sourceIndex": 25
+        },
+        {
+          "text": "26",
+          "x": 100,
+          "y": 639,
+          "font": "600 22px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 26.532089233398438,
+          "role": "source-row-reference"
+        },
+        {
+          "text": "pignon_droit:cell-6-1 : 120 po × 48 po · coupe spéciale à valider",
+          "x": 170,
+          "y": 699,
+          "font": "33px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 912.4044189453125,
+          "role": "source-summary",
+          "faceKey": "front",
+          "sourceIndex": 26
+        },
+        {
+          "text": "27",
+          "x": 100,
+          "y": 699,
+          "font": "600 22px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 24.134872436523438,
+          "role": "source-row-reference"
+        },
+        {
+          "text": "pignon_droit:cell-6-2 : 23 po × 48 po",
+          "x": 170,
+          "y": 759,
+          "font": "33px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 539.865478515625,
+          "role": "source-summary",
+          "faceKey": "front",
+          "sourceIndex": 27
+        },
+        {
+          "text": "28",
+          "x": 100,
+          "y": 759,
+          "font": "600 22px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 26.15887451171875,
+          "role": "source-row-reference"
+        },
+        {
+          "text": "Accent gauche : MAC Métal architectural · Norwood · Bouleau Fumé · 26,7 pi².",
+          "x": 170,
+          "y": 819,
+          "font": "33px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 1097.4744873046875,
+          "role": "source-summary",
+          "faceKey": "front",
+          "sourceIndex": 28
+        },
+        {
+          "text": "29",
+          "x": 100,
+          "y": 819,
+          "font": "600 22px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 26.403121948242188,
+          "role": "source-row-reference"
+        },
+        {
+          "text": "Accent droit : MAC Métal architectural · Norwood · Bouleau Fumé · 27,9 pi².",
+          "x": 170,
+          "y": 879,
+          "font": "33px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 1056.886474609375,
+          "role": "source-summary",
+          "faceKey": "front",
+          "sourceIndex": 29
+        },
+        {
+          "text": "30",
+          "x": 100,
+          "y": 879,
+          "font": "600 22px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 28.622100830078125,
+          "role": "source-row-reference"
+        },
+        {
+          "text": "Centre · étage : CanExel · Ridgewood D-5 · Charbon · 99,6 pi².",
+          "x": 170,
+          "y": 939,
+          "font": "33px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 874.14697265625,
+          "role": "source-summary",
+          "faceKey": "front",
+          "sourceIndex": 30
+        },
+        {
+          "text": "31",
+          "x": 100,
+          "y": 939,
+          "font": "600 22px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 20.350845336914062,
+          "role": "source-row-reference"
+        },
+        {
+          "text": "Centre · rez-de-chaussée : CanExel · Ridgewood D-5 · Charbon · 82,4 pi².",
+          "x": 170,
+          "y": 999,
+          "font": "33px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 1043.6123046875,
+          "role": "source-summary",
+          "faceKey": "front",
+          "sourceIndex": 31
+        },
+        {
+          "text": "32",
+          "x": 100,
+          "y": 999,
+          "font": "600 22px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 25.718093872070312,
+          "role": "source-row-reference"
+        },
+        {
+          "text": "Cloison centrale · chant revêtu : James Hardie · HardiePanel Lisse · Blanc arctique · 7,4 pi².",
+          "x": 170,
+          "y": 1059,
+          "font": "33px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 1266.1129150390625,
+          "role": "source-summary",
+          "faceKey": "front",
+          "sourceIndex": 32
+        },
+        {
+          "text": "33",
+          "x": 100,
+          "y": 1059,
+          "font": "600 22px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 26.224090576171875,
+          "role": "source-row-reference"
+        },
+        {
+          "text": "pilier:cell-1-1 : 10 13/16 po × 3 po",
+          "x": 170,
+          "y": 1119,
+          "font": "33px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 451.776123046875,
+          "role": "source-summary",
+          "faceKey": "front",
+          "sourceIndex": 33
+        },
+        {
+          "text": "34",
+          "x": 100,
+          "y": 1119,
+          "font": "600 22px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 27.08209228515625,
+          "role": "source-row-reference"
+        },
+        {
+          "text": "pilier:cell-2-1 : 10 13/16 po × 48 po",
+          "x": 170,
+          "y": 1179,
+          "font": "33px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 480.61810302734375,
+          "role": "source-summary",
+          "faceKey": "front",
+          "sourceIndex": 34
+        },
+        {
+          "text": "35",
+          "x": 100,
+          "y": 1179,
+          "font": "600 22px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 26.730087280273438,
+          "role": "source-row-reference"
+        },
+        {
+          "text": "pilier:cell-3-1 : 10 13/16 po × 48 po",
+          "x": 170,
+          "y": 1239,
+          "font": "33px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 481.47613525390625,
+          "role": "source-summary",
+          "faceKey": "front",
+          "sourceIndex": 35
+        },
+        {
+          "text": "36",
+          "x": 100,
+          "y": 1239,
+          "font": "600 22px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 27.0380859375,
+          "role": "source-row-reference"
+        },
+        {
+          "text": "Soubassement · maçonnerie : Générique · Brique classique · Rouge argile · 132 pi².",
+          "x": 170,
+          "y": 1299,
+          "font": "33px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 1155.4122314453125,
+          "role": "source-summary",
+          "faceKey": "front",
+          "sourceIndex": 36
+        },
+        {
+          "text": "37",
+          "x": 100,
+          "y": 1299,
+          "font": "600 22px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 24.640869140625,
+          "role": "source-row-reference"
+        },
+        {
+          "text": "Droite",
+          "x": 100,
+          "y": 1392,
+          "font": "600 38px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 102.96363830566406,
+          "role": "annex-heading"
+        },
+        {
+          "text": "Élévation Droite · estimation sur tracé d’étude, à valider avant commande.",
+          "x": 170,
+          "y": 1495,
+          "font": "33px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 1050.4639892578125,
+          "role": "source-summary",
+          "faceKey": "right",
+          "sourceIndex": 0
+        },
+        {
+          "text": "01",
+          "x": 100,
+          "y": 1495,
+          "font": "600 22px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 22.96807861328125,
+          "role": "source-row-reference"
+        },
+        {
+          "text": "Surface nette de façade : 593,5 pi². Retours 3D traités séparément dans les métrés.",
+          "x": 170,
+          "y": 1555,
+          "font": "33px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 1187.822265625,
+          "role": "source-summary",
+          "faceKey": "right",
+          "sourceIndex": 1
+        },
+        {
+          "text": "02",
+          "x": 100,
+          "y": 1555,
+          "font": "600 22px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 27.987136840820312,
+          "role": "source-row-reference"
+        },
+        {
+          "text": "Ouvertures : 5. Dimensions de pièces arrondies au 1/16 po ; échelle uniforme à confirmer.",
+          "x": 170,
+          "y": 1615,
+          "font": "33px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 1262.03515625,
+          "role": "source-summary",
+          "faceKey": "right",
+          "sourceIndex": 2
+        },
+        {
+          "text": "03",
+          "x": 100,
+          "y": 1615,
+          "font": "600 22px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 28.622100830078125,
+          "role": "source-row-reference"
+        },
+        {
+          "text": "Images de nuanciers officiels si disponibles ; textures illustratives, échantillons physiques à valider.",
+          "x": 170,
+          "y": 1675,
+          "font": "33px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 1400.0555419921875,
+          "role": "source-summary",
+          "faceKey": "right",
+          "sourceIndex": 3
+        },
+        {
+          "text": "04",
+          "x": 100,
+          "y": 1675,
+          "font": "600 22px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 29.4801025390625,
+          "role": "source-row-reference"
+        },
+        {
+          "text": "Mur latéral droit : CanExel · Ridgewood D-5 · Charbon · 593,5 pi².",
+          "x": 170,
+          "y": 1735,
+          "font": "33px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 912.9879760742188,
+          "role": "source-summary",
+          "faceKey": "right",
+          "sourceIndex": 4
+        },
+        {
+          "text": "05",
+          "x": 100,
+          "y": 1735,
+          "font": "600 22px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 29.128097534179688,
+          "role": "source-row-reference"
+        },
+        {
+          "text": "Échelle d’impression variable · dimensions et pose à valider avant fabrication.",
+          "x": 100,
+          "y": 2010,
+          "font": "23px \"DM Sans\", Arial, sans-serif",
+          "color": "#c6c1b7",
+          "width": 816.1320190429688
+        },
+        {
+          "text": "Document de travail, sans valeur de construction.",
+          "x": 100,
+          "y": 2047,
+          "font": "23px \"DM Sans\", Arial, sans-serif",
+          "color": "#c6c1b7",
+          "width": 523.1580810546875
+        },
+        {
+          "text": "07 / 08",
+          "x": 2876,
+          "y": 2032,
+          "font": "600 26px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 89.59138488769531
+        }
+      ],
+      "drawing": null
+    },
+    {
+      "number": 8,
+      "kind": "technical",
+      "faceKey": null,
+      "text": [
+        {
+          "text": "STUDIO MIR · VOTRE PROJET",
+          "x": 2876,
+          "y": 108,
+          "font": "600 26px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 346.86724853515625
+        },
+        {
+          "text": "Détails du projet",
+          "x": 100,
+          "y": 270,
+          "font": "600 64px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 458.56817626953125
+        },
+        {
+          "text": "Annexes techniques · mêmes façades, aucune quantité supplémentaire.",
+          "x": 100,
+          "y": 325,
+          "font": "28px \"DM Sans\", Arial, sans-serif",
+          "color": "#c6c1b7",
+          "width": 904.656005859375
+        },
+        {
+          "text": "Arrière",
+          "x": 100,
+          "y": 416,
+          "font": "600 38px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 115.62913513183594,
+          "role": "annex-heading"
+        },
+        {
+          "text": "Élévation Arrière · estimation sur tracé d’étude, à valider avant commande.",
+          "x": 170,
+          "y": 519,
+          "font": "33px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 1059.62548828125,
+          "role": "source-summary",
+          "faceKey": "back",
+          "sourceIndex": 0
+        },
+        {
+          "text": "01",
+          "x": 100,
+          "y": 519,
+          "font": "600 22px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 22.96807861328125,
+          "role": "source-row-reference"
+        },
+        {
+          "text": "Surface nette de façade : 670,7 pi². Retours 3D traités séparément dans les métrés.",
+          "x": 170,
+          "y": 579,
+          "font": "33px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 1187.78515625,
+          "role": "source-summary",
+          "faceKey": "back",
+          "sourceIndex": 1
+        },
+        {
+          "text": "02",
+          "x": 100,
+          "y": 579,
+          "font": "600 22px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 27.987136840820312,
+          "role": "source-row-reference"
+        },
+        {
+          "text": "Ouvertures : 8. Dimensions de pièces arrondies au 1/16 po ; échelle uniforme à confirmer.",
+          "x": 170,
+          "y": 639,
+          "font": "33px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 1262.26611328125,
+          "role": "source-summary",
+          "faceKey": "back",
+          "sourceIndex": 2
+        },
+        {
+          "text": "03",
+          "x": 100,
+          "y": 639,
+          "font": "600 22px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 28.622100830078125,
+          "role": "source-row-reference"
+        },
+        {
+          "text": "Images de nuanciers officiels si disponibles ; textures illustratives, échantillons physiques à valider.",
+          "x": 170,
+          "y": 699,
+          "font": "33px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 1400.0555419921875,
+          "role": "source-summary",
+          "faceKey": "back",
+          "sourceIndex": 3
+        },
+        {
+          "text": "04",
+          "x": 100,
+          "y": 699,
+          "font": "600 22px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 29.4801025390625,
+          "role": "source-row-reference"
+        },
+        {
+          "text": "Façade arrière : CanExel · Ridgewood D-5 · Charbon · 670,7 pi².",
+          "x": 170,
+          "y": 759,
+          "font": "33px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 893.468505859375,
+          "role": "source-summary",
+          "faceKey": "back",
+          "sourceIndex": 4
+        },
+        {
+          "text": "05",
+          "x": 100,
+          "y": 759,
+          "font": "600 22px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 29.128097534179688,
+          "role": "source-row-reference"
+        },
+        {
+          "text": "Gauche",
+          "x": 100,
+          "y": 852,
+          "font": "600 38px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 133.494384765625,
+          "role": "annex-heading"
+        },
+        {
+          "text": "Élévation Gauche · estimation sur tracé d’étude, à valider avant commande.",
+          "x": 170,
+          "y": 955,
+          "font": "33px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 1076.521484375,
+          "role": "source-summary",
+          "faceKey": "left",
+          "sourceIndex": 0
+        },
+        {
+          "text": "01",
+          "x": 100,
+          "y": 955,
+          "font": "600 22px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 22.96807861328125,
+          "role": "source-row-reference"
+        },
+        {
+          "text": "Surface nette de façade : 595,4 pi². Retours 3D traités séparément dans les métrés.",
+          "x": 170,
+          "y": 1015,
+          "font": "33px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 1189.189697265625,
+          "role": "source-summary",
+          "faceKey": "left",
+          "sourceIndex": 1
+        },
+        {
+          "text": "02",
+          "x": 100,
+          "y": 1015,
+          "font": "600 22px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 27.987136840820312,
+          "role": "source-row-reference"
+        },
+        {
+          "text": "Ouvertures : 5. Dimensions de pièces arrondies au 1/16 po ; échelle uniforme à confirmer.",
+          "x": 170,
+          "y": 1075,
+          "font": "33px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 1262.03515625,
+          "role": "source-summary",
+          "faceKey": "left",
+          "sourceIndex": 2
+        },
+        {
+          "text": "03",
+          "x": 100,
+          "y": 1075,
+          "font": "600 22px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 28.622100830078125,
+          "role": "source-row-reference"
+        },
+        {
+          "text": "Images de nuanciers officiels si disponibles ; textures illustratives, échantillons physiques à valider.",
+          "x": 170,
+          "y": 1135,
+          "font": "33px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 1400.0555419921875,
+          "role": "source-summary",
+          "faceKey": "left",
+          "sourceIndex": 3
+        },
+        {
+          "text": "04",
+          "x": 100,
+          "y": 1135,
+          "font": "600 22px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 29.4801025390625,
+          "role": "source-row-reference"
+        },
+        {
+          "text": "Mur latéral gauche : CanExel · Ridgewood D-5 · Charbon · 595,4 pi².",
+          "x": 170,
+          "y": 1195,
+          "font": "33px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 953.9760131835938,
+          "role": "source-summary",
+          "faceKey": "left",
+          "sourceIndex": 4
+        },
+        {
+          "text": "05",
+          "x": 100,
+          "y": 1195,
+          "font": "600 22px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 29.128097534179688,
+          "role": "source-row-reference"
+        },
+        {
+          "text": "Repères du document",
+          "x": 100,
+          "y": 1288,
+          "font": "600 38px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 374.234619140625,
+          "role": "annex-heading"
+        },
+        {
+          "text": "MIR · étude des quatre élévations",
+          "x": 170,
+          "y": 1391,
+          "font": "33px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 473.4942321777344,
+          "role": "document-note"
+        },
+        {
+          "text": "Choix fabricants, calepinage et estimations à calibrer — sans valeur de construction",
+          "x": 170,
+          "y": 1451,
+          "font": "33px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 1197.2333984375,
+          "role": "document-note"
+        },
+        {
+          "text": "Échelle d’impression variable · dimensions et pose à valider avant fabrication.",
+          "x": 100,
+          "y": 2010,
+          "font": "23px \"DM Sans\", Arial, sans-serif",
+          "color": "#c6c1b7",
+          "width": 816.1320190429688
+        },
+        {
+          "text": "Document de travail, sans valeur de construction.",
+          "x": 100,
+          "y": 2047,
+          "font": "23px \"DM Sans\", Arial, sans-serif",
+          "color": "#c6c1b7",
+          "width": 523.1580810546875
+        },
+        {
+          "text": "08 / 08",
+          "x": 2876,
+          "y": 2032,
+          "font": "600 26px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 92.04006958007812
+        }
+      ],
+      "drawing": null
+    }
+  ],
+  "notes": [
+    "Summary values are used exactly as received; no quantity is calculated or rounded by this renderer."
+  ],
+  "pageCount": 8
+}

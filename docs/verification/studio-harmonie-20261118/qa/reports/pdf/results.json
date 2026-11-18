@@ -1,0 +1,109 @@
+{
+  "baseline": "e0cd92d9e6dd01b3f6697dd7de972df95839c8e1",
+  "checks": [
+    {
+      "name": "legacy-byte-identical",
+      "passed": true,
+      "detail": [
+        {
+          "id": "client-no-opt-in",
+          "pages": 1,
+          "sha256": "630ec8e804d10424afdcff31b27b64097bccb9b071a66d6103fa2b0c07a41fb4",
+          "byteIdentical": true
+        },
+        {
+          "id": "admin-opt-in",
+          "pages": 1,
+          "sha256": "630ec8e804d10424afdcff31b27b64097bccb9b071a66d6103fa2b0c07a41fb4",
+          "byteIdentical": true
+        },
+        {
+          "id": "atelier-opt-in",
+          "pages": 1,
+          "sha256": "630ec8e804d10424afdcff31b27b64097bccb9b071a66d6103fa2b0c07a41fb4",
+          "byteIdentical": true
+        },
+        {
+          "id": "embed-opt-in",
+          "pages": 1,
+          "sha256": "630ec8e804d10424afdcff31b27b64097bccb9b071a66d6103fa2b0c07a41fb4",
+          "byteIdentical": true
+        },
+        {
+          "id": "wide-layout",
+          "pages": 1,
+          "sha256": "2339d535c5b3cee767ceab524b161a773fee7f9e46b013644e763c72f39ed70b",
+          "byteIdentical": true
+        },
+        {
+          "id": "bending-layout",
+          "pages": 1,
+          "sha256": "c152a71d162d6c94f9fc24144a6895d80032adc66d26e9841806890a0a931980",
+          "byteIdentical": true
+        },
+        {
+          "id": "english-no-opt-in",
+          "pages": 1,
+          "sha256": "e0d348a5c1825f8deebc5708e4ac5eb09959606939730f3a18cbafcaad82394d",
+          "byteIdentical": true
+        }
+      ]
+    },
+    {
+      "name": "annex-stress-fr-CA",
+      "passed": true,
+      "detail": {
+        "renderer": "studio-client-1",
+        "locale": "fr-CA",
+        "pages": 13,
+        "presentationPages": 4,
+        "annotatedPages": 4,
+        "technicalPages": 5,
+        "sourceRows": 33,
+        "paintedSourceLines": 114,
+        "allRowsPreserved": true,
+        "independentCanvasCalls": 256,
+        "sha256": "f584a96506b7e346c84c39da8f1d693823606c72ef38dc09ff8d616a0fc236f3",
+        "bytes": 7221234,
+        "sourceOptionsUnchanged": true
+      }
+    },
+    {
+      "name": "annex-stress-en-CA",
+      "passed": true,
+      "detail": {
+        "renderer": "studio-client-1",
+        "locale": "en-CA",
+        "pages": 13,
+        "presentationPages": 4,
+        "annotatedPages": 4,
+        "technicalPages": 5,
+        "sourceRows": 33,
+        "paintedSourceLines": 114,
+        "allRowsPreserved": true,
+        "independentCanvasCalls": 256,
+        "sha256": "a4082b7f0ce3e5e75718501c5dc20927636ca97272e607b930a0c446996ffaad",
+        "bytes": 7200632,
+        "sourceOptionsUnchanged": true
+      }
+    }
+  ],
+  "errors": [],
+  "consoleErrors": [],
+  "httpErrors": [],
+  "blocked": [],
+  "sourceSha256": {
+    "before/mir-client-en-ca.js": "cbd2c2575d2015da25a7b968b8e5c1f77dbb3b6ca46390f51d60fe80fd04cee7",
+    "before/mir-client-i18n.js": "5ba9620f0215fd93cadadc588b9104def54878a05f31a84adc39a51510538536",
+    "before/annotated-pdf.js": "de0a3f7ebcd6971e735d7258ba6137cba425ee84fa033474af842cc357a52a38",
+    "before/assets/fonts/dm-sans-variable.ttf": "8cd08d97e89c24d0aa92edd2f0f4c8ee6195eee9b7c9f154865a58b02f0c1c0d",
+    "after/mir-client-en-ca.js": "cbd2c2575d2015da25a7b968b8e5c1f77dbb3b6ca46390f51d60fe80fd04cee7",
+    "after/mir-client-i18n.js": "5ba9620f0215fd93cadadc588b9104def54878a05f31a84adc39a51510538536",
+    "after/annotated-pdf.js": "473d7515a257e8e1c669bf3480b9d08a2a2ee7b5f172b7aa1a2a0973190b6413",
+    "after/mir-studio-pdf.js": "8cd05c00f319b96b2c0493517a0775267c14b421d9dfd6680194bfeec2f69fdf",
+    "after/assets/fonts/dm-sans-variable.ttf": "8cd08d97e89c24d0aa92edd2f0f4c8ee6195eee9b7c9f154865a58b02f0c1c0d",
+    "after/assets/MIR-logo-officiel-original.svg": "7e9426e426351853f0956551270fae114de831e06aa3af9188711a18a6e5696c"
+  },
+  "testSha256": "6af1f9471cf46285178f0cea046653e3795b5fa3a4061b8f197894a91cf5df76",
+  "passed": true
+}

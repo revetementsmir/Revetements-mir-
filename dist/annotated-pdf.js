@@ -66,8 +66,21 @@
       canvas.toBlob(blob=>{clearTimeout(timer);blob?resolve(blob):reject(new Error(tr('Le dessin ne peut pas être exporté.','The drawing could not be exported.')));},'image/jpeg',.94);
     });
   }
-  async function makePlan({faces,title='MIR — Plan annoté',subtitle='Étude de revêtement',filename='MIR-plan-annote.pdf',onProgress=()=>{}}={}){
+  async function makePlan(options={}){
+    let {faces,title='MIR — Plan annoté',subtitle='Étude de revêtement',filename='MIR-plan-annote.pdf',onProgress=()=>{}}=options;
     if(!Array.isArray(faces)||!faces.length)throw new Error(tr('Aucune élévation disponible pour l’export.','No elevations are available for export.'));
+    // Explicit presentation opt-in only. Never theme staff, embedded, bending,
+    // procurement or estimate PDFs because they happen to share this renderer.
+    const query=new URLSearchParams(global.location?.search||'');
+    const studioClient=String(global.location?.pathname||'').split('/').pop()==='plan.html'&&
+      !query.has('embed')&&query.get('context')!=='admin'&&query.get('mode')!=='atelier'&&
+      document.body.dataset.mirStudioLayout==='materials-bottom'&&
+      global.MIRClientLocale?.isClient?.(global.location?.pathname,global.location?.search)===true;
+    if(options.theme==='studio-client'&&studioClient&&!faces.some(face=>face.layout)){
+      if(!global.MIRStudioPDF?.make)throw new Error(tr('La présentation PDF du Studio n’a pas chargé. Rechargez la page.','The Studio PDF presentation did not load. Reload the page.'));
+      return global.MIRStudioPDF.make({...options,title,subtitle,filename,onProgress,locale:clientEN()?'en-CA':'fr-CA'},
+        {svgImage,wrap,canvasJPEG,assemble,loadImage});
+    }
     title=known(title);subtitle=known(subtitle);
     if(clientEN()&&filename==='MIR-plan-annote.pdf')filename='MIR-annotated-plan-en-CA.pdf';
     if(faces.every(f=>f.layout==='mir-dossier')){

@@ -1,0 +1,446 @@
+{
+  "sourceBase": "e0cd92d",
+  "cssSha256": "34c426f2878697f6becb3ea7e1deccdfaf897c9b307b7128397bbd152a3ba4cb",
+  "screens": [
+    {
+      "name": "library",
+      "size": {
+        "width": 1440,
+        "height": 900
+      },
+      "file": "/workspace/mir-studio-harmonie/docs/verification/studio-harmonie-20261118/surfaces/checks/library-1440.png",
+      "rect": {
+        "left": 220,
+        "top": 16,
+        "right": 1220,
+        "bottom": 884,
+        "scrollWidth": 983,
+        "clientWidth": 983
+      }
+    },
+    {
+      "name": "material",
+      "size": {
+        "width": 1440,
+        "height": 900
+      },
+      "file": "/workspace/mir-studio-harmonie/docs/verification/studio-harmonie-20261118/surfaces/checks/material-1440.png",
+      "rect": {
+        "left": 360,
+        "top": 16,
+        "right": 1080,
+        "bottom": 884,
+        "scrollWidth": 703,
+        "clientWidth": 703
+      }
+    },
+    {
+      "name": "volume-error",
+      "size": {
+        "width": 1440,
+        "height": 900
+      },
+      "file": "/workspace/mir-studio-harmonie/docs/verification/studio-harmonie-20261118/surfaces/checks/volume-error-1440.png",
+      "rect": {
+        "left": 340,
+        "top": 16,
+        "right": 1100,
+        "bottom": 884,
+        "scrollWidth": 743,
+        "clientWidth": 743
+      }
+    },
+    {
+      "name": "import-error",
+      "size": {
+        "width": 1440,
+        "height": 900
+      },
+      "file": "/workspace/mir-studio-harmonie/docs/verification/studio-harmonie-20261118/surfaces/checks/import-error-1440.png",
+      "rect": {
+        "left": 260,
+        "top": 154.421875,
+        "right": 1180,
+        "bottom": 745.578125,
+        "scrollWidth": 903,
+        "clientWidth": 903
+      },
+      "disabled": {
+        "disabled": true,
+        "background": "rgb(48, 49, 44)",
+        "color": "rgb(170, 168, 158)"
+      }
+    },
+    {
+      "name": "estimate-disabled",
+      "size": {
+        "width": 1440,
+        "height": 900
+      },
+      "file": "/workspace/mir-studio-harmonie/docs/verification/studio-harmonie-20261118/surfaces/checks/estimate-disabled-1440.png",
+      "rect": {
+        "left": 320,
+        "top": 16,
+        "right": 1120,
+        "bottom": 884,
+        "scrollWidth": 783,
+        "clientWidth": 783
+      }
+    },
+    {
+      "name": "library",
+      "size": {
+        "width": 834,
+        "height": 1194
+      },
+      "file": "/workspace/mir-studio-harmonie/docs/verification/studio-harmonie-20261118/surfaces/checks/library-834.png",
+      "rect": {
+        "left": 30,
+        "top": 16,
+        "right": 804,
+        "bottom": 1178,
+        "scrollWidth": 757,
+        "clientWidth": 757
+      }
+    },
+    {
+      "name": "material",
+      "size": {
+        "width": 834,
+        "height": 1194
+      },
+      "file": "/workspace/mir-studio-harmonie/docs/verification/studio-harmonie-20261118/surfaces/checks/material-834.png",
+      "rect": {
+        "left": 57,
+        "top": 16,
+        "right": 777,
+        "bottom": 1178,
+        "scrollWidth": 703,
+        "clientWidth": 703
+      }
+    },
+    {
+      "name": "volume-error",
+      "size": {
+        "width": 834,
+        "height": 1194
+      },
+      "file": "/workspace/mir-studio-harmonie/docs/verification/studio-harmonie-20261118/surfaces/checks/volume-error-834.png",
+      "rect": {
+        "left": 37,
+        "top": 16,
+        "right": 797,
+        "bottom": 1178,
+        "scrollWidth": 743,
+        "clientWidth": 743
+      }
+    },
+    {
+      "name": "import-error",
+      "size": {
+        "width": 834,
+        "height": 1194
+      },
+      "file": "/workspace/mir-studio-harmonie/docs/verification/studio-harmonie-20261118/surfaces/checks/import-error-834.png",
+      "rect": {
+        "left": 18,
+        "top": 306.09375,
+        "right": 816,
+        "bottom": 887.90625,
+        "scrollWidth": 781,
+        "clientWidth": 781
+      },
+      "disabled": {
+        "disabled": true,
+        "background": "rgb(48, 49, 44)",
+        "color": "rgb(170, 168, 158)"
+      }
+    },
+    {
+      "name": "estimate-disabled",
+      "size": {
+        "width": 834,
+        "height": 1194
+      },
+      "file": "/workspace/mir-studio-harmonie/docs/verification/studio-harmonie-20261118/surfaces/checks/estimate-disabled-834.png",
+      "rect": {
+        "left": 17,
+        "top": 16,
+        "right": 817,
+        "bottom": 1178,
+        "scrollWidth": 783,
+        "clientWidth": 783
+      }
+    },
+    {
+      "name": "library",
+      "size": {
+        "width": 390,
+        "height": 844
+      },
+      "file": "/workspace/mir-studio-harmonie/docs/verification/studio-harmonie-20261118/surfaces/checks/library-390.png",
+      "rect": {
+        "left": 12,
+        "top": 10,
+        "right": 378,
+        "bottom": 834,
+        "scrollWidth": 349,
+        "clientWidth": 349
+      }
+    },
+    {
+      "name": "material",
+      "size": {
+        "width": 390,
+        "height": 844
+      },
+      "file": "/workspace/mir-studio-harmonie/docs/verification/studio-harmonie-20261118/surfaces/checks/material-390.png",
+      "rect": {
+        "left": 12,
+        "top": 10,
+        "right": 378,
+        "bottom": 834,
+        "scrollWidth": 349,
+        "clientWidth": 349
+      }
+    },
+    {
+      "name": "volume-error",
+      "size": {
+        "width": 390,
+        "height": 844
+      },
+      "file": "/workspace/mir-studio-harmonie/docs/verification/studio-harmonie-20261118/surfaces/checks/volume-error-390.png",
+      "rect": {
+        "left": 8,
+        "top": 10,
+        "right": 382,
+        "bottom": 834,
+        "scrollWidth": 357,
+        "clientWidth": 357
+      }
+    },
+    {
+      "name": "import-error",
+      "size": {
+        "width": 390,
+        "height": 844
+      },
+      "file": "/workspace/mir-studio-harmonie/docs/verification/studio-harmonie-20261118/surfaces/checks/import-error-390.png",
+      "rect": {
+        "left": 6,
+        "top": 70.578125,
+        "right": 384,
+        "bottom": 773.421875,
+        "scrollWidth": 361,
+        "clientWidth": 361
+      },
+      "disabled": {
+        "disabled": true,
+        "background": "rgb(48, 49, 44)",
+        "color": "rgb(170, 168, 158)"
+      }
+    },
+    {
+      "name": "estimate-disabled",
+      "size": {
+        "width": 390,
+        "height": 844
+      },
+      "file": "/workspace/mir-studio-harmonie/docs/verification/studio-harmonie-20261118/surfaces/checks/estimate-disabled-390.png",
+      "rect": {
+        "left": 12,
+        "top": 10,
+        "right": 378,
+        "bottom": 834,
+        "scrollWidth": 349,
+        "clientWidth": 349
+      }
+    }
+  ],
+  "contrasts": [
+    {
+      "width": 1440,
+      "label": "Library title",
+      "foreground": "rgb(244, 241, 234)",
+      "background": "rgb(36, 37, 34)",
+      "ratio": 13.661336047074835,
+      "text": "La matériauthèque MIR",
+      "fontSize": "30px"
+    },
+    {
+      "width": 1440,
+      "label": "Library card metadata",
+      "foreground": "rgb(198, 195, 186)",
+      "background": "rgb(52, 53, 47)",
+      "ratio": 7.024831232937092,
+      "text": "Fibrociment · 3 ressources",
+      "fontSize": "12px"
+    },
+    {
+      "width": 1440,
+      "label": "Document badge",
+      "foreground": "rgb(198, 195, 186)",
+      "background": "rgb(52, 53, 47)",
+      "ratio": 7.024831232937092,
+      "text": "Données techniques · Gamme / système",
+      "fontSize": "11px"
+    },
+    {
+      "width": 1440,
+      "label": "Invalid dimensions warning",
+      "foreground": "rgb(243, 189, 169)",
+      "background": "rgb(64, 47, 41)",
+      "ratio": 7.643797686211402,
+      "text": "Précisez la forme du toit, les dimensions positives du bâtiment et la montée du toit. Le retrait doit tenir dans la largeur et la profondeur du bâtiment; chaque valeur doit rester entre 0 et 1 000 pi.",
+      "fontSize": "14px"
+    },
+    {
+      "width": 1440,
+      "label": "Invalid PDF warning",
+      "foreground": "rgb(243, 189, 169)",
+      "background": "rgb(64, 47, 41)",
+      "ratio": 7.643797686211402,
+      "text": "Ce fichier est vide ou incomplet.",
+      "fontSize": "14px"
+    },
+    {
+      "width": 1440,
+      "label": "File field",
+      "foreground": "rgb(198, 195, 186)",
+      "background": "rgb(52, 53, 47)",
+      "ratio": 7.024831232937092,
+      "text": "",
+      "fontSize": "14px"
+    },
+    {
+      "width": 834,
+      "label": "Library title",
+      "foreground": "rgb(244, 241, 234)",
+      "background": "rgb(36, 37, 34)",
+      "ratio": 13.661336047074835,
+      "text": "La matériauthèque MIR",
+      "fontSize": "30px"
+    },
+    {
+      "width": 834,
+      "label": "Library card metadata",
+      "foreground": "rgb(198, 195, 186)",
+      "background": "rgb(52, 53, 47)",
+      "ratio": 7.024831232937092,
+      "text": "Fibrociment · 3 ressources",
+      "fontSize": "12px"
+    },
+    {
+      "width": 834,
+      "label": "Document badge",
+      "foreground": "rgb(198, 195, 186)",
+      "background": "rgb(52, 53, 47)",
+      "ratio": 7.024831232937092,
+      "text": "Données techniques · Gamme / système",
+      "fontSize": "11px"
+    },
+    {
+      "width": 834,
+      "label": "Invalid dimensions warning",
+      "foreground": "rgb(243, 189, 169)",
+      "background": "rgb(64, 47, 41)",
+      "ratio": 7.643797686211402,
+      "text": "Précisez la forme du toit, les dimensions positives du bâtiment et la montée du toit. Le retrait doit tenir dans la largeur et la profondeur du bâtiment; chaque valeur doit rester entre 0 et 1 000 pi.",
+      "fontSize": "14px"
+    },
+    {
+      "width": 834,
+      "label": "Invalid PDF warning",
+      "foreground": "rgb(243, 189, 169)",
+      "background": "rgb(64, 47, 41)",
+      "ratio": 7.643797686211402,
+      "text": "Ce fichier est vide ou incomplet.",
+      "fontSize": "14px"
+    },
+    {
+      "width": 834,
+      "label": "File field",
+      "foreground": "rgb(198, 195, 186)",
+      "background": "rgb(52, 53, 47)",
+      "ratio": 7.024831232937092,
+      "text": "",
+      "fontSize": "14px"
+    },
+    {
+      "width": 390,
+      "label": "Library title",
+      "foreground": "rgb(244, 241, 234)",
+      "background": "rgb(36, 37, 34)",
+      "ratio": 13.661336047074835,
+      "text": "La matériauthèque MIR",
+      "fontSize": "25px"
+    },
+    {
+      "width": 390,
+      "label": "Library card metadata",
+      "foreground": "rgb(198, 195, 186)",
+      "background": "rgb(52, 53, 47)",
+      "ratio": 7.024831232937092,
+      "text": "Fibrociment · 3 ressources",
+      "fontSize": "12px"
+    },
+    {
+      "width": 390,
+      "label": "Document badge",
+      "foreground": "rgb(198, 195, 186)",
+      "background": "rgb(52, 53, 47)",
+      "ratio": 7.024831232937092,
+      "text": "Données techniques · Gamme / système",
+      "fontSize": "11px"
+    },
+    {
+      "width": 390,
+      "label": "Invalid dimensions warning",
+      "foreground": "rgb(243, 189, 169)",
+      "background": "rgb(64, 47, 41)",
+      "ratio": 7.643797686211402,
+      "text": "Précisez la forme du toit, les dimensions positives du bâtiment et la montée du toit. Le retrait doit tenir dans la largeur et la profondeur du bâtiment; chaque valeur doit rester entre 0 et 1 000 pi.",
+      "fontSize": "14px"
+    },
+    {
+      "width": 390,
+      "label": "Invalid PDF warning",
+      "foreground": "rgb(243, 189, 169)",
+      "background": "rgb(64, 47, 41)",
+      "ratio": 7.643797686211402,
+      "text": "Ce fichier est vide ou incomplet.",
+      "fontSize": "14px"
+    },
+    {
+      "width": 390,
+      "label": "File field",
+      "foreground": "rgb(198, 195, 186)",
+      "background": "rgb(52, 53, 47)",
+      "ratio": 7.024831232937092,
+      "text": "",
+      "fontSize": "14px"
+    }
+  ],
+  "guards": [
+    {
+      "query": "?embed=1",
+      "marker": null,
+      "surfaceVariable": ""
+    },
+    {
+      "query": "?context=admin",
+      "marker": null,
+      "surfaceVariable": ""
+    },
+    {
+      "query": "?mode=atelier",
+      "marker": null,
+      "surfaceVariable": ""
+    }
+  ],
+  "pageErrors": [],
+  "httpErrors": [],
+  "blocked": [],
+  "passed": true
+}

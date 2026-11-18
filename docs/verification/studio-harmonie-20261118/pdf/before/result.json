@@ -1,0 +1,27 @@
+{
+  "errors": [],
+  "name": "MIR_Etude_annotee_4_elevations.pdf",
+  "faces": [
+    {
+      "key": "front",
+      "name": "Avant",
+      "summaryCount": 37
+    },
+    {
+      "key": "right",
+      "name": "Droite",
+      "summaryCount": 5
+    },
+    {
+      "key": "back",
+      "name": "Arrière",
+      "summaryCount": 5
+    },
+    {
+      "key": "left",
+      "name": "Gauche",
+      "summaryCount": 5
+    }
+  ],
+  "sha256": "714981b6682b9441f49041ce5e370269809622a1d9798f9b9633794e84af49aa"
+}

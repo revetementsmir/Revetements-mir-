@@ -1,0 +1,273 @@
+CAPTURE library-fr-CA-1440
+CAPTURE material-fr-CA-1440
+CAPTURE openings-fr-CA-1440
+CAPTURE volume-fr-CA-1440
+CAPTURE pdf-ready-fr-CA-1440
+FAIL windows-1440-fr-CA: page.evaluate: TypeError: __mirQaPDFDocument.destroy is not a function
+    at eval (eval at evaluate (:311:30), <anonymous>:1:36)
+    at UtilityScript.evaluate (<anonymous>:313:16)
+    at UtilityScript.<anonymous> (<anonymous>:1:44)
+CAPTURE library-en-CA-1440
+CAPTURE material-en-CA-1440
+CAPTURE openings-en-CA-1440
+CAPTURE volume-en-CA-1440
+CAPTURE pdf-ready-en-CA-1440
+FAIL windows-1440-en-CA: page.evaluate: TypeError: __mirQaPDFDocument.destroy is not a function
+    at eval (eval at evaluate (:311:30), <anonymous>:1:36)
+    at UtilityScript.evaluate (<anonymous>:313:16)
+    at UtilityScript.<anonymous> (<anonymous>:1:44)
+CAPTURE library-fr-CA-834
+CAPTURE material-fr-CA-834
+CAPTURE openings-fr-CA-834
+CAPTURE volume-fr-CA-834
+CAPTURE pdf-ready-fr-CA-834
+CAPTURE estimate-disabled-fr-CA-834
+CAPTURE projects-empty-fr-CA-834
+CAPTURE import-empty-fr-CA-834
+CAPTURE import-error-fr-CA-834
+CAPTURE import-success-fr-CA-834
+CAPTURE projects-saved-fr-CA-834
+CAPTURE source-imported-fr-CA-834
+FAIL windows-834-fr-CA: all original annotated SVG bytes, summaries, dimensions and references preserved
++ actual - expected
+... Skipped lines
+
+  [
+    {
++     footerNote: undefined,
+      key: 'front',
+      name: 'Avant',
++     scaleNote: undefined,
+      summary: [
+        'Élévation Avant · estimation sur tracé d’étude, à valider avant commande.',
+        'Surface nette de façade : 614,8 pi². Retours 3D traités séparément dans les métrés.',
+        'Ouvertures : 8. Dimensions de pièces arrondies au 1/16 po ; échelle uniforme à confirmer.',
+        'Images de nuanciers officiels si disponibles ; textures illustratives, échantillons physiques à valider.',
+...
+    {
++     footerNote: undefined,
+      key: 'right',
+      name: 'Droite',
++     scaleNote: undefined,
+      summary: [
+        'Élévation Droite · estimation sur tracé d’étude, à valider avant commande.',
+        'Surface nette de façade : 593,5 pi². Retours 3D traités séparément dans les métrés.',
+        'Ouvertures : 5. Dimensions de pièces arrondies au 1/16 po ; échelle uniforme à confirmer.',
+        'Images de nuanciers officiels si disponibles ; textures illustratives, échantillons physiques à valider.',
+...
+    {
++     footerNote: undefined,
+      key: 'back',
+      name: 'Arrière',
++     scaleNote: undefined,
+      summary: [
+        'Élévation Arrière · estimation sur tracé d’étude, à valider avant commande.',
+        'Surface nette de façade : 670,7 pi². Retours 3D traités séparément dans les métrés.',
+        'Ouvertures : 8. Dimensions de pièces arrondies au 1/16 po ; échelle uniforme à confirmer.',
+        'Images de nuanciers officiels si disponibles ; textures illustratives, échantillons physiques à valider.',
+...
+    {
++     footerNote: undefined,
+      key: 'left',
+      name: 'Gauche',
++     scaleNote: undefined,
+      summary: [
+        'Élévation Gauche · estimation sur tracé d’étude, à valider avant commande.',
+        'Surface nette de façade : 595,4 pi². Retours 3D traités séparément dans les métrés.',
+        'Ouvertures : 5. Dimensions de pièces arrondies au 1/16 po ; échelle uniforme à confirmer.',
+        'Images de nuanciers officiels si disponibles ; textures illustratives, échantillons physiques à valider.',
+
+CAPTURE library-en-CA-834
+CAPTURE material-en-CA-834
+CAPTURE openings-en-CA-834
+CAPTURE volume-en-CA-834
+CAPTURE pdf-ready-en-CA-834
+CAPTURE estimate-disabled-en-CA-834
+CAPTURE projects-empty-en-CA-834
+CAPTURE import-empty-en-CA-834
+CAPTURE import-error-en-CA-834
+CAPTURE import-success-en-CA-834
+CAPTURE projects-saved-en-CA-834
+CAPTURE source-imported-en-CA-834
+FAIL windows-834-en-CA: all original annotated SVG bytes, summaries, dimensions and references preserved
++ actual - expected
+... Skipped lines
+
+  [
+    {
++     footerNote: undefined,
+      key: 'front',
+      name: 'Avant',
++     scaleNote: undefined,
+      summary: [
+        'Élévation Avant · estimation sur tracé d’étude, à valider avant commande.',
+        'Surface nette de façade : 614.8 pi². Retours 3D traités séparément dans les métrés.',
+        'Ouvertures : 8. Dimensions de pièces arrondies au 1/16 po ; échelle uniforme à confirmer.',
+        'Images de nuanciers officiels si disponibles ; textures illustratives, échantillons physiques à valider.',
+...
+    {
++     footerNote: undefined,
+      key: 'right',
+      name: 'Droite',
++     scaleNote: undefined,
+      summary: [
+        'Élévation Droite · estimation sur tracé d’étude, à valider avant commande.',
+        'Surface nette de façade : 593.5 pi². Retours 3D traités séparément dans les métrés.',
+        'Ouvertures : 5. Dimensions de pièces arrondies au 1/16 po ; échelle uniforme à confirmer.',
+        'Images de nuanciers officiels si disponibles ; textures illustratives, échantillons physiques à valider.',
+...
+    {
++     footerNote: undefined,
+      key: 'back',
+      name: 'Arrière',
++     scaleNote: undefined,
+      summary: [
+        'Élévation Arrière · estimation sur tracé d’étude, à valider avant commande.',
+        'Surface nette de façade : 670.7 pi². Retours 3D traités séparément dans les métrés.',
+        'Ouvertures : 8. Dimensions de pièces arrondies au 1/16 po ; échelle uniforme à confirmer.',
+        'Images de nuanciers officiels si disponibles ; textures illustratives, échantillons physiques à valider.',
+...
+    {
++     footerNote: undefined,
+      key: 'left',
+      name: 'Gauche',
++     scaleNote: undefined,
+      summary: [
+        'Élévation Gauche · estimation sur tracé d’étude, à valider avant commande.',
+        'Surface nette de façade : 595.4 pi². Retours 3D traités séparément dans les métrés.',
+        'Ouvertures : 5. Dimensions de pièces arrondies au 1/16 po ; échelle uniforme à confirmer.',
+        'Images de nuanciers officiels si disponibles ; textures illustratives, échantillons physiques à valider.',
+
+CAPTURE library-fr-CA-390
+CAPTURE material-fr-CA-390
+CAPTURE openings-fr-CA-390
+CAPTURE volume-fr-CA-390
+CAPTURE pdf-ready-fr-CA-390
+CAPTURE estimate-disabled-fr-CA-390
+CAPTURE projects-empty-fr-CA-390
+CAPTURE import-empty-fr-CA-390
+CAPTURE import-error-fr-CA-390
+CAPTURE import-success-fr-CA-390
+CAPTURE projects-saved-fr-CA-390
+CAPTURE source-imported-fr-CA-390
+FAIL windows-390-fr-CA: all original annotated SVG bytes, summaries, dimensions and references preserved
++ actual - expected
+... Skipped lines
+
+  [
+    {
++     footerNote: undefined,
+      key: 'front',
+      name: 'Avant',
++     scaleNote: undefined,
+      summary: [
+        'Élévation Avant · estimation sur tracé d’étude, à valider avant commande.',
+        'Surface nette de façade : 614,8 pi². Retours 3D traités séparément dans les métrés.',
+        'Ouvertures : 8. Dimensions de pièces arrondies au 1/16 po ; échelle uniforme à confirmer.',
+        'Images de nuanciers officiels si disponibles ; textures illustratives, échantillons physiques à valider.',
+...
+    {
++     footerNote: undefined,
+      key: 'right',
+      name: 'Droite',
++     scaleNote: undefined,
+      summary: [
+        'Élévation Droite · estimation sur tracé d’étude, à valider avant commande.',
+        'Surface nette de façade : 593,5 pi². Retours 3D traités séparément dans les métrés.',
+        'Ouvertures : 5. Dimensions de pièces arrondies au 1/16 po ; échelle uniforme à confirmer.',
+        'Images de nuanciers officiels si disponibles ; textures illustratives, échantillons physiques à valider.',
+...
+    {
++     footerNote: undefined,
+      key: 'back',
+      name: 'Arrière',
++     scaleNote: undefined,
+      summary: [
+        'Élévation Arrière · estimation sur tracé d’étude, à valider avant commande.',
+        'Surface nette de façade : 670,7 pi². Retours 3D traités séparément dans les métrés.',
+        'Ouvertures : 8. Dimensions de pièces arrondies au 1/16 po ; échelle uniforme à confirmer.',
+        'Images de nuanciers officiels si disponibles ; textures illustratives, échantillons physiques à valider.',
+...
+    {
++     footerNote: undefined,
+      key: 'left',
+      name: 'Gauche',
++     scaleNote: undefined,
+      summary: [
+        'Élévation Gauche · estimation sur tracé d’étude, à valider avant commande.',
+        'Surface nette de façade : 595,4 pi². Retours 3D traités séparément dans les métrés.',
+        'Ouvertures : 5. Dimensions de pièces arrondies au 1/16 po ; échelle uniforme à confirmer.',
+        'Images de nuanciers officiels si disponibles ; textures illustratives, échantillons physiques à valider.',
+
+CAPTURE library-en-CA-390
+CAPTURE material-en-CA-390
+CAPTURE openings-en-CA-390
+CAPTURE volume-en-CA-390
+CAPTURE pdf-ready-en-CA-390
+CAPTURE estimate-disabled-en-CA-390
+CAPTURE projects-empty-en-CA-390
+CAPTURE import-empty-en-CA-390
+CAPTURE import-error-en-CA-390
+CAPTURE import-success-en-CA-390
+CAPTURE projects-saved-en-CA-390
+CAPTURE source-imported-en-CA-390
+FAIL windows-390-en-CA: all original annotated SVG bytes, summaries, dimensions and references preserved
++ actual - expected
+... Skipped lines
+
+  [
+    {
++     footerNote: undefined,
+      key: 'front',
+      name: 'Avant',
++     scaleNote: undefined,
+      summary: [
+        'Élévation Avant · estimation sur tracé d’étude, à valider avant commande.',
+        'Surface nette de façade : 614.8 pi². Retours 3D traités séparément dans les métrés.',
+        'Ouvertures : 8. Dimensions de pièces arrondies au 1/16 po ; échelle uniforme à confirmer.',
+        'Images de nuanciers officiels si disponibles ; textures illustratives, échantillons physiques à valider.',
+...
+    {
++     footerNote: undefined,
+      key: 'right',
+      name: 'Droite',
++     scaleNote: undefined,
+      summary: [
+        'Élévation Droite · estimation sur tracé d’étude, à valider avant commande.',
+        'Surface nette de façade : 593.5 pi². Retours 3D traités séparément dans les métrés.',
+        'Ouvertures : 5. Dimensions de pièces arrondies au 1/16 po ; échelle uniforme à confirmer.',
+        'Images de nuanciers officiels si disponibles ; textures illustratives, échantillons physiques à valider.',
+...
+    {
++     footerNote: undefined,
+      key: 'back',
+      name: 'Arrière',
++     scaleNote: undefined,
+      summary: [
+        'Élévation Arrière · estimation sur tracé d’étude, à valider avant commande.',
+        'Surface nette de façade : 670.7 pi². Retours 3D traités séparément dans les métrés.',
+        'Ouvertures : 8. Dimensions de pièces arrondies au 1/16 po ; échelle uniforme à confirmer.',
+        'Images de nuanciers officiels si disponibles ; textures illustratives, échantillons physiques à valider.',
+...
+    {
++     footerNote: undefined,
+      key: 'left',
+      name: 'Gauche',
++     scaleNote: undefined,
+      summary: [
+        'Élévation Gauche · estimation sur tracé d’étude, à valider avant commande.',
+        'Surface nette de façade : 595.4 pi². Retours 3D traités séparément dans les métrés.',
+        'Ouvertures : 5. Dimensions de pièces arrondies au 1/16 po ; échelle uniforme à confirmer.',
+        'Images de nuanciers officiels si disponibles ; textures illustratives, échantillons physiques à valider.',
+
+PASS demo-real-studio-link
+AssertionError [ERR_ASSERTION]: see report
+    at main (/workspace/mir-studio-harmonie/tests/mir-studio-harmonie-browser.cjs:149:9)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}

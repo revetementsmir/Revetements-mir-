@@ -1,0 +1,18 @@
+{
+  "baseline": "e0cd92d9e6dd01b3f6697dd7de972df95839c8e1",
+  "protectedFiles": 1651,
+  "permittedExistingFiles": [
+    "dist/plan.html",
+    "dist/plan-app.js",
+    "dist/annotated-pdf.js",
+    "dist/studio.html"
+  ],
+  "engines": {
+    "plan-app.js": "eb06450d84823e5b26e07b4657aea988a91a9b6a2acd0ad419228b454ccc1db9",
+    "plan-3d.js": "d8381fc28350bd2990c26be787f9ff2cc1d3462a04d6d53dae3296ddfcbbf5ad",
+    "plan-import.js": "7358cc1686b20921d96ba5fcff1a0efaae9d576f86c180282455e692921af0a9",
+    "project-store.js": "0b473afaad7ea73ad9aa0d5aec5630e5b7d5e2dcbd335419725fcc240f7ca539",
+    "studio-features.js": "0cde88ec3cca705229b3822a09a7a850f7f845e096db7f7b969fc7e876ec1259"
+  },
+  "productionChanges": false
+}

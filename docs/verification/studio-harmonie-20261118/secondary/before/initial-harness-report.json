@@ -1,0 +1,79 @@
+{
+  "phase": "before",
+  "baseline": "e0cd92d9e6dd01b3f6697dd7de972df95839c8e1",
+  "checks": [
+    {
+      "route": "studio.html",
+      "width": 1440,
+      "status": "FAIL",
+      "message": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\nnull !== 'fr-CA'\n\n    at main (/workspace/mir-studio-harmonie/tests/mir-studio-secondary-browser.cjs:28:13)"
+    },
+    {
+      "route": "studio-public.html",
+      "width": 1440,
+      "status": "FAIL",
+      "message": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n0 !== 1\n\n    at main (/workspace/mir-studio-harmonie/tests/mir-studio-secondary-browser.cjs:36:127)"
+    },
+    {
+      "route": "studio.html",
+      "width": 834,
+      "status": "FAIL",
+      "message": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\nnull !== 'fr-CA'\n\n    at main (/workspace/mir-studio-harmonie/tests/mir-studio-secondary-browser.cjs:28:13)"
+    },
+    {
+      "route": "studio-public.html",
+      "width": 834,
+      "status": "FAIL",
+      "message": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n0 !== 1\n\n    at main (/workspace/mir-studio-harmonie/tests/mir-studio-secondary-browser.cjs:36:127)"
+    },
+    {
+      "route": "studio.html",
+      "width": 390,
+      "status": "FAIL",
+      "message": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\nnull !== 'fr-CA'\n\n    at main (/workspace/mir-studio-harmonie/tests/mir-studio-secondary-browser.cjs:28:13)"
+    },
+    {
+      "route": "studio-public.html",
+      "width": 390,
+      "status": "FAIL",
+      "message": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n0 !== 1\n\n    at main (/workspace/mir-studio-harmonie/tests/mir-studio-secondary-browser.cjs:36:127)"
+    }
+  ],
+  "captures": [
+    {
+      "file": "docs/verification/studio-harmonie-20261118/secondary/before/studio-public-1440-fr-CA.png",
+      "title": "Studio public — En construction",
+      "page": "studio-public.html",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "language": "fr-CA",
+      "simulated": false
+    },
+    {
+      "file": "docs/verification/studio-harmonie-20261118/secondary/before/studio-public-834-fr-CA.png",
+      "title": "Studio public — En construction",
+      "page": "studio-public.html",
+      "viewport": {
+        "width": 834,
+        "height": 1194
+      },
+      "language": "fr-CA",
+      "simulated": false
+    },
+    {
+      "file": "docs/verification/studio-harmonie-20261118/secondary/before/studio-public-390-fr-CA.png",
+      "title": "Studio public — En construction",
+      "page": "studio-public.html",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "language": "fr-CA",
+      "simulated": false
+    }
+  ],
+  "blocked": [],
+  "errors": []
+}

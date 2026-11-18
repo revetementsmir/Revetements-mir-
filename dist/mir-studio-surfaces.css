@@ -1,0 +1,107 @@
+/* MIR client Studio surfaces. The existing guarded layout marker is absent
+   from embedded, admin and workshop contexts. No renderer or layout changes. */
+body[data-mir-studio-layout="materials-bottom"]{
+ --ss-ink:#242522;--ss-panel:#34352f;--ss-field:#2d2e29;--ss-text:#f4f1ea;
+ --ss-muted:#c6c3ba;--ss-sand:#bda889;--ss-line:#68685c;
+ --ss-error:#f3bda9;--ss-error-bg:#402f29;
+}
+body[data-mir-studio-layout="materials-bottom"] :is(#library-dialog,#material-dialog,#openings-dialog,#mir-pdf-import,#projects-dialog,#source-dialog,#volume-dialog,#mir-estimate-dialog){
+ --ink:var(--ss-text);--paper:var(--ss-ink);--muted:var(--ss-muted);--line:var(--ss-line);
+ box-sizing:border-box;max-height:calc(100dvh - 32px);overflow:auto;
+ border:1px solid var(--ss-line);border-radius:6px;background:var(--ss-ink);color:var(--ss-text);
+ font:400 14px/1.55 "DM Sans",Arial,sans-serif;box-shadow:0 24px 90px #0008;
+ color-scheme:dark;scrollbar-color:#918674 var(--ss-ink);scrollbar-gutter:stable;
+}
+body[data-mir-studio-layout="materials-bottom"] :is(#library-dialog,#material-dialog,#openings-dialog,#mir-pdf-import,#projects-dialog,#source-dialog,#volume-dialog,#mir-estimate-dialog)::backdrop{background:#11120fe0;backdrop-filter:blur(5px)}
+body[data-mir-studio-layout="materials-bottom"] :is(#library-dialog,#material-dialog,#openings-dialog,#mir-pdf-import,#projects-dialog,#source-dialog,#volume-dialog,#mir-estimate-dialog) :is(h1,h2,h3,h4,strong,legend,label){color:var(--ss-text);font-family:"DM Sans",Arial,sans-serif}
+body[data-mir-studio-layout="materials-bottom"] :is(#library-dialog,#material-dialog,#openings-dialog,#mir-pdf-import,#projects-dialog,#source-dialog,#volume-dialog,#mir-estimate-dialog) :is(p,small,li,dt){color:var(--ss-muted)}
+body[data-mir-studio-layout="materials-bottom"] :is(#library-dialog,#material-dialog,#openings-dialog,#mir-pdf-import,#projects-dialog,#source-dialog,#volume-dialog,#mir-estimate-dialog) :is(.eyebrow,.mir-pdf-eyebrow){color:var(--ss-sand)}
+body[data-mir-studio-layout="materials-bottom"] :is(#library-dialog,#material-dialog,#openings-dialog,#mir-pdf-import,#projects-dialog,#source-dialog,#volume-dialog,#mir-estimate-dialog) a{color:var(--ss-sand);text-underline-offset:3px}
+body[data-mir-studio-layout="materials-bottom"] :is(#library-dialog,#material-dialog,#openings-dialog,#mir-pdf-import,#projects-dialog,#source-dialog,#volume-dialog,#mir-estimate-dialog) :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]),select,textarea){
+ box-sizing:border-box;min-width:0;max-width:100%;min-height:44px;padding:10px 12px;
+ border:1px solid #858173;border-radius:3px;background:var(--ss-field);color:var(--ss-text);
+ font:400 16px/1.4 "DM Sans",Arial,sans-serif;color-scheme:dark;
+}
+body[data-mir-studio-layout="materials-bottom"] :is(#library-dialog,#material-dialog,#openings-dialog,#mir-pdf-import,#projects-dialog,#source-dialog,#volume-dialog,#mir-estimate-dialog) :is(input,textarea)::placeholder{color:#b4b1a6;opacity:1}
+body[data-mir-studio-layout="materials-bottom"] :is(#library-dialog,#material-dialog,#openings-dialog,#mir-pdf-import,#projects-dialog,#source-dialog,#volume-dialog,#mir-estimate-dialog) :is(input[type="checkbox"],input[type="radio"],input[type="range"],progress){accent-color:var(--ss-sand)}
+body[data-mir-studio-layout="materials-bottom"] :is(#library-dialog,#material-dialog,#openings-dialog,#mir-pdf-import,#projects-dialog,#source-dialog,#volume-dialog,#mir-estimate-dialog) input[type="file"]{max-width:100%;background:transparent;color:var(--ss-muted);font:400 14px/1.5 "DM Sans",Arial,sans-serif}
+body[data-mir-studio-layout="materials-bottom"] :is(#mir-pdf-import,#mir-estimate-dialog) input[type="file"]::file-selector-button{min-height:44px;margin:0 12px 4px 0;padding:9px 12px;border:1px solid var(--ss-sand);border-radius:3px;background:var(--ss-panel);color:var(--ss-text);font:inherit;cursor:pointer}
+body[data-mir-studio-layout="materials-bottom"] :is(#library-dialog,#material-dialog,#openings-dialog,#mir-pdf-import,#projects-dialog,#source-dialog,#volume-dialog,#mir-estimate-dialog) button{
+ min-height:44px;padding:9px 14px;border:1px solid var(--ss-line);border-radius:3px;
+ background:var(--ss-panel);color:var(--ss-text);font:400 13px/1.45 "DM Sans",Arial,sans-serif;
+ box-shadow:none;cursor:pointer;
+}
+body[data-mir-studio-layout="materials-bottom"] :is(#library-dialog,#material-dialog,#openings-dialog,#mir-pdf-import,#projects-dialog,#source-dialog,#volume-dialog,#mir-estimate-dialog) button:not(:disabled):hover{border-color:var(--ss-sand);background:#414137;color:var(--ss-text)}
+body[data-mir-studio-layout="materials-bottom"] :is(#library-dialog,#material-dialog,#openings-dialog,#mir-pdf-import,#projects-dialog,#source-dialog,#volume-dialog,#mir-estimate-dialog) :is(button.primary,button.mir-button,button.mir-pdf-primary,#estimate-send){background:var(--ss-sand);border-color:var(--ss-sand);color:var(--ss-ink);font-weight:600}
+body[data-mir-studio-layout="materials-bottom"] :is(#library-dialog,#material-dialog,#openings-dialog,#mir-pdf-import,#projects-dialog,#source-dialog,#volume-dialog,#mir-estimate-dialog) :is(button.primary,button.mir-button,button.mir-pdf-primary,#estimate-send):not(:disabled):hover{background:#cfbea4;border-color:#cfbea4;color:var(--ss-ink)}
+body[data-mir-studio-layout="materials-bottom"] :is(#library-dialog,#material-dialog,#openings-dialog,#mir-pdf-import,#projects-dialog,#source-dialog,#volume-dialog,#mir-estimate-dialog) :is(button,button.primary,button.mir-button,button.mir-pdf-primary,#estimate-send):disabled{border-color:#595b51;background:#30312c;color:#aaa89e;opacity:1;cursor:not-allowed}
+body[data-mir-studio-layout="materials-bottom"] :is(#library-dialog,#material-dialog,#openings-dialog,#mir-pdf-import,#projects-dialog,#source-dialog,#volume-dialog,#mir-estimate-dialog) button:is([aria-pressed="true"],[aria-selected="true"]){border-color:var(--ss-sand);background:#494438;color:var(--ss-text)}
+body[data-mir-studio-layout="materials-bottom"] :is(#library-dialog,#material-dialog,#openings-dialog,#mir-pdf-import,#projects-dialog,#source-dialog,#volume-dialog,#mir-estimate-dialog,#mir-pdf-ready) :focus-visible{outline:2px solid var(--ss-sand);outline-offset:3px}
+
+/* Existing content hierarchy and grids stay intact; preview images and colour
+   chips are deliberately excluded from all background overrides. */
+body[data-mir-studio-layout="materials-bottom"] #library-dialog .library-card{background:var(--ss-panel);border-color:var(--ss-line)}
+body[data-mir-studio-layout="materials-bottom"] #library-dialog .library-card :is(h3,button){color:var(--ss-text)}
+body[data-mir-studio-layout="materials-bottom"] #library-dialog .library-card :is(p,.eyebrow){color:var(--ss-muted)}
+body[data-mir-studio-layout="materials-bottom"] #library-dialog .library-card p:not(.eyebrow){font-size:12px}
+body[data-mir-studio-layout="materials-bottom"] #library-dialog .library-card button{background:transparent;border-color:#848071}
+body[data-mir-studio-layout="materials-bottom"] #library-dialog .library-notice{font-size:12px}
+body[data-mir-studio-layout="materials-bottom"] #material-dialog :is(.doc-section,.doc-section dl){border-color:var(--ss-line)}
+body[data-mir-studio-layout="materials-bottom"] #material-dialog :is(.doc-missing,.doc-colors>span){background:var(--ss-panel);color:var(--ss-muted)}
+body[data-mir-studio-layout="materials-bottom"] #material-dialog :is(.doc-section p,.doc-section li,.doc-section dl,.doc-intro a){font-size:12px}
+body[data-mir-studio-layout="materials-bottom"] #material-dialog .document-link span{color:var(--ss-muted);font-size:12px}
+body[data-mir-studio-layout="materials-bottom"] #material-dialog .document-badge{background:var(--ss-panel);color:var(--ss-sand);font-size:11px!important}
+body[data-mir-studio-layout="materials-bottom"] #openings-dialog .opening-row{background:var(--ss-panel);border-color:var(--ss-line);color:var(--ss-text)}
+body[data-mir-studio-layout="materials-bottom"] #openings-dialog .opening-row span{color:var(--ss-muted);font-size:12px}
+body[data-mir-studio-layout="materials-bottom"] #projects-dialog .project-choice{background:var(--ss-panel);border-color:var(--ss-line);color:var(--ss-text)}
+body[data-mir-studio-layout="materials-bottom"] #projects-dialog .project-choice small{color:var(--ss-muted)}
+body[data-mir-studio-layout="materials-bottom"] #source-dialog .download-link{border-color:var(--ss-line);background:var(--ss-panel);color:var(--ss-text)}
+body[data-mir-studio-layout="materials-bottom"] #volume-dialog .field-grid label span{color:var(--ss-text)}
+
+/* Import and estimate keep the actual processing, validation and disabled
+   states. Their service messages remain fully visible. */
+body[data-mir-studio-layout="materials-bottom"] #mir-pdf-import :is(.mir-pdf-steps,.mir-pdf-bottom){border-color:var(--ss-line);color:var(--ss-muted)}
+body[data-mir-studio-layout="materials-bottom"] #mir-pdf-import .mir-pdf-steps b{background:var(--ss-panel);color:var(--ss-sand)}
+body[data-mir-studio-layout="materials-bottom"] #mir-pdf-import .mir-pdf-upload label{border-color:#9b8c75;background:var(--ss-panel)}
+body[data-mir-studio-layout="materials-bottom"] #mir-pdf-import :is(.mir-pdf-upload span,.mir-pdf-fine,.mir-pdf-working p){color:var(--ss-muted)}
+body[data-mir-studio-layout="materials-bottom"] #mir-pdf-import .mir-pdf-assigned>span{background:var(--ss-panel);color:var(--ss-text);border:1px solid var(--ss-line)}
+body[data-mir-studio-layout="materials-bottom"] #mir-pdf-import progress{color:var(--ss-sand);background:var(--ss-field)}
+body[data-mir-studio-layout="materials-bottom"] #mir-pdf-import progress::-webkit-progress-bar{background:var(--ss-field)}
+body[data-mir-studio-layout="materials-bottom"] #mir-pdf-import progress::-webkit-progress-value{background:var(--ss-sand)}
+body[data-mir-studio-layout="materials-bottom"] #mir-estimate-dialog :is(fieldset,.estimate-review){border-color:var(--ss-line);background:transparent}
+body[data-mir-studio-layout="materials-bottom"] #mir-estimate-dialog .estimate-review{background:var(--ss-panel)}
+body[data-mir-studio-layout="materials-bottom"] #mir-estimate-dialog .estimate-submit{background:var(--ss-ink);border-color:var(--ss-line)}
+body[data-mir-studio-layout="materials-bottom"] #mir-estimate-dialog #estimate-status{background:var(--ss-panel);border-left-color:var(--ss-sand);color:var(--ss-text)}
+body[data-mir-studio-layout="materials-bottom"] #mir-estimate-dialog :is(#estimate-limits,.estimate-privacy,#estimate-draft-state){color:var(--ss-muted)}
+body[data-mir-studio-layout="materials-bottom"] :is(#mir-pdf-import .mir-pdf-error,#mir-estimate-dialog #estimate-errors:not(:empty),#mir-estimate-dialog .estimate-warning,#volume-dialog #volume-error:not(:empty)){
+ padding:12px 14px;border:1px solid #aa7e68;border-left:3px solid #cf997c;border-radius:3px;
+ background:var(--ss-error-bg);color:var(--ss-error);font-size:14px;line-height:1.55;
+}
+
+/* PDF-ready is a native body child with inline presentation. Only these
+   explicit surface properties need !important; its blob links stay untouched. */
+body[data-mir-studio-layout="materials-bottom"] #mir-pdf-ready{background:var(--ss-panel)!important;color:var(--ss-text)!important;border-color:var(--ss-line)!important;border-radius:4px;box-shadow:0 15px 55px #0008!important;font:400 14px/1.5 "DM Sans",Arial,sans-serif!important}
+body[data-mir-studio-layout="materials-bottom"] #mir-pdf-ready>a[download]{min-height:44px;background:var(--ss-sand)!important;color:var(--ss-ink)!important;border:1px solid var(--ss-sand)!important;border-radius:3px;font-weight:600!important}
+body[data-mir-studio-layout="materials-bottom"] #mir-pdf-ready>a:not([download]){color:var(--ss-sand)!important}
+body[data-mir-studio-layout="materials-bottom"] #mir-pdf-ready>button{min-height:44px;color:var(--ss-text)!important}
+
+/* Detail areas already present in the Studio: recolour only. The light stage,
+   PDF/source images, manufacturer samples and geometry keep their own styles. */
+body[data-mir-studio-layout="materials-bottom"] :is(.mir-studio-03-material-details,#mir-studio-03-advanced) :is(p,small,label,dt,.eyebrow,.roof-palette-label,.project-notes>p,#project-scale,.zone-button small){color:var(--ss-muted)}
+body[data-mir-studio-layout="materials-bottom"] :is(.mir-studio-03-material-details,#mir-studio-03-advanced) :is(h2,h3,strong,legend){color:var(--ss-text)}
+body[data-mir-studio-layout="materials-bottom"] :is(.mir-studio-03-material-details,#mir-studio-03-advanced) :is(.coverage-summary,.coverage-summary.is-unresolved,.structure-meta,.roof-selection,.export-note,.mir-structure-evidence){background:var(--ss-panel);color:var(--ss-text);border-color:var(--ss-line)}
+body[data-mir-studio-layout="materials-bottom"] :is(.mir-studio-03-material-details,#mir-studio-03-advanced) :is(.coverage-summary,.roof-selection) :is(strong,p,small,a){color:var(--ss-muted)}
+body[data-mir-studio-layout="materials-bottom"] #mir-studio-03-advanced :is(.mir-studio-03-scene-options button,.zone-button){background:var(--ss-panel);color:var(--ss-text);border-color:var(--ss-line)}
+body[data-mir-studio-layout="materials-bottom"] #mir-studio-03-advanced :is(.mir-studio-03-scene-options button,.zone-button)[aria-pressed="true"]{border-color:var(--ss-sand);box-shadow:inset 0 0 0 1px var(--ss-sand)}
+body[data-mir-studio-layout="materials-bottom"] #mir-studio-03-advanced :is(.display-toolbar>div>span,#zone-count,#saved-label){color:var(--ss-muted)}
+body[data-mir-studio-layout="materials-bottom"] #toast{border:1px solid var(--ss-sand);background:var(--ss-panel);color:var(--ss-text);font:400 14px/1.5 "DM Sans",Arial,sans-serif;box-shadow:0 10px 40px #0006}
+@media(max-width:600px){
+ body[data-mir-studio-layout="materials-bottom"] :is(#library-dialog,#material-dialog,#openings-dialog,#mir-pdf-import,#projects-dialog,#source-dialog,#volume-dialog,#mir-estimate-dialog){max-height:calc(100dvh - 20px)}
+ body[data-mir-studio-layout="materials-bottom"] :is(#library-dialog,#material-dialog,#openings-dialog,#projects-dialog,#source-dialog,#volume-dialog) .dialog-top{gap:12px}
+ body[data-mir-studio-layout="materials-bottom"] :is(#library-dialog,#material-dialog,#openings-dialog,#projects-dialog,#source-dialog,#volume-dialog) .close-dialog{flex:none;padding-inline:10px}
+}
+
+/* A single opt-in beside the PDF action. The simple four-view export is default. */
+body[data-mir-studio-layout="materials-bottom"] .mir-studio-pdf-option{display:flex;align-items:center;gap:10px;flex-basis:100%;padding:10px 2px;color:var(--ss-text);font-size:13px;line-height:1.4;cursor:pointer}
+body[data-mir-studio-layout="materials-bottom"] .mir-studio-pdf-option input{width:18px;height:18px;flex:none;accent-color:var(--ss-sand);margin:0}
+body[data-mir-studio-layout="materials-bottom"] .mir-studio-pdf-option:focus-within{outline:2px solid var(--ss-sand);outline-offset:3px}

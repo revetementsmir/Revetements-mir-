@@ -1,0 +1,431 @@
+{
+  "renderer": "studio-client-1",
+  "locale": "en-CA",
+  "paper": "A3 landscape",
+  "includeTechnical": false,
+  "sourceTitle": "MIR · Four-elevation study",
+  "sourceSubtitle": "Manufacturer selections, layouts and estimates need calibration — not suitable for construction",
+  "sourceFaces": [
+    {
+      "key": "front",
+      "name": "Avant",
+      "summary": [
+        "Élévation Avant · estimation sur tracé d’étude, à valider avant commande.",
+        "Surface nette de façade : 614.8 pi². Retours 3D traités séparément dans les métrés.",
+        "Ouvertures : 8. Dimensions de pièces arrondies au 1/16 in. ; échelle uniforme à confirmer.",
+        "Images de nuanciers officiels si disponibles ; textures illustratives, échantillons physiques à valider.",
+        "Pignon gauche : James Hardie · HardiePanel Lisse · Blanc arctique · 117.4 pi².",
+        "  pignon_gauche:cell-1-1 : 23 in. × 9 3/4 in. · coupe spéciale à valider",
+        "  pignon_gauche:cell-2-1 : 117 7/8 in. × 48 in. · coupe spéciale à valider",
+        "  pignon_gauche:cell-2-2 : 17 15/16 in. × 15 11/16 in. · coupe spéciale à valider",
+        "  pignon_gauche:cell-3-1 : 120 in. × 48 in. · coupe spéciale à valider",
+        "  pignon_gauche:cell-3-2 : 20 1/8 in. × 48 in. · coupe spéciale à valider",
+        "  pignon_gauche:cell-4-1 : 120 in. × 48 in. · coupe spéciale à valider",
+        "  pignon_gauche:cell-4-2 : 20 5/16 in. × 48 in. · coupe spéciale à valider",
+        "  pignon_gauche:cell-5-1 : 120 in. × 48 in. · coupe spéciale à valider",
+        "  pignon_gauche:cell-5-2 : 20 1/2 in. × 48 in. · coupe spéciale à valider",
+        "  pignon_gauche:cell-6-1 : 120 in. × 48 in. · coupe spéciale à valider",
+        "  pignon_gauche:cell-6-2 : 20 11/16 in. × 48 in. · coupe spéciale à valider",
+        "Pignon droit : James Hardie · HardiePanel Lisse · Blanc arctique · 121.3 pi².",
+        "  pignon_droit:cell-1-1 : 23 5/8 in. × 9 3/4 in. · coupe spéciale à valider",
+        "  pignon_droit:cell-2-1 : 117 7/8 in. × 48 in. · coupe spéciale à valider",
+        "  pignon_droit:cell-2-2 : 21 13/16 in. × 18 in. · coupe spéciale à valider",
+        "  pignon_droit:cell-3-1 : 120 in. × 48 in. · coupe spéciale à valider",
+        "  pignon_droit:cell-3-2 : 23 in. × 48 in. · coupe spéciale à valider",
+        "  pignon_droit:cell-4-1 : 120 in. × 48 in. · coupe spéciale à valider",
+        "  pignon_droit:cell-4-2 : 23 in. × 48 in.",
+        "  pignon_droit:cell-5-1 : 120 in. × 48 in. · coupe spéciale à valider",
+        "  pignon_droit:cell-5-2 : 23 in. × 48 in.",
+        "  pignon_droit:cell-6-1 : 120 in. × 48 in. · coupe spéciale à valider",
+        "  pignon_droit:cell-6-2 : 23 in. × 48 in.",
+        "Accent gauche : MAC Métal architectural · Norwood · Bouleau Fumé · 26.7 pi².",
+        "Accent droit : MAC Métal architectural · Norwood · Bouleau Fumé · 27.9 pi².",
+        "Centre · étage : CanExel · Ridgewood D-5 · Charbon · 99.6 pi².",
+        "Centre · rez-de-chaussée : CanExel · Ridgewood D-5 · Charbon · 82.4 pi².",
+        "Cloison centrale · chant revêtu : James Hardie · HardiePanel Lisse · Blanc arctique · 7.4 pi².",
+        "  pilier:cell-1-1 : 10 13/16 in. × 3 in.",
+        "  pilier:cell-2-1 : 10 13/16 in. × 48 in.",
+        "  pilier:cell-3-1 : 10 13/16 in. × 48 in.",
+        "Soubassement · maçonnerie : Générique · Brique classique · Rouge argile · 132 pi²."
+      ]
+    },
+    {
+      "key": "right",
+      "name": "Droite",
+      "summary": [
+        "Élévation Droite · estimation sur tracé d’étude, à valider avant commande.",
+        "Surface nette de façade : 593.5 pi². Retours 3D traités séparément dans les métrés.",
+        "Ouvertures : 5. Dimensions de pièces arrondies au 1/16 in. ; échelle uniforme à confirmer.",
+        "Images de nuanciers officiels si disponibles ; textures illustratives, échantillons physiques à valider.",
+        "Mur latéral droit : CanExel · Ridgewood D-5 · Charbon · 593.5 pi²."
+      ]
+    },
+    {
+      "key": "back",
+      "name": "Arrière",
+      "summary": [
+        "Élévation Arrière · estimation sur tracé d’étude, à valider avant commande.",
+        "Surface nette de façade : 670.7 pi². Retours 3D traités séparément dans les métrés.",
+        "Ouvertures : 8. Dimensions de pièces arrondies au 1/16 in. ; échelle uniforme à confirmer.",
+        "Images de nuanciers officiels si disponibles ; textures illustratives, échantillons physiques à valider.",
+        "Façade arrière : CanExel · Ridgewood D-5 · Charbon · 670.7 pi²."
+      ]
+    },
+    {
+      "key": "left",
+      "name": "Gauche",
+      "summary": [
+        "Élévation Gauche · estimation sur tracé d’étude, à valider avant commande.",
+        "Surface nette de façade : 595.4 pi². Retours 3D traités séparément dans les métrés.",
+        "Ouvertures : 5. Dimensions de pièces arrondies au 1/16 in. ; échelle uniforme à confirmer.",
+        "Images de nuanciers officiels si disponibles ; textures illustratives, échantillons physiques à valider.",
+        "Mur latéral gauche : CanExel · Ridgewood D-5 · Charbon · 595.4 pi²."
+      ]
+    }
+  ],
+  "sourceRows": [],
+  "pages": [
+    {
+      "number": 1,
+      "kind": "presentation",
+      "faceKey": "front",
+      "text": [
+        {
+          "text": "MIR STUDIO · YOUR PROJECT",
+          "x": 2876,
+          "y": 108,
+          "font": "600 26px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 351.33746337890625
+        },
+        {
+          "text": "Front",
+          "x": 100,
+          "y": 270,
+          "font": "600 68px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 156.5948486328125
+        },
+        {
+          "text": "MATERIALS · COLOURS",
+          "x": 100,
+          "y": 1723,
+          "font": "600 27px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 286.1125793457031
+        },
+        {
+          "text": "James Hardie · HardiePanel Lisse — Blanc arctique",
+          "x": 100,
+          "y": 1768,
+          "font": "32px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 700.9933471679688,
+          "role": "material-excerpt"
+        },
+        {
+          "text": "MAC Métal architectural · Norwood — Bouleau Fumé",
+          "x": 100,
+          "y": 1809,
+          "font": "32px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 729.5693359375,
+          "role": "material-excerpt"
+        },
+        {
+          "text": "CanExel · Ridgewood D-5 — Charbon",
+          "x": 100,
+          "y": 1850,
+          "font": "32px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 522.0970458984375,
+          "role": "material-excerpt"
+        },
+        {
+          "text": "1 other selection — A detailed version is available in the Studio.",
+          "x": 100,
+          "y": 1910,
+          "font": "25px \"DM Sans\", Arial, sans-serif",
+          "color": "#c6c1b7",
+          "width": 714.322998046875
+        },
+        {
+          "text": "Print scale varies · verify dimensions and installation before fabrication.",
+          "x": 100,
+          "y": 2010,
+          "font": "23px \"DM Sans\", Arial, sans-serif",
+          "color": "#c6c1b7",
+          "width": 750.0529174804688
+        },
+        {
+          "text": "Working document, not a construction document.",
+          "x": 100,
+          "y": 2047,
+          "font": "23px \"DM Sans\", Arial, sans-serif",
+          "color": "#c6c1b7",
+          "width": 529.3680419921875
+        },
+        {
+          "text": "01 / 04",
+          "x": 2876,
+          "y": 2032,
+          "font": "600 26px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 84.86407470703125
+        }
+      ],
+      "drawing": {
+        "x": 432.1666666666665,
+        "y": 353.9999999999999,
+        "width": 2111.666666666667,
+        "height": 1267.0000000000002,
+        "source": "presentation-svg",
+        "svgLength": 34456
+      }
+    },
+    {
+      "number": 2,
+      "kind": "presentation",
+      "faceKey": "right",
+      "text": [
+        {
+          "text": "MIR STUDIO · YOUR PROJECT",
+          "x": 2876,
+          "y": 108,
+          "font": "600 26px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 351.33746337890625
+        },
+        {
+          "text": "Right",
+          "x": 100,
+          "y": 270,
+          "font": "600 68px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 154.2241973876953
+        },
+        {
+          "text": "MATERIALS · COLOURS",
+          "x": 100,
+          "y": 1805,
+          "font": "600 27px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 286.1125793457031
+        },
+        {
+          "text": "CanExel · Ridgewood D-5 — Charbon",
+          "x": 100,
+          "y": 1850,
+          "font": "32px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 522.0970458984375,
+          "role": "material-excerpt"
+        },
+        {
+          "text": "A detailed version is available in the Studio.",
+          "x": 100,
+          "y": 1910,
+          "font": "25px \"DM Sans\", Arial, sans-serif",
+          "color": "#c6c1b7",
+          "width": 493.25030517578125
+        },
+        {
+          "text": "Print scale varies · verify dimensions and installation before fabrication.",
+          "x": 100,
+          "y": 2010,
+          "font": "23px \"DM Sans\", Arial, sans-serif",
+          "color": "#c6c1b7",
+          "width": 750.0529174804688
+        },
+        {
+          "text": "Working document, not a construction document.",
+          "x": 100,
+          "y": 2047,
+          "font": "23px \"DM Sans\", Arial, sans-serif",
+          "color": "#c6c1b7",
+          "width": 529.3680419921875
+        },
+        {
+          "text": "02 / 04",
+          "x": 2876,
+          "y": 2032,
+          "font": "600 26px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 90.79568481445312
+        }
+      ],
+      "drawing": {
+        "x": 623.1707920792079,
+        "y": 354,
+        "width": 1729.6584158415842,
+        "height": 1349,
+        "source": "presentation-svg",
+        "svgLength": 10612
+      }
+    },
+    {
+      "number": 3,
+      "kind": "presentation",
+      "faceKey": "back",
+      "text": [
+        {
+          "text": "MIR STUDIO · YOUR PROJECT",
+          "x": 2876,
+          "y": 108,
+          "font": "600 26px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 351.33746337890625
+        },
+        {
+          "text": "Back",
+          "x": 100,
+          "y": 270,
+          "font": "600 68px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 148.920166015625
+        },
+        {
+          "text": "MATERIALS · COLOURS",
+          "x": 100,
+          "y": 1805,
+          "font": "600 27px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 286.1125793457031
+        },
+        {
+          "text": "CanExel · Ridgewood D-5 — Charbon",
+          "x": 100,
+          "y": 1850,
+          "font": "32px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 522.0970458984375,
+          "role": "material-excerpt"
+        },
+        {
+          "text": "A detailed version is available in the Studio.",
+          "x": 100,
+          "y": 1910,
+          "font": "25px \"DM Sans\", Arial, sans-serif",
+          "color": "#c6c1b7",
+          "width": 493.25030517578125
+        },
+        {
+          "text": "Print scale varies · verify dimensions and installation before fabrication.",
+          "x": 100,
+          "y": 2010,
+          "font": "23px \"DM Sans\", Arial, sans-serif",
+          "color": "#c6c1b7",
+          "width": 750.0529174804688
+        },
+        {
+          "text": "Working document, not a construction document.",
+          "x": 100,
+          "y": 2047,
+          "font": "23px \"DM Sans\", Arial, sans-serif",
+          "color": "#c6c1b7",
+          "width": 529.3680419921875
+        },
+        {
+          "text": "03 / 04",
+          "x": 2876,
+          "y": 2032,
+          "font": "600 26px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 91.59808349609375
+        }
+      ],
+      "drawing": {
+        "x": 457.97536945812817,
+        "y": 354,
+        "width": 2060.0492610837437,
+        "height": 1349,
+        "source": "presentation-svg",
+        "svgLength": 13137
+      }
+    },
+    {
+      "number": 4,
+      "kind": "presentation",
+      "faceKey": "left",
+      "text": [
+        {
+          "text": "MIR STUDIO · YOUR PROJECT",
+          "x": 2876,
+          "y": 108,
+          "font": "600 26px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 351.33746337890625
+        },
+        {
+          "text": "Left",
+          "x": 100,
+          "y": 270,
+          "font": "600 68px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 114.76773071289062
+        },
+        {
+          "text": "MATERIALS · COLOURS",
+          "x": 100,
+          "y": 1805,
+          "font": "600 27px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 286.1125793457031
+        },
+        {
+          "text": "CanExel · Ridgewood D-5 — Charbon",
+          "x": 100,
+          "y": 1850,
+          "font": "32px \"DM Sans\", Arial, sans-serif",
+          "color": "#f4f1ea",
+          "width": 522.0970458984375,
+          "role": "material-excerpt"
+        },
+        {
+          "text": "A detailed version is available in the Studio.",
+          "x": 100,
+          "y": 1910,
+          "font": "25px \"DM Sans\", Arial, sans-serif",
+          "color": "#c6c1b7",
+          "width": 493.25030517578125
+        },
+        {
+          "text": "Print scale varies · verify dimensions and installation before fabrication.",
+          "x": 100,
+          "y": 2010,
+          "font": "23px \"DM Sans\", Arial, sans-serif",
+          "color": "#c6c1b7",
+          "width": 750.0529174804688
+        },
+        {
+          "text": "Working document, not a construction document.",
+          "x": 100,
+          "y": 2047,
+          "font": "23px \"DM Sans\", Arial, sans-serif",
+          "color": "#c6c1b7",
+          "width": 529.3680419921875
+        },
+        {
+          "text": "04 / 04",
+          "x": 2876,
+          "y": 2032,
+          "font": "600 26px \"DM Sans\", Arial, sans-serif",
+          "color": "#bda889",
+          "width": 92.66409301757812
+        }
+      ],
+      "drawing": {
+        "x": 596.4579207920792,
+        "y": 354,
+        "width": 1783.0841584158416,
+        "height": 1349,
+        "source": "presentation-svg",
+        "svgLength": 10656
+      }
+    }
+  ],
+  "notes": [
+    "Summary values are used exactly as received; no quantity is calculated or rounded by this renderer."
+  ],
+  "pageCount": 4
+}
