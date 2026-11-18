@@ -96,3 +96,15 @@ body[data-field-home-compact=true] .field-home-list{gap:2px!important}body[data-
 
 body[data-field-shell=true] .field-home-job-choice{margin:0;display:block}body[data-field-shell=true] .field-home-job-choice .mir-choice-trigger{border:0!important;background:transparent!important;padding:0!important;min-height:44px;text-align:left}body[data-field-shell=true] .field-home-job-choice .mir-choice-rich>strong{font-size:1.375rem!important}body[data-field-shell=true] .field-home-job-choice .mir-choice-rich>span{display:none}body[data-field-home-compact=true] .field-home-job-choice .mir-choice-rich>strong{font-size:1.25rem!important}
 body[data-field-shell=true] .field-home-job-select>.mir-choice-chevron{font-size:1.25rem!important;line-height:1!important;height:auto!important;min-height:44px;align-self:stretch}
+
+body[data-field-shell=true] .field-home-list .field-home-punch-primary {
+  background: var(--field-accent);
+  border-color: var(--field-accent);
+  color: var(--field-action-text);
+}
+body[data-field-shell=true] .field-home-list .field-home-punch-primary svg {
+  color: inherit;
+}
+body[data-field-shell=true] #portal-navigation.field-bottom button span {
+  font-size: clamp(.75rem, 3vw, .875rem);
+}
