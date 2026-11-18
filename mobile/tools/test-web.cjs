@@ -27,7 +27,19 @@ async function assertTeamScreen(page){
   await context.addInitScript(()=>{window.__lockState={enabled:false,locked:false,cancel:false,unlocks:0};window.__appListeners={};window.androidBridge={postMessage(){}};window.Capacitor={PluginHeaders:[{name:'MIRNative',methods:['readAuth','writeAuth','clearAuth','clearTemporary','pdf','openExternal','pickFile','scanQr','authLockStatus','lockAuth','unlockAuth','setAuthLock'].map(name=>({name,rtype:'promise'}))},{name:'App',methods:[{name:'addListener',rtype:'callback'},{name:'minimizeApp',rtype:'promise'},{name:'getLaunchUrl',rtype:'promise'}]}],nativePromise:async(plugin,method,options)=>{const s=window.__lockState;if(method==='authLockStatus')return{available:true,enabled:s.enabled,locked:s.locked};if(method==='setAuthLock'){s.enabled=options.enabled;return{};}if(method==='lockAuth'){s.locked=true;return{};}if(method==='unlockAuth'){s.unlocks++;if(s.cancel)throw Error('Déverrouillage annulé');s.locked=false;return{};}return{};},nativeCallback:(plugin,method,options,callback)=>{if(plugin==='App'&&method==='addListener')window.__appListeners[options.eventName]=callback;return 'simulated-listener';}};});
   await context.route('**/*',async route=>{const url=new URL(route.request().url());if(url.origin!=='https://localhost'){requests.push(url.href);return route.abort();}const file=path.resolve(root,'.'+decodeURIComponent(url.pathname));if(!file.startsWith(root+path.sep)||!fs.existsSync(file))return route.fulfill({status:404,body:'missing'});await route.fulfill({path:file});});
   const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));await page.goto('https://localhost/chantier.html');await page.locator('#mir-email-toggle').waitFor({state:'visible'});await page.locator('#mir-email-toggle').click();await page.locator('#auth-signin-form').waitFor({state:'visible'});
-  assert.equal(await page.evaluate(()=>MIRPortalConfig.projectRef),'hxtztkmbfpmzrieccwsg');assert.equal(await page.locator('#auth-google').isVisible(),true);assert.equal(await page.locator('#auth-google').isDisabled(),true);assert.equal(await page.locator('#mir-email-toggle').getAttribute('aria-expanded'),'true');assert.equal(await page.locator('[data-auth-screen=signup]').evaluate(e=>e.hidden),true);
+  assert.equal(await page.evaluate(()=>MIRPortalConfig.projectRef),'hxtztkmbfpmzrieccwsg');
+  // The shared account pager now places the unavailable Google option on its
+  // Information page. Exercise that real navigation without enabling OAuth.
+  assert.equal(await page.locator('#auth-google').evaluate(e=>e.hidden),false);
+  assert.equal(await page.locator('#auth-google').isVisible(),false,'Google is outside the active sign-in form page');
+  assert.equal(await page.locator('#auth-google').isDisabled(),true);
+  await page.locator('#mir-account-workspace-pages-select').selectOption('info');
+  await page.locator('#auth-google').waitFor({state:'visible'});
+  assert.equal(await page.locator('#auth-google').isDisabled(),true,'Information never enables unavailable OAuth');
+  assert.equal(await page.locator('#auth-signin-form').isVisible(),false);
+  await page.locator('#mir-account-workspace-pages-select').selectOption('form');
+  await page.locator('#auth-signin-form').waitFor({state:'visible'});
+  assert.equal(await page.locator('#mir-email-toggle').getAttribute('aria-expanded'),'true');assert.equal(await page.locator('[data-auth-screen=signup]').evaluate(e=>e.hidden),true);
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2),true);
   await assertTeamScreen(page);
   const blocked=await page.evaluate(async()=>{try{await fetch('https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/');return false;}catch{return true;}});assert.equal(blocked,true);assert.deepEqual(requests,[]);assert.deepEqual(errors,[]);

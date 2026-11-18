@@ -39,6 +39,14 @@ jobs:
           node tests/mir-pliage03-field-browser.cjs || result=1
           node tests/mir-pliage03-field-contract.cjs || result=1
           exit "$result"
+      - name: Conserver immédiatement les preuves du thème et du Pliage
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: phase11-app-theme-proof
+          path: |
+            artifacts/app-selection/
+            artifacts/pliage03-field/
       - name: Non-régressions existantes sans serveur
         if: ${{ !cancelled() && steps.web-adapter.outcome == 'success' }}
         env:
@@ -98,8 +106,6 @@ jobs:
         with:
           name: phase11-chromium-simulation
           path: |
-            artifacts/app-selection/
-            artifacts/pliage03-field/
             artifacts/teams-hours/postgres-fixture.json
             artifacts/teams-hours/browser/
             artifacts/phase11/web/
