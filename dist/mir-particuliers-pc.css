@@ -1,0 +1,75 @@
+/* Particuliers PC — scoped implementation from locked MIR desktop home.
+   Shared header, account, cart, FR/EN and navigation are owned by mir-prestige.js.
+   No changes to homepage styles, engines, backends or staff routes. */
+body.mir-particuliers-page{
+ --mir-pc-charcoal:#242522;--mir-pc-cream:#f4f1ea;--mir-pc-champagne:#bda889;
+ --mir-pc-muted:#c8c5bd;--mir-pc-line:#55554d;
+ margin:0;background:var(--mir-pc-charcoal);color:var(--mir-pc-cream)
+}
+body.mir-particuliers-page .mir-pc-en{display:none}
+html[lang="en-CA"] body.mir-particuliers-page .mir-pc-en{display:contents}
+html[lang="en-CA"] body.mir-particuliers-page .mir-pc-fr{display:none}
+body.mir-particuliers-page .mir-pc-main{padding:0;margin:0;width:100%;max-width:none;background:var(--mir-pc-charcoal)}
+body.mir-particuliers-page .mir-pc-hero{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);min-height:0;background:var(--mir-pc-charcoal)}
+body.mir-particuliers-page .mir-pc-visual{position:relative;min-width:0;min-height:0;overflow:hidden;background:#363833}
+body.mir-particuliers-page .mir-pc-photo{display:block;width:100%;height:100%;object-fit:cover;object-position:49% 52%}
+body.mir-particuliers-page .mir-pc-visual-shade{position:absolute;inset:40% 0 0;pointer-events:none;background:linear-gradient(transparent 0%,rgba(17,22,19,.15) 23%,rgba(16,19,16,.75) 100%)}
+body.mir-particuliers-page .mir-pc-visual-copy{position:absolute;left:clamp(28px,4.1vw,72px);right:25px;bottom:clamp(28px,5vh,78px);z-index:1}
+body.mir-particuliers-page .mir-pc-overline,body.mir-particuliers-page .mir-pc-intro{font:600 11px/1.5 "DM Sans",Arial,sans-serif;letter-spacing:.20em;color:var(--mir-pc-muted);margin:0 0 24px;text-transform:uppercase}
+body.mir-particuliers-page .mir-pc-visual-copy h1{font:400 clamp(38px,4.1vw,66px)/1.055 Arial,Helvetica,sans-serif;letter-spacing:-.052em;color:var(--mir-pc-cream)!important;margin:0;text-wrap:balance;text-shadow:0 2px 14px rgba(0,0,0,.17)}
+body.mir-particuliers-page .mir-pc-visual-copy h1 em{font:italic 400 1.06em/1 Georgia,"Times New Roman",serif;color:var(--mir-pc-champagne)!important}
+body.mir-particuliers-page .mir-pc-actions-pane{min-width:0;min-height:0;display:flex;align-items:center;justify-content:center;padding:clamp(24px,3vw,56px) clamp(32px,4.5vw,78px);background:var(--mir-pc-charcoal)}
+body.mir-particuliers-page .mir-pc-actions-inner{width:100%;max-width:590px}
+body.mir-particuliers-page .mir-pc-intro{margin:0 0 31px}
+body.mir-particuliers-page .mir-pc-actions{border-top:1px solid var(--mir-pc-line);width:100%}
+body.mir-particuliers-page .mir-pc-action{display:flex;align-items:center;justify-content:space-between;gap:18px;min-width:0;min-height:105px;padding:15px 0;border-bottom:1px solid var(--mir-pc-line);color:var(--mir-pc-cream);text-decoration:none;background:transparent;transition:color .18s ease}
+body.mir-particuliers-page a.mir-pc-action:hover,body.mir-particuliers-page a.mir-pc-action:focus-visible{color:var(--mir-pc-champagne)}
+body.mir-particuliers-page a.mir-pc-action:focus-visible{outline:2px solid var(--mir-pc-champagne);outline-offset:4px}
+body.mir-particuliers-page .mir-pc-action-copy{display:block;min-width:0;max-width:100%}
+body.mir-particuliers-page .mir-pc-action-copy strong{display:block;font:400 clamp(20px,1.7vw,27px)/1.17 "DM Sans",Arial,sans-serif;letter-spacing:-.02em;color:inherit}
+body.mir-particuliers-page .mir-pc-action-copy small{display:block;margin-top:8px;font:400 13px/1.4 "DM Sans",Arial,sans-serif;color:var(--mir-pc-muted)}
+body.mir-particuliers-page .mir-pc-arrow{flex:none;font:400 26px/1 Georgia,serif;color:var(--mir-pc-champagne)}
+body.mir-particuliers-page .mir-pc-pending{color:#c3c1b7}
+body.mir-particuliers-page .mir-pc-coming{flex:none;color:var(--mir-pc-champagne);font:500 10px/1.5 "DM Sans",Arial,sans-serif;letter-spacing:.06em}
+body.mir-particuliers-page .mir-pc-action-highlight .mir-pc-action-copy strong{color:var(--mir-pc-champagne)}
+body.mir-particuliers-page .mir-pc-illustration-note{margin:20px 0 0;color:#a8a69c;font:400 11px/1.45 "DM Sans",Arial,sans-serif;letter-spacing:.015em}
+body.mir-particuliers-page .mir-pc-footer{background:var(--mir-pc-charcoal)!important;color:#d7d5cc!important}
+body.mir-particuliers-page .mir-pc-footer-links{display:flex;flex-wrap:wrap;gap:8px 19px;align-items:center;justify-content:flex-end;font:400 11px/1.5 "DM Sans",Arial,sans-serif;color:#bdbab0}
+body.mir-particuliers-page .mir-pc-footer-links a{color:#d3d0c7;text-decoration:none}
+body.mir-particuliers-page .mir-pc-footer-links a:hover{text-decoration:underline;color:var(--mir-pc-champagne)}
+body.mir-particuliers-page .mir-pc-footer-disabled{opacity:.57}
+@media(min-width:1101px){
+ body.mir-particuliers-page{min-height:100svh;display:flex;flex-direction:column}
+ body.mir-particuliers-page #mir-prestige-header{min-height:90px!important;height:90px!important;flex:0 0 90px;padding-top:20px!important;padding-bottom:0!important;grid-template-columns:1fr auto!important}
+ body.mir-particuliers-page #mir-prestige-header>.mir-client-brand{width:166px!important;margin-bottom:20px!important}
+ body.mir-particuliers-page #mir-prestige-header .mir-prestige-actions{margin-bottom:20px!important}
+ body.mir-particuliers-page #mir-prestige-header>nav.mir-prestige-nav{display:none!important}
+ body.mir-particuliers-page .mir-pc-main{height:calc(100svh - 154px);min-height:570px;flex:1 0 auto}
+ body.mir-particuliers-page .mir-pc-hero{height:100%;min-height:570px}
+ body.mir-particuliers-page .mir-pc-footer{height:64px;min-height:64px;flex:0 0 64px;display:grid!important;grid-template-columns:108px minmax(240px,1fr) auto;align-items:center;gap:16px;padding:8px max(20px,calc((100vw - 1320px)/2));margin:0!important}
+ body.mir-particuliers-page .mir-pc-footer .mir-signature-footer-logo{width:108px}
+ body.mir-particuliers-page .mir-pc-footer p{font-size:12px;text-align:center}
+}
+@media(min-width:1101px) and (max-height:740px){
+ body.mir-particuliers-page .mir-pc-main,body.mir-particuliers-page .mir-pc-hero{min-height:505px}
+ body.mir-particuliers-page .mir-pc-action{min-height:91px;padding:10px 0}
+ body.mir-particuliers-page .mir-pc-intro{margin-bottom:16px}
+ body.mir-particuliers-page .mir-pc-actions-pane{padding-block:16px}
+ body.mir-particuliers-page .mir-pc-visual-copy h1{font-size:clamp(35px,3.7vw,58px)}
+}
+@media(max-width:1100px){
+ body.mir-particuliers-page .mir-pc-hero{grid-template-columns:1fr}
+ body.mir-particuliers-page .mir-pc-visual{height:clamp(300px,51vh,560px)}
+ body.mir-particuliers-page .mir-pc-actions-pane{padding:36px max(22px,5vw)}
+ body.mir-particuliers-page .mir-pc-action{min-height:82px}
+ body.mir-particuliers-page .mir-pc-footer{display:flex!important;flex-wrap:wrap;justify-content:space-between;gap:12px;padding:15px 20px}
+ body.mir-particuliers-page .mir-pc-footer p{text-align:left}
+}
+@media(max-width:600px){
+ body.mir-particuliers-page .mir-pc-visual-copy h1{font-size:clamp(31px,8.4vw,47px)}
+ body.mir-particuliers-page .mir-pc-visual-copy{left:22px;bottom:26px}
+ body.mir-particuliers-page .mir-pc-actions-pane{padding:25px 20px}
+ body.mir-particuliers-page .mir-pc-action-copy strong{font-size:20px}
+ body.mir-particuliers-page .mir-pc-footer-links{justify-content:flex-start}
+}
+@media(prefers-reduced-motion:reduce){body.mir-particuliers-page .mir-pc-action{transition:none}}
