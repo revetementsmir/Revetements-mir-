@@ -1,10 +1,32 @@
-/* Public profile journey 03. The adapter opts in only outside store, panel and staff contexts.
+/* Profile journey 03. Public client or the explicitly opted-in personal chantier wrapper.
    Drawings, manufacturer swatches and all fabrication values retain their native rendering. */
 html body.mir-pliage03.mir-prestige{
  --p03-bg:#242522;--p03-panel:#30312c;--p03-input:#34352f;--p03-text:#f4f1ea;
  --p03-muted:#c6c3ba;--p03-sand:#bda889;--p03-line:#626258;--p03-drawing:#292a26;
  --p03-gap:clamp(20px,2vw,32px);background:var(--p03-bg)!important;color:var(--p03-text)!important;color-scheme:dark;
  font-family:"DM Sans",Arial,sans-serif;
+}
+
+/* The app owns its header and bottom navigation. These rules only apply when
+   that same-origin parent supplies the personal Pliage 03 presentation context. */
+html[data-field-pliage03=true] body.mir-pliage03.mir-prestige{
+ --field-bg:var(--p03-bg);--field-surface:var(--p03-panel);--field-soft:var(--p03-input);--field-text:var(--p03-text);
+ --field-muted:var(--p03-muted);--field-border:var(--p03-line);--field-accent:var(--p03-sand);--field-action-text:var(--p03-bg);
+ --field-focus:var(--p03-sand);--field-selection:#444238;--field-error:#ffb4a8;--field-error-bg:#3a2525;
+ --field-disabled-bg:var(--p03-input);--field-disabled-text:#a8a69e;--field-disabled-border:var(--p03-line);
+ margin:0!important;padding:0!important;min-height:100dvh;height:auto;overflow-y:auto;
+}
+html[data-field-pliage03=true] body.mir-pliage03.mir-prestige .mir-choice-sheet{font-family:"DM Sans",Arial,sans-serif}
+html[data-field-pliage03=true] body.mir-pliage03.mir-prestige :is(#mir-harmony-header,.production-header,.workshop-banner,.production-intro,.kind-bar,.mir-client-return,.mir-unified-client-shortcut,#production-order,.mir-signature-footer){display:none!important}
+html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-entry] #production-main{padding:14px 16px 24px!important;margin:0!important;max-width:none}
+html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-entry] .mir-pliage03-heading{margin-bottom:12px}
+html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-entry] .mir-production-steps>p{display:none}
+html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-entry] .client-entry-cards{margin:16px 0}
+html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-entry] .client-entry-cards>:is(button,a){min-height:128px}
+@media(max-width:599px){
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-entry] #client-step-list{grid-template-columns:repeat(4,minmax(0,1fr));gap:3px}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-entry] #client-step-list button{flex-direction:column;justify-content:center;text-align:center;gap:5px;min-height:72px;padding:6px 2px;font-size:11px}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-entry] .mir-production-steps{padding-bottom:10px}
 }
 html body.mir-pliage03.mir-prestige[data-client-entry] [hidden]{display:none!important}
 html body.mir-pliage03.mir-prestige[data-client-entry] :is(button,a,input,select,textarea,summary):focus-visible{outline:2px solid var(--p03-sand);outline-offset:4px}

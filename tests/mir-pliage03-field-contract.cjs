@@ -1,0 +1,39 @@
+'use strict';
+// Execute the actual routing/key definitions and editing entrypoint. Browser
+// geometry and controls are covered separately by mir-pliage03-field-browser.
+const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),assert=require('node:assert/strict');
+const source=fs.readFileSync(path.resolve(__dirname,'../dist/production-app.js'),'utf8');
+const scope=source.slice(source.indexOf('const catalogueChannel='),source.indexOf('const unitValue='));
+const declaration=name=>{const match=source.match(new RegExp('^const '+name+'=.*$','m'));assert.ok(match,name);return match[0];};
+const begin=source.indexOf('function editFieldOrderItem('),end=source.indexOf('\nfunction editPiece(',begin);assert.ok(begin>0&&end>begin);
+const edit=source.slice(begin,end),copy=x=>JSON.parse(JSON.stringify(x));
+function run({context=null,embedded=true,mode='client',channel='store',kind='profile',blocked=false}={}){
+ const frame={};frame.self=frame;frame.top=embedded?{}:frame;frame.parent=embedded?{MIRFieldDrawingContext(){if(blocked)throw new Error('cross-origin parent');return context;}}:frame;
+ const row={id:'M001',kind:'profile',spec:{quantity:2,dimensions:{A:3.5,B:2.25},finish:{name:'QA'}},history:[]};
+ const box={client:mode==='client',kind,params:new URLSearchParams({mode,source:channel,kind}),window:frame,order:{items:[row]},draft:null,edits:0,renders:0,updates:0};
+ box.editPiece=id=>{box.edits++;box.draft=copy(box.order.items.find(x=>x.id===id).spec);};box.renderFormMetadata=()=>box.renders++;box.updateDrawing=()=>box.updates++;
+ vm.createContext(box);vm.runInContext(scope+'\n'+declaration('clientProfileWizard')+'\n'+declaration('publicPliage03')+'\n'+edit+'\nglobalThis.keys={...KEYS};globalThis.presentation=publicPliage03();',box);
+ return box;
+}
+const personal=(ownerId='worker-a',jobId='job-a',extra={})=>({personal:true,ownerId,jobId,presentation:'pliage03',...extra});
+let checks=0;function check(name,fn){fn();checks++;console.log('PASS '+name);}
+check('the public client keeps its original keys and presentation',()=>{const x=run({embedded:false,channel:'client'});assert.equal(x.keys.activeProfile,'mir_client_active_profile_v1');assert.equal(x.keys.draft,'mir_production_client_dossier_v1');assert.equal(x.presentation,true);assert.equal(x.editFieldOrderItem('M001'),false);});
+check('personal active drafts are distinct per actor, chantier and unassigned job',()=>{const cases=[personal(),personal('worker-b'),personal('worker-a','job-b'),personal('worker-a',''),personal('worker:a','job:b'),personal('worker','a:job:b')].map(context=>run({context}));assert.equal(new Set(cases.map(x=>x.keys.activeProfile)).size,cases.length);assert.ok(cases.every(x=>x.keys.activeProfile!=='mir_client_active_profile_v1'&&x.presentation));assert.equal(cases[0].keys.draft,'mir_production_employee_dossier_v1_worker-a_job-a');assert.ok(cases[3].keys.activeProfile.endsWith(':unassigned'));});
+check('standalone, invalid-owner and nonpersonal store contexts stay excluded',()=>{for(const options of[{embedded:false},{context:personal('')},{context:personal('   ')},{context:{...personal(),personal:false}},{context:personal(),blocked:true},{context:personal(),kind:'panel'},{context:personal(),mode:'admin'}]){const x=run(options);assert.equal(x.presentation,false,JSON.stringify(options));assert.equal(x.editFieldOrderItem('M001'),false);assert.equal(x.edits,0);}});
+check('legacy personal embedding retains its old presentation and isolated draft',()=>{const x=run({context:personal('worker-a','job-a',{presentation:'legacy'})});assert.equal(x.presentation,false);assert.equal(x.keys.activeProfile,'mir_production_employee_active_profile_v1_worker-a:job-a');assert.equal(x.editFieldOrderItem('M001'),false);});
+check('unknown piece and invalid cart quantities do not mutate any draft or order',()=>{const x=run({context:personal()}),archive=JSON.stringify(x.order);for(const quantity of[null,'',0,-1,1.5,100001,Infinity,NaN])assert.equal(x.editFieldOrderItem('M001',{quantity}),false,String(quantity));assert.equal(x.editFieldOrderItem('M002',{quantity:2}),false);assert.equal(x.edits,0);assert.equal(x.draft,null);assert.equal(JSON.stringify(x.order),archive);});
+check('reediting preserves current cart quantity without committing a revision',()=>{const x=run({context:personal()}),archive=JSON.stringify(x.order);assert.equal(x.editFieldOrderItem('M001',{quantity:6}),true);assert.equal(x.draft.quantity,6);assert.deepEqual(x.draft.dimensions,{A:3.5,B:2.25});assert.equal(JSON.stringify(x.order),archive);assert.equal(x.renders,1);assert.equal(x.updates,1);assert.equal(x.editFieldOrderItem('M001'),true);assert.equal(x.draft.quantity,2,'legacy caller can still reopen saved quantity');assert.equal(JSON.stringify(x.order),archive);});
+const parent=fs.readFileSync(path.resolve(__dirname,'../dist/chantier-app.js'),'utf8');
+const mountBegin=parent.indexOf('function mountFieldDrawing('),mountEnd=parent.indexOf('\n  function authorizedFieldJobs',mountBegin);assert.ok(mountBegin>0&&mountEnd>mountBegin);
+function mounting({ready=true}={}){
+ const appended=[],calls=[],doc={documentElement:{dataset:{}},createElement:tag=>({tag}),head:{append:node=>appended.push(node)},addEventListener(){},defaultView:{addEventListener:(name,fn)=>{if(name==='mir-production-ready')doc.ready=fn;}}};
+ const workspace={editFieldOrderItem:(id,options)=>{calls.push({id,quantity:options.quantity});return true;}};if(ready)doc.defaultView.MIRProductionWorkspace=workspace;
+ const frame={dataset:{},style:{},contentDocument:doc,isConnected:true,getBoundingClientRect:()=>({top:100}),addEventListener:(name,fn)=>{if(name==='load')frame.loaded=fn;}};
+ const box={actorId:'worker-a',mode:'employee',view:'draw',job:'job-a',innerHeight:800,ui:{fieldDrawingRequest:'request-a',fieldDrawingEdit:{id:'M001',quantity:6,ownerId:'worker-a',jobId:'job-a',role:'employee',requestId:'request-a'}},$ :()=>({getBoundingClientRect:()=>({top:740})}),terrainRole:()=>true,toast(){}};
+ box.currentJobId=()=>box.job;vm.createContext(box);vm.runInContext(parent.slice(mountBegin,mountEnd),box);box.mountFieldDrawing(frame);
+ return{box,frame,doc,appended,calls,workspace};
+}
+check('real parent mount injects only native controls and consumes the matching edit once',()=>{const x=mounting();x.frame.loaded();assert.deepEqual(x.calls,[{id:'M001',quantity:6}]);assert.equal(x.box.ui.fieldDrawingEdit,undefined);assert.deepEqual(x.appended.filter(n=>n.tag==='link').map(n=>n.href),['mir-field-controls.css']);assert.deepEqual(x.appended.filter(n=>n.tag==='script').map(n=>n.src),['mir-field-controls.js']);});
+check('delayed parent editing cannot cross actor, chantier, role, view or request',()=>{for(const [key,value]of[['actorId','worker-b'],['job','job-b'],['mode','chef_equipe'],['view','catalogue'],['request','request-b'],['connected',false]]){const x=mounting({ready:false});x.frame.loaded();if(key==='request')x.box.ui.fieldDrawingRequest=value;else if(key==='connected')x.frame.isConnected=value;else x.box[key]=value;x.doc.defaultView.MIRProductionWorkspace=x.workspace;x.doc.ready();assert.equal(x.calls.length,0,key);assert.equal(x.box.ui.fieldDrawingEdit,undefined,key);}});
+check('an old iframe or callback never consumes a newer edit request',()=>{for(const timing of['before-load','before-ready']){const x=mounting({ready:false});if(timing==='before-ready')x.frame.loaded();const fresh={...x.box.ui.fieldDrawingEdit,requestId:'new-request'};x.box.ui.fieldDrawingEdit=fresh;x.box.ui.fieldDrawingRequest=fresh.requestId;if(timing==='before-load')x.frame.loaded();else{x.doc.defaultView.MIRProductionWorkspace=x.workspace;x.doc.ready();}assert.equal(x.calls.length,0);assert.equal(x.box.ui.fieldDrawingEdit,fresh);}});
+console.log(JSON.stringify({passed:true,checks,scope:'actual field context/key logic and personal edit entrypoint; no browser rendering claim'}));

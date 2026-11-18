@@ -1,3 +1,7 @@
+Refonte app C02 / M08 / P10 — version standard **0.13.2-test**, codes **130003 → 130004** pour la recette de mise à jour. Même identifiant `ca.revetementsmir.equipe.test`, ressources `dist/` embarquées et environnement MIR TEST. L’accueil et le Punch existants sont conservés. La nouvelle APK doit être validée sur son SHA exact avant remise.
+
+Les versions et preuves des paragraphes suivants sont historiques. Le paquet personnel Samsung S25 (`ca.revetementsmir.equipe.recette.s25`) possède sa propre identité et sa propre signature; cette compilation standard ne prétend pas le remplacer.
+
 Refonte chantier TEST : **0.13.0-test /130001**, CI de mise à jour130001→130002. Nouvelle interface Employé/Chef activée dans APK TEST, mêmes sources dist ; [intégration et limites](../docs/verification/chantier-redesign/INTEGRATION.md). Recette physique Samsung ouverte. Google/courriels désactivés.
 
 # Android privé MIR — recette uniquement

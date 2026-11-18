@@ -1,9 +1,14 @@
-/* Presentation adapter for the public profile wizard. The production controller
+/* Presentation adapter for the public and explicitly opted-in personal profile wizard. The production controller
  * owns all business values, validation, persistence and cart mutations. */
 (() => {
  'use strict';
  const params=new URLSearchParams(location.search);
- if(params.get('mode')!=='client'||params.get('source')==='store'||window.self!==window.top)return;
+ let field=null;
+ try{if(params.get('source')==='store'&&window.parent!==window)field=window.parent.MIRFieldDrawingContext?.();}catch{}
+ const fieldPliage03=params.get('kind')==='profile'&&field?.personal===true&&typeof field.ownerId==='string'&&field.ownerId.trim().length>0&&field.presentation==='pliage03';
+ const publicClient=params.get('source')!=='store'&&window.self===window.top;
+ if(params.get('mode')!=='client'||!publicClient&&!fieldPliage03)return;
+ if(fieldPliage03){document.documentElement.dataset.fieldPliage03='true';document.body.classList.add('mir-prestige');}
  const $=s=>document.querySelector(s);
  const T=s=>s; // Canonical French source; shared locale observer owns FR/EN roundtrips.
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -16,7 +21,7 @@
    nav.classList.add('mir-pliage03-steps');workspace.prepend(nav);
    nav.after($('#client-entry'));$('.config-card').classList.add('mir-pliage03-config');
    const heading=document.createElement('div');heading.className='mir-pliage03-heading';
-   heading.innerHTML='<p class="eyebrow">PLIAGE SUR MESURE</p><a href="selection.html">Voir mon panier <span aria-hidden="true">↗</span></a>';
+   heading.innerHTML='<p class="eyebrow">PLIAGE SUR MESURE</p><a href="'+(fieldPliage03?'chantier.html?view=orders':'selection.html')+'">Voir mon panier <span aria-hidden="true">↗</span></a>';
    workspace.before(heading);
    $('#client-choose-model .client-entry-icon').innerHTML='<svg viewBox="0 0 120 90" aria-hidden="true"><path d="M32 15V70H95" fill="none" stroke="currentColor" stroke-width="4"/></svg>';
    $('#client-draw-profile .client-entry-icon').innerHTML='<svg viewBox="0 0 120 90" aria-hidden="true"><path d="M28 66L34 45 80 10 92 24 45 61Z M34 45L45 61 M72 17L84 31 M28 66L45 61" fill="none" stroke="currentColor" stroke-width="2.5"/></svg>';

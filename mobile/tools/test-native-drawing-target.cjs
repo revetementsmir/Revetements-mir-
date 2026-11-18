@@ -23,10 +23,13 @@ const keyboardTest=keyboardSource.slice(keyboardSource.indexOf('@Test public voi
 assert.match(keyboardTest,/uptimeMillis\(\)\+5000/);assert.match(keyboardTest,/isVisible\(androidx\.core\.view\.WindowInsetsCompat\.Type\.ime\(\)\)/);assert.match(keyboardTest,/assertTrue\("Clavier Android visible",keyboard\.get\(\)\)/);assert.doesNotMatch(keyboardTest,/\.focus\(|showSoftInput/);
 const metadata=source.slice(source.indexOf('private String fieldMetadataReady('),source.indexOf('private JSONArray assertAndroidFontScales('));
 const metadataExpressions=[...metadata.matchAll(/return ("(?:[^"\\]|\\.)*");/g)].map(m=>JSON.parse(m[1]));
-assert.equal(metadataExpressions.length,3,'Actual Java metadata waits for all three scaled views');
-for(const predicate of metadataExpressions){
+assert.match(metadata,/if\(view\.equals\("command"\)\|\|view\.equals\("catalogue"\)\)/,'C02 direct Commande and its Magasin tab share the selected-job proof');
+assert.equal(metadataExpressions.length,2,'Actual Java metadata keeps catalogue and Punch predicates');
+const metadataByView={command:metadataExpressions[0],catalogue:metadataExpressions[0],punch:metadataExpressions[1]};
+for(const [view,predicate] of Object.entries(metadataByView)){
  const node={value:'7da20261-1114-4000-8000-000000000001',textContent:'Adresse à préciser',selectedOptions:[{textContent:'Adresse à préciser'}],nextElementSibling:{textContent:'Adresse à préciser'}};
- const context={document:{querySelector:()=>node}};
+ const selector=view==='punch'?'[data-field-punch-job]':'#order-job';
+ const context={document:{querySelector:value=>value===selector?node:null}};
  assert.equal(Boolean(vm.runInNewContext(predicate,context)),false,'Loaded view alone is insufficient for a font-scale screenshot');
  node.textContent=node.selectedOptions[0].textContent=node.nextElementSibling.textContent='QA-UX-1 · 10 rue fictive QA';
  assert.equal(vm.runInNewContext(predicate,context),true,'Canonical metadata qualifies the screenshot');

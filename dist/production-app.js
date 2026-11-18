@@ -11,8 +11,12 @@ const shortPanel=matchMedia('(max-height: 520px) and (min-aspect-ratio: 3/2)');
 // This selects a local catalogue only; it is not authentication or authorization.
 const catalogueChannel=params.get('source')==='store'?'store':'client';
 const fieldDrawingContext=(()=>{try{return client&&catalogueChannel==='store'&&window.parent!==window?window.parent.MIRFieldDrawingContext?.():null;}catch(_){return null;}})();
-const fieldPersonal=fieldDrawingContext?.personal===true&&typeof fieldDrawingContext.ownerId==='string';
-const KEYS={templates:'mir_production_templates_v1',requests:'mir_production_requests_v1',draft:!client?'mir_production_admin_dossier_v1':catalogueChannel==='store'?(fieldPersonal?'mir_production_employee_dossier_v1_'+fieldDrawingContext.ownerId+'_'+(fieldDrawingContext.jobId||'unassigned'):'mir_production_employee_dossier_v1'):'mir_production_client_dossier_v1'};
+const fieldPersonal=fieldDrawingContext?.personal===true&&typeof fieldDrawingContext.ownerId==='string'&&fieldDrawingContext.ownerId.trim().length>0;
+// The chantier parent opts into presentation only. Store catalogues, template
+// permissions and the personal order remain owned by their existing controllers.
+const fieldPliage03=fieldPersonal&&params.get('kind')==='profile'&&fieldDrawingContext.presentation==='pliage03';
+const fieldActiveScope=fieldPersonal?encodeURIComponent(fieldDrawingContext.ownerId)+':'+encodeURIComponent(fieldDrawingContext.jobId||'unassigned'):'';
+const KEYS={templates:'mir_production_templates_v1',requests:'mir_production_requests_v1',draft:!client?'mir_production_admin_dossier_v1':catalogueChannel==='store'?(fieldPersonal?'mir_production_employee_dossier_v1_'+fieldDrawingContext.ownerId+'_'+(fieldDrawingContext.jobId||'unassigned'):'mir_production_employee_dossier_v1'):'mir_production_client_dossier_v1',activeProfile:fieldPersonal?'mir_production_employee_active_profile_v1_'+fieldActiveScope:catalogueChannel==='store'?'mir_production_store_active_profile_v1':'mir_client_active_profile_v1'};
 const unitValue=(mm,unit)=>unit==='mm'?mm:mm/25.4;
 const fmt=value=>finite(value)?String(Math.round(value*10000)/10000):'';
 const uid=()=>globalThis.crypto?.randomUUID?.()||Date.now().toString(36)+'-'+Math.random().toString(36).slice(2);
@@ -60,7 +64,7 @@ function applyStoreColorLock(){
 const profiles={l:{name:'Pliage en L',dimensions:{A:3,B:2}},j:{name:'Pliage en J',dimensions:{A:1,B:3,C:1}},z:{name:'Pliage en Z',dimensions:{A:2,B:4,C:2}},beam5:{name:'Cache-poutre · 5 côtés',dimensions:{A:1,B:6,C:8,D:6,E:1}},omega:{name:'Oméga',dimensions:{A:1,B:2,C:4,D:2,E:1}},custom:{name:'Profil personnalisé',segments:[{label:'A',length:4},{label:'B',length:3},{label:'C',length:2}],bends:[{mode:'interior',angle:90,direction:'left'},{mode:'interior',angle:90,direction:'right'}],startAngle:0},...window.MIRBendingPresets?.catalog(),j_soffite:{name:'J à soffite · 12 pi',template:'j',mirProfileId:'j_soffite',dimensions:{A:1,B:3,C:1}}};
 const phase10ProfileIds=new Set((window.MIRBendingPresets?.VARIANTS||[]).map(({id})=>id));
 const shapes=[['rectangle','Rectangle'],['square','Carré'],['right-triangle','Triangle rectangle'],['triangle','Triangle à sommet'],['roof-slope','Panneau haut rampant X/12'],['trapezoid','Trapèze'],['parallelogram','Parallélogramme'],['pointed','Côté en pointe']];
-function store(key,value){try{localStorage.setItem(key,JSON.stringify(value));if(key===KEYS.draft)window.dispatchEvent(new CustomEvent('mir:workshop-saved'));if(client&&catalogueChannel!=='store'&&[KEYS.draft,'mir_client_active_profile_v1'].includes(key)){const label=document.querySelector('.workshop-banner span:last-child');if(label)label.textContent=(key===KEYS.draft?'Dossier':'Tracé')+' enregistré sur cet appareil';if(clientProfileWizard()){let status=$('#client-local-save');if(!status){status=document.createElement('p');status.id='client-local-save';status.className='field-hint';status.setAttribute('role','status');$('#client-step-hint')?.after(status);}status.textContent='Enregistré';status.title='Enregistré sur cet appareil';status.setAttribute('aria-label','Enregistré sur cet appareil');status.dataset.clientSaveState='saved';}}return true;}catch{const status=$('#client-local-save');if(status){status.textContent='Sauvegarde locale indisponible · exportez votre dossier';status.dataset.clientSaveState='error';status.removeAttribute('aria-label');}toast('La sauvegarde locale est indisponible. Exportez votre dossier JSON.');return false;}}
+function store(key,value){try{localStorage.setItem(key,JSON.stringify(value));if(key===KEYS.draft)window.dispatchEvent(new CustomEvent('mir:workshop-saved'));if(client&&(catalogueChannel!=='store'||fieldPliage03)&&[KEYS.draft,KEYS.activeProfile].includes(key)){const label=document.querySelector('.workshop-banner span:last-child');if(label)label.textContent=(key===KEYS.draft?'Dossier':'Tracé')+' enregistré sur cet appareil';if(clientProfileWizard()){let status=$('#client-local-save');if(!status){status=document.createElement('p');status.id='client-local-save';status.className='field-hint';status.setAttribute('role','status');$('#client-step-hint')?.after(status);}status.textContent='Enregistré';status.title='Enregistré sur cet appareil';status.setAttribute('aria-label','Enregistré sur cet appareil');status.dataset.clientSaveState='saved';}}return true;}catch{const status=$('#client-local-save');if(status){status.textContent='Sauvegarde locale indisponible · exportez votre dossier';status.dataset.clientSaveState='error';status.removeAttribute('aria-label');}toast('La sauvegarde locale est indisponible. Exportez votre dossier JSON.');return false;}}
 function persist(){store(KEYS.draft,{version:1,order});}
 function toast(text,{quiet=false}={}){$('#production-toast').textContent=text;$('#production-toast').classList.toggle('visible',!quiet);clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#production-toast').classList.remove('visible'),4400);}
 function closeDialog(){pendingPOAfterSave=null;$('#production-dialog').close();}
@@ -908,7 +912,9 @@ function syncPieceNameField(){
   input.value=['Profil dessiné','Profil personnalisé','Profil libre'].includes(name)?'':name;
  }
 }
-const publicPliage03=()=>clientProfileWizard()&&catalogueChannel==='client'&&!fieldDrawingContext&&window.self===window.top;
+// Keep the public client exactly as before and opt in only the authenticated
+// personal chantier wrapper. A standalone store or another iframe stays legacy.
+const publicPliage03=()=>clientProfileWizard()&&(fieldPliage03||catalogueChannel==='client'&&!fieldDrawingContext&&window.self===window.top);
 let selectedClientAngle=-1;
 const clientStages=[
  {title:'Choisissez votre moulure',hint:'Sélectionnez un modèle ci-dessous ou dessinez votre propre profil.',action:'Passer aux mesures'},
@@ -1053,7 +1059,7 @@ function goClientStep(step,{confirm=false}={}){
  $('#client-step-title').scrollIntoView({block:'nearest'});
 }
 function updateDrawing({keepForm=false}={}){
- if(clientProfileWizard()&&draft&&order&&clientDraftReady)store('mir_client_active_profile_v1',{version:1,journeyVersion:2,draft,drawPoints,clientStep,clientUnlocked,clientProfileSelected,clientEntry,tool,colorSystem,colorId,materialId,selectedTemplate,clientModelAngles,legacyQuickId,editingItemId});
+ if(clientProfileWizard()&&draft&&order&&clientDraftReady)store(KEYS.activeProfile,{version:1,journeyVersion:2,draft,drawPoints,clientStep,clientUnlocked,clientProfileSelected,clientEntry,tool,colorSystem,colorId,materialId,selectedTemplate,clientModelAngles,legacyQuickId,editingItemId});
  document.body.dataset.panelSketch=String(kind==='panel'&&tool==='panel-trace');
  syncPieceNameField();
  renderFractionPickers();
@@ -1605,6 +1611,16 @@ function offerProfileImport(confirmedPO=false){
  }catch(error){toast(error.message);}
 }
 function restoreSelection(item){const selection=item.selection||{};colorSystem=selection.colorSystem||({manufacturer:'manufacturer',ral:'ral',custom:'special'}[item.spec.finish?.selectionType])||((item.spec.finish||{}).system==='RAL Classic'?'ral':item.spec.finish?.manufacturer||/^Nuancier /i.test(item.spec.finish?.system||'')?'manufacturer':item.spec.finish?.special?'special':'manufacturer');materialId=selection.materialId||materials.find(m=>m.brand===item.spec.finish?.manufacturer)?.id||'';colorId=selection.colorId||'';if(!colorId&&colorSystem==='ral')colorId=ral.colors.find(c=>c.code===item.spec.finish?.code)?.id||'';if(!colorId&&colorSystem==='manufacturer')colorId=(chosenMaterial()?.colors||[]).find(c=>(c.code||c.name)===item.spec.finish?.code)?.id||'';}
+function editFieldOrderItem(id,options={}){
+ if(!fieldPliage03||!clientProfileWizard()||!order.items.some(row=>row.id===id&&row.kind==='profile'))return false;
+ const quantity=options?.quantity===undefined?null:Number(options.quantity);
+ if(quantity!==null&&(!Number.isSafeInteger(quantity)||quantity<1||quantity>100000))return false;
+ editPiece(id);
+ // The app cart may hold a newer quantity. Only the active draft changes here;
+ // the personal dossier and common cart are revised when the user saves it.
+ if(quantity!==null){draft.quantity=quantity;renderFormMetadata();updateDrawing({keepForm:true});}
+ return true;
+}
 function editPiece(id){panelDirectUndo=[];panelDirectRedo=[];const item=order.items.find(row=>row.id===id);if(!item)return;jException=null;activeStoreColorLock=!!(client&&catalogueChannel==='store'&&item.selection?.storeColorMode==='fixed');workflow='configure';authoring=false;editingTemplateId=null;editingItemId=id;activeDefaultLocks={};kind=item.kind;draft=copy(item.spec);preservedPanelMetadata=kind==='panel'?{id,finish:copy(draft.finish||{}),material:copy(draft.material||{})}:null;if(item.stockProfileType)draft.mirProfileId=item.stockProfileType;selectedTemplate=item.snapshot?.templateSnapshot||null;clientModelAngles=Array.isArray(item.clientAngleDefaults||item.snapshot?.values?.clientAngleDefaults)?copy(item.clientAngleDefaults||item.snapshot.values.clientAngleDefaults):null;restoreClientProfileMetadata(item);restoreSelection(item);tool='select';view='face';if(clientProfileWizard()){
  if(!publicProfileMaterials.includes(draft.material?.type)){
   draft.material={type:'',thickness:'',gauge:''};
@@ -2957,14 +2973,33 @@ async function boot(){M=window.MIRProduction;if(!M?.createTemplate)throw new Err
  },true);
  modal.addEventListener('close',()=>{modalPressed=backdropPressed=false;forwardedLabelControl=null;});
  choose(kind,kind==='panel'?'rectangle':'l');const requestedMaterial=params.get('material');if(kind==='panel'&&['unico-up1-acier','unico-up1-aluminium'].includes(requestedMaterial)){const type=requestedMaterial.endsWith('aluminium')?'aluminium':'acier';draft.material={type,name:'Unico U-P1 — '+(type==='acier'?'Acier':'Aluminium plié'),productRef:requestedMaterial,thickness:'',thicknessUnit:'mm',gauge:''};materialId=availableMaterials()[0]?.id||'';colorSystem='manufacturer';const requestedColor=params.get('color'),palette=availableMaterials().find(m=>m.colors.some(c=>c.id===requestedColor));if(palette){materialId=palette.id;colorId=requestedColor;}render();}const linked=params.get('template');if(linked&&templates.some(record=>record.id===linked))useSavedTemplate(linked);if(!client&&params.get('view')==='models'){workflow='models';render();}if(!client&&params.get('view')==='requests'){workflow='requests';render();}if(client&&params.get('kind')==='profile'&&!linked)choose('profile','custom');
+ let restoredClientDraft=false;
  if(clientProfileWizard()&&!linked&&!params.get('profile')){
-  const active=read('mir_client_active_profile_v1',null);
+  // No fallback to the public client key: a colleague or another chantier must
+  // never inherit a draft merely because they use the same device.
+  const active=read(KEYS.activeProfile,null);
   if(active?.version===1&&active.draft?.kind==='profile'&&Array.isArray(active.drawPoints)&&(Array.isArray(active.draft.segments)||active.draft.dimensions&&typeof active.draft.dimensions==='object')){
-   editingItemId=order.items.some(item=>item.id===active.editingItemId)?active.editingItemId:null;selectedTemplate=active.selectedTemplate||null;legacyQuickId=active.legacyQuickId||null;draft=copy(active.draft);drawPoints=copy(active.drawPoints);const restoredStage=Number(active.clientStep)||1,restoredUnlocked=Number(active.clientUnlocked)||1;clientStep=active.journeyVersion===2?Math.min(4,Math.max(1,restoredStage)):Math.min(3,Math.max(1,restoredStage));clientUnlocked=active.journeyVersion===2?Math.min(4,Math.max(clientStep,restoredUnlocked)):Math.min(3,Math.max(clientStep,restoredUnlocked));clientModelAngles=Array.isArray(active.clientModelAngles)?copy(active.clientModelAngles):null;clientProfileSelected=!!active.clientProfileSelected;clientEntry=active.clientEntry||'choice';tool=active.tool==='draw'?'draw':'select';colorSystem=active.colorSystem||'manufacturer';colorId=active.colorId||'';materialId=active.materialId||'';render();
+   editingItemId=order.items.some(item=>item.id===active.editingItemId)?active.editingItemId:null;selectedTemplate=active.selectedTemplate||null;legacyQuickId=active.legacyQuickId||null;draft=copy(active.draft);drawPoints=copy(active.drawPoints);const restoredStage=Number(active.clientStep)||1,restoredUnlocked=Number(active.clientUnlocked)||1;clientStep=active.journeyVersion===2?Math.min(4,Math.max(1,restoredStage)):Math.min(3,Math.max(1,restoredStage));clientUnlocked=active.journeyVersion===2?Math.min(4,Math.max(clientStep,restoredUnlocked)):Math.min(3,Math.max(clientStep,restoredUnlocked));clientModelAngles=Array.isArray(active.clientModelAngles)?copy(active.clientModelAngles):null;clientProfileSelected=!!active.clientProfileSelected;clientEntry=active.clientEntry||'choice';tool=active.tool==='draw'?'draw':'select';colorSystem=active.colorSystem||'manufacturer';colorId=active.colorId||'';materialId=active.materialId||'';render();restoredClientDraft=true;
   }
  }
  if(publicPliage03()&&params.get('start')&&!params.get('quick')&&!linked&&!params.get('profile')){clientStep=1;clientEntry=params.get('start')==='models'?'models':'choice';if(params.get('start')==='draw'){if(draft.template==='custom'&&drawPoints.length)resumeClientTrace();else{choose('profile','custom');startProfileDrawing({fullscreen:false});}}render();const entered=new URL(location.href);entered.searchParams.delete('start');history.replaceState(history.state,'',entered.href);params.delete('start');}
+ let fieldEntryApplied=false;
+ if(fieldPliage03&&['models','draw'].includes(fieldDrawingContext.entry)&&!linked&&!params.get('profile')){
+  const requestId=typeof fieldDrawingContext.entryRequestId==='string'?fieldDrawingContext.entryRequestId:'';
+  const entryKey=KEYS.activeProfile+':entry';
+  let enter=!restoredClientDraft;
+  if(requestId){try{enter=sessionStorage.getItem(entryKey)!==requestId;}catch{}}
+  if(enter){
+   clientStep=1;
+   if(fieldDrawingContext.entry==='models'){clientEntry='models';tool='select';}
+   else if(draft.template==='custom'&&drawPoints.length)resumeClientTrace();
+   else{choose('profile','custom');startProfileDrawing({fullscreen:false});}
+   render();fieldEntryApplied=true;
+   if(requestId){try{sessionStorage.setItem(entryKey,requestId);}catch{}}
+  }
+ }
  clientDraftReady=true;
+ if(fieldEntryApplied)updateDrawing();
  if(clientProfileWizard()&&params.get('quick')&&legacyQuickId!==params.get('quick')&&order.items.find(item=>item.id===editingItemId)?.legacyQuickId!==params.get('quick')){
   const quick=read('mir-bending-v1',null),item=quick?.items?.find(row=>row.id===params.get('quick'));
   const migrated=order.items.find(row=>row.legacyQuickId===params.get('quick'));
@@ -2994,7 +3029,7 @@ async function boot(){M=window.MIRProduction;if(!M?.createTemplate)throw new Err
  });
  offerProfileImport();
  if(!client&&params.get('shared-request'))openRequest(params.get('shared-request'));
- window.MIRProductionWorkspace=Object.freeze({version:'1.1.0',storageKeys:{...KEYS},localOnly:true,newPurchaseOrder(){if(client||!switchWorkshopOrder(defaultOrder()))return false;workflow='configure';render();return true;},openPurchaseOrder(po){if(client)return false;if(!po.items?.every(i=>i.spec&&i.snapshot?.schema==='mir-production-instance-1'&&build(i.spec).valid)){toast('Ancien format ou géométrie à vérifier : dessin conservé; exportez le dossier avant une conversion.');return false;}const next={...defaultOrder(),id:'procurement-'+po.id,poNumber:po.poNumber,project:po.job,foreman:po.foreman,date:po.requestedDate,revision:po.revision,notes:po.notes,items:copy(po.items)};if(!switchWorkshopOrder(next))return false;workflow='configure';authoring=false;render();return true;},getEstimationDossier(){return client?copy(order):null;},getLivePreviewState(){return {model:build(),tool,kind,authoring,editingItemId,preview:view,zoom,pan:{...viewPan},drawPointsMM:drawPoints.map(point=>point.slice()),canUndo:kind==='panel'?panelDirectUndo.length>0:freeformCanUndo(),canRedo:kind==='panel'?panelDirectRedo.length>0:freeformRedo.length>0};},saveCurrentPiece:saveWorkspacePiece,setOrderItemQuantity,openContinueMenu,openOrderPanelEditor(id,key,edge){if(client||!order.items.some(row=>row.id===id&&row.kind==='panel'))return false;editPiece(id);if(edge)openPanelEdge(edge);else openPanelMeasure(key);return true;},editOrderItem(id){if(client||!order.items.some(row=>row.id===id))return false;editPiece(id);return true;},finishFreeformTrace(){if(client||kind!=='profile'||authoring||editingItemId)return false;if(!build().valid||(draft.segments||[]).length<2)return false;if(tool==='draw')freeformFinish();return true;},openModelFromCurrent(){if(client||kind!=='profile'||authoring||editingItemId)return false;if(!build().valid){toast('Termine les cotes avant d’enregistrer ce modèle.');return false;}saveTemplateDialog();return true;}});
+ window.MIRProductionWorkspace=Object.freeze({version:'1.1.0',storageKeys:{...KEYS},localOnly:true,newPurchaseOrder(){if(client||!switchWorkshopOrder(defaultOrder()))return false;workflow='configure';render();return true;},openPurchaseOrder(po){if(client)return false;if(!po.items?.every(i=>i.spec&&i.snapshot?.schema==='mir-production-instance-1'&&build(i.spec).valid)){toast('Ancien format ou géométrie à vérifier : dessin conservé; exportez le dossier avant une conversion.');return false;}const next={...defaultOrder(),id:'procurement-'+po.id,poNumber:po.poNumber,project:po.job,foreman:po.foreman,date:po.requestedDate,revision:po.revision,notes:po.notes,items:copy(po.items)};if(!switchWorkshopOrder(next))return false;workflow='configure';authoring=false;render();return true;},getEstimationDossier(){return client?copy(order):null;},getLivePreviewState(){return {model:build(),tool,kind,authoring,editingItemId,preview:view,zoom,pan:{...viewPan},drawPointsMM:drawPoints.map(point=>point.slice()),canUndo:kind==='panel'?panelDirectUndo.length>0:freeformCanUndo(),canRedo:kind==='panel'?panelDirectRedo.length>0:freeformRedo.length>0};},saveCurrentPiece:saveWorkspacePiece,setOrderItemQuantity,openContinueMenu,openOrderPanelEditor(id,key,edge){if(client||!order.items.some(row=>row.id===id&&row.kind==='panel'))return false;editPiece(id);if(edge)openPanelEdge(edge);else openPanelMeasure(key);return true;},editOrderItem(id){if(client||!order.items.some(row=>row.id===id))return false;editPiece(id);return true;},editFieldOrderItem,finishFreeformTrace(){if(client||kind!=='profile'||authoring||editingItemId)return false;if(!build().valid||(draft.segments||[]).length<2)return false;if(tool==='draw')freeformFinish();return true;},openModelFromCurrent(){if(client||kind!=='profile'||authoring||editingItemId)return false;if(!build().valid){toast('Termine les cotes avant d’enregistrer ce modèle.');return false;}saveTemplateDialog();return true;}});
  matchMedia('(max-width:600px)').addEventListener('change',()=>{if(clientProfileWizard()&&tool==='draw'&&!drag)updateDrawing();});
  if(publicClientDossier()){
   void refreshBendTariff();

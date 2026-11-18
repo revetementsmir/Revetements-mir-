@@ -1,0 +1,172 @@
+/* C02 / M08 / P10 — the approved desktop TEST home's own palette and type.
+ * Reference: mir-prestige-editorial.css and mir-home-desktop-locked.css.
+ * Existing Accueil and Punch intentionally keep their approved presentation.
+ */
+body[data-field-shell=true][data-field-design=home-test]{
+  --field-bg:#242522;--field-surface:#2d2e2a;--field-soft:#353630;
+  --field-text:#f4f1ea;--field-muted:#c8c5bd;--field-border:#55554d;
+  --field-accent:#bda889;--field-action-text:#242522;
+  --mir-page:#242522;--mir-surface:#2d2e2a;--mir-text:#f4f1ea;
+  --mir-muted:#c8c5bd;--mir-border:#55554d;--mir-accent-strong:#bda889;
+  background:var(--field-bg)!important;color:var(--field-text)!important;
+  font-family:"DM Sans",Arial,Helvetica,sans-serif!important;
+  font-weight:400;letter-spacing:0;line-height:1.45;
+}
+body[data-field-shell=true][data-field-design=home-test] :is(button,input,select,textarea){font-family:inherit!important}
+body[data-field-shell=true][data-field-design=home-test] :is(h1,h2,h3){font-family:Arial,Helvetica,sans-serif!important;font-weight:400!important}
+body[data-field-shell=true][data-field-design=home-test] #portal-main{padding:20px 18px 14px!important;max-width:1000px}
+body[data-field-shell=true][data-field-design=home-test] .field-header{background:#242522!important;border-color:#55554d!important}
+body[data-field-shell=true][data-field-design=home-test] .field-avatar{background:#353630!important;border:1px solid #55554d!important;font-weight:500}
+body[data-field-shell=true][data-field-design=home-test] .field-cart b{background:#bda889;color:#242522}
+body[data-field-shell=true][data-field-design=home-test] #portal-navigation.field-bottom{background:#242522!important;box-shadow:none;border-color:#55554d!important}
+body[data-field-shell=true][data-field-design=home-test] #portal-navigation.field-bottom button{position:relative;font-weight:400!important;border-radius:0!important;background:transparent!important}
+body[data-field-shell=true][data-field-design=home-test] #portal-navigation.field-bottom button[aria-current=page]{color:#bda889!important;background:transparent!important}
+body[data-field-shell=true][data-field-design=home-test] #portal-navigation.field-bottom button[aria-current=page]:before{content:"";position:absolute;top:0;left:calc(50% - 11px);width:22px;height:2px;background:#bda889}
+body[data-field-shell=true][data-field-design=home-test] :is(.button,.field-cart-summary){background:#bda889!important;color:#242522!important;border:1px solid #bda889!important;border-radius:4px!important;box-shadow:none!important;font-weight:500!important}
+body[data-field-shell=true][data-field-design=home-test] .button.secondary{background:#353630!important;color:#f4f1ea!important;border-color:#55554d!important}
+body[data-field-shell=true][data-field-design=home-test] .button.danger{background:#963d33!important;color:#fff5f0!important;border-color:#c76e61!important}
+body[data-field-shell=true][data-field-design=home-test] :is(input,select,textarea,.mir-choice-trigger){background:#2d2e2a!important;color:#f4f1ea!important;border-color:#55554d!important;border-radius:4px!important;box-shadow:none!important}
+body[data-field-shell=true][data-field-design=home-test] :is(.mir-choice-panel,.mir-choice-list,.mir-choice-option){background:#2d2e2a!important;color:#f4f1ea!important;border-color:#55554d!important}
+body[data-field-shell=true][data-field-design=home-test] .mir-choice-option[aria-selected=true]{background:#454236!important;color:#f4f1ea!important}
+body[data-field-shell=true][data-field-design=home-test] :is(.field-section,.order-cart,.order-card,.expense-card,.absence-card,.settings-card,.mg-card){border-radius:6px!important}
+body[data-field-shell=true][data-field-design=home-test] #portal-dialog{background:#242522!important;border-color:#55554d!important;border-radius:8px}
+body[data-field-shell=true][data-field-design=home-test] #portal-dialog .dialog-title{font-family:Arial,Helvetica,sans-serif;font-weight:400;letter-spacing:-.035em}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-heading{flex:none;margin:0 0 14px!important;display:block}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-heading h1{margin:0!important;font-size:clamp(1.75rem,5.4vw,2.1rem)!important;line-height:1.12;letter-spacing:-.045em;font-weight:400!important}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-heading p{margin:6px 0 0;color:#c8c5bd!important;font-size:.8125rem}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-heading .mir-app-eyebrow{margin:0 0 8px!important;font-size:.6rem!important;line-height:1.5;letter-spacing:.17em;color:#bda889!important;font-weight:500}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-segments{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;flex:none;min-width:0}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-segments button{min-height:44px;border:1px solid transparent;border-radius:4px;background:#2d2e2a;color:#c8c5bd;font-size:.875rem;font-weight:400;padding:8px}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-segments button[aria-pressed=true]{color:#f4f1ea;background:#454236;border-color:#bda889}
+
+/* C02: fixed frame, one independently scrollable catalogue, common cart. */
+body[data-field-shell=true][data-field-design=home-test] .mir-app-c02{gap:0;height:var(--field-available-height,calc(100dvh - 175px));min-height:0;overflow:visible}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-c02 #employee-browse{display:flex;flex:1;min-height:0;flex-direction:column;gap:9px;overflow:visible}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-c02 #employee-browse[hidden]{display:none!important}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-catalogue-context{flex:none;min-width:0}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-catalogue-context .field-store-context{display:block;margin:0!important}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-catalogue-context .mir-choice-trigger{width:100%;border:0!important;border-bottom:1px solid #55554d!important;border-radius:0!important;background:transparent!important;padding:4px 0!important;min-height:44px;font-size:.875rem!important;text-align:left}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-job-reference{padding:6px 0;font-size:.75rem!important}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-job-reference input{margin-top:4px}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-search-row{display:flex;gap:8px;align-items:center;flex:none}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-search-row .field-store-search{margin:0!important;flex:1!important;min-width:0;height:44px!important}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-search-row #catalogue-search{height:44px!important;min-height:44px;font-size:.875rem!important}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-filter-button[data-field-store-filters]{display:inline-flex!important;align-items:center;justify-content:center;width:44px;min-height:44px;flex:0 0 44px;border-radius:4px;border:1px solid #55554d;background:#353630;color:#f4f1ea}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-c02 .field-store-controls{display:block!important;flex:none}
+body[data-field-shell=true][data-field-design=home-test] .field-store-filter{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}
+body[data-field-shell=true][data-field-design=home-test] .field-store-filter .mir-choice-trigger{min-height:44px!important;padding:8px 10px!important;font-size:.8125rem!important}
+body[data-field-shell=true][data-field-design=home-test] .favorites-filter{min-height:44px!important;padding:8px 12px!important;border:1px solid #55554d!important;border-radius:4px!important;background:transparent!important;color:#c8c5bd!important;font-weight:400}
+body[data-field-shell=true][data-field-design=home-test] .favorites-filter[aria-pressed=true]{background:#454236!important;border-color:#bda889!important;color:#f4f1ea!important}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-c02 .field-store-results{flex:1;display:flex;flex-direction:column;gap:8px;min-height:76px;overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#716a5e transparent}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-results-heading{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex:none}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-results-heading h2{font-size:1rem!important;font-weight:400!important;margin:0}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-results-heading #catalogue-count{display:block!important;margin:0!important;font-size:.75rem;color:#c8c5bd!important;text-align:right}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-c02 #catalogue-grid{display:block!important;flex:none;min-height:0}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-product-list{display:grid;gap:7px}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-c02 .field-store-item{display:grid!important;grid-template-columns:48px minmax(0,1fr) auto;align-items:center;gap:10px;min-height:76px!important;max-height:none!important;padding:9px!important;border:1px solid #45463f;background:#2d2e2a;border-radius:5px;box-shadow:none;text-align:left}
+body[data-field-shell=true][data-field-design=home-test] .field-store-item .mir-app-product-thumb{display:grid;place-items:center;width:48px;height:48px;overflow:hidden;border-radius:3px;background:#f4f1ea;color:#242522}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-product-thumb :is(img,picture,svg,canvas){display:block;max-width:100%!important;width:100%!important;height:100%!important;max-height:100%!important;object-fit:contain}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-product-thumb :is(.product-preview-caption,figcaption,.material-preview-caption){display:none!important}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-product-thumb :is(.product-preview,.mir-store-siding-sample){width:100%;height:100%;min-height:0!important;margin:0!important}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-product-copy{min-width:0;display:block}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-product-copy strong{display:block!important;overflow:visible!important;font-size:.875rem!important;font-weight:500;line-height:1.3;word-break:normal}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-product-copy small{display:block!important;margin-top:5px;font-size:.6875rem!important;line-height:1.3;color:#c8c5bd!important}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-choose{display:inline-flex;align-items:center;min-height:32px;padding:5px 9px;border:1px solid #746b5c;border-radius:3px;font-size:.6875rem;white-space:nowrap;color:#e0cfb3!important}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-quick{margin:0 0 10px}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-quick h3{font-size:.6875rem!important;color:#c8c5bd!important;margin:0 0 7px}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-quick>div{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-quick button{display:block;min-width:0;min-height:44px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:7px;background:transparent;color:#d6c8af;border:1px solid #55554d;border-radius:3px;font-size:.6875rem;text-align:left}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-store-tools{display:flex;justify-content:space-between;align-items:center;gap:8px;flex:none}
+body[data-field-shell=true][data-field-design=home-test] .field-store-pages{display:flex;align-items:center;gap:3px;margin:0;font-size:.6875rem!important;min-height:44px}
+body[data-field-shell=true][data-field-design=home-test] .field-store-pages button{width:36px;min-width:36px;min-height:44px;padding:4px;background:transparent!important;color:#f4f1ea;border:0;border-radius:3px}
+body[data-field-shell=true][data-field-design=home-test] .field-store-pages button:disabled{opacity:.45;color:#c8c5bd!important}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-orders-link{display:flex;align-items:center;gap:5px;padding:7px;background:#353630;color:#f4f1ea;border:1px solid #55554d;border-radius:4px;font-size:.6875rem;min-height:44px;line-height:1.2}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-orders-link svg{width:16px;height:16px}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-c02 .field-store-footer{display:flex!important;align-items:center;gap:10px;min-height:50px!important;width:100%;margin:0;padding:10px 12px!important;flex:none;font-size:.875rem!important;text-align:left}
+body[data-field-shell=true][data-field-design=home-test] .field-store-footer>span{flex:1}
+body[data-field-shell=true][data-field-design=home-test] .field-store-footer strong{font-size:.6875rem;font-weight:500;white-space:nowrap}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-c02 #mobile-cart{display:none!important}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-c02 #order-cart{min-height:0;overflow:auto}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-empty{font-size:.875rem;color:#c8c5bd}
+
+/* M08: three genuine filters; readable threads; search and compose within reach. */
+body[data-field-shell=true][data-field-design=home-test] .mir-app-m08{margin:0!important;display:block!important;background:#242522!important;border:0!important;border-radius:0!important;box-shadow:none!important;min-height:0!important;height:var(--field-available-height,calc(100dvh - 175px))}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-m08 .chat-placeholder{display:none!important}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-message-list{display:flex!important;flex-direction:column;gap:0;width:100%;height:100%;min-height:0;background:#242522!important;border:0!important;padding:0!important;overflow:hidden}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-message-filters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;flex:none;margin:2px 0 16px}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-message-filters button{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:9px;min-height:76px;padding:12px;background:#2d2e2a;color:#c8c5bd;border:1px solid #45463f;border-radius:5px;font-size:.8125rem}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-message-filters button svg{width:20px;height:20px}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-message-filters button[aria-pressed=true]{background:#454236;border-color:#bda889;color:#f4f1ea}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-conversation-scroll{flex:1;min-height:80px;overflow:auto;overscroll-behavior:contain;border-top:1px solid #55554d;scrollbar-width:thin}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-conversation-scroll .chat-conversations{display:block;background:#242522!important}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-conversation{display:grid!important;grid-template-columns:32px minmax(0,1fr) auto;align-items:center;gap:10px;width:100%;min-height:76px!important;padding:12px 0!important;background:#242522!important;border:0!important;border-bottom:1px solid #41423c!important;border-radius:0!important;text-align:left;color:#f4f1ea!important}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-conversation .chat-avatar{display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:#353630;color:#bda889}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-conversation .chat-avatar svg{width:18px;height:18px}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-conversation-copy{min-width:0;display:block}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-conversation-copy strong{display:block;font-size:.875rem;font-weight:500;line-height:1.3}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-conversation-copy small{display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:.75rem;color:#c8c5bd!important;margin-top:5px;line-height:1.3}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-conversation-meta{display:flex;flex-direction:column;align-items:flex-end;gap:7px}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-conversation-meta time{font-size:.625rem;color:#c8c5bd;white-space:nowrap}
+body[data-field-shell=true][data-field-design=home-test] .chat-unread{display:grid;place-items:center;min-width:18px;height:18px;padding:0 4px;border-radius:50%;background:#bda889!important;color:#242522!important;font-size:.625rem;font-weight:600}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-message-actions{flex:none;display:grid;gap:10px;padding-top:14px}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-message-actions #chat-search-form{display:flex;gap:0;border:1px solid #55554d;border-radius:4px;background:#353630;min-height:46px}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-message-actions #chat-search-form label{position:relative;display:flex;align-items:center;min-width:0;flex:1;margin:0!important}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-message-actions #chat-search-form label>svg{display:block!important;position:absolute;left:12px;width:18px;height:18px;pointer-events:none;color:#c8c5bd}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-message-actions #chat-search-form input{border:0!important;background:transparent!important;padding:10px 6px 10px 38px!important;font-size:.8125rem!important;min-height:44px}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-message-actions #chat-search-form button{border:0!important;padding:8px!important;width:44px!important;background:transparent!important}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-primary{display:flex;align-items:center;gap:10px;min-height:50px;padding:12px!important;width:100%;text-align:left}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-primary span{flex:1}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-message-picker .field-row{background:transparent;color:#f4f1ea;min-height:54px;padding:10px 4px}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-message-picker .field-row span{flex:1}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-offline{flex:none;border:1px solid #716858;padding:8px;margin:0 0 10px!important;font-size:.75rem;color:#e0cfb3!important;border-radius:4px}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-m08.has-thread .mir-app-message-list{display:none!important}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-m08 .message-thread{height:100%!important;min-height:0!important;border-radius:5px!important;background:#242522!important}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-m08 .chat-thread-head{background:#242522!important;border-bottom:1px solid #55554d;padding:0 0 12px!important}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-m08 .chat-thread-head h1{font-size:1.35rem!important;line-height:1.25}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-m08 .message-list article.mine{background:#454236!important;color:#f4f1ea!important}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-m08 .message-list article.theirs{background:#353630!important;color:#f4f1ea!important}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-m08 :is(#message-form,.chat-compose){background:#242522!important}
+
+/* P10: the real destinations in a compact list, including role-specific tools. */
+body[data-field-shell=true][data-field-design=home-test] .mir-app-p10{height:var(--field-available-height,calc(100dvh - 175px));min-height:0;display:flex;flex-direction:column}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-menu{flex:1;min-height:0;overflow:auto;border:0!important;border-top:1px solid #55554d!important;border-radius:0!important;margin:4px 0 0!important}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-menu .field-row{min-height:53px!important;padding:12px 2px!important;background:transparent!important;color:#f4f1ea!important;border-bottom:1px solid #41423c!important;gap:10px}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-menu .field-row>span{min-width:0}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-menu .field-row strong{display:flex;align-items:center;gap:13px;font-weight:400;font-size:.875rem;line-height:1.35}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-menu .field-row strong svg{width:19px;height:19px;margin:0;color:#bda889}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-menu .field-row>svg{width:16px;height:16px;margin:0;color:#c8c5bd}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-drawing{height:var(--field-available-height,calc(100dvh - 175px));display:flex;flex-direction:column;min-height:0;gap:10px}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-drawing .mir-app-heading{margin-bottom:2px!important}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-drawing iframe{width:100%;min-height:240px!important;border:1px solid #55554d;border-radius:5px;flex:1;background:#242522}
+
+@media(max-width:380px){
+  body[data-field-shell=true][data-field-design=home-test] #portal-main{padding-inline:12px!important}
+  body[data-field-shell=true][data-field-design=home-test] .mir-app-c02 .field-store-item{grid-template-columns:42px minmax(0,1fr) auto;gap:7px}
+  body[data-field-shell=true][data-field-design=home-test] .field-store-item .mir-app-product-thumb{width:42px;height:42px}
+  body[data-field-shell=true][data-field-design=home-test] .mir-app-choose{padding-inline:6px}
+}
+@media(min-width:900px){
+  body[data-field-shell=true][data-field-design=home-test][data-field-view=messages] #portal-main{max-width:1180px}
+  body[data-field-shell=true][data-field-design=home-test] .mir-app-m08.has-thread{display:grid!important;grid-template-columns:minmax(300px,38%) minmax(0,1fr);gap:28px}
+  body[data-field-shell=true][data-field-design=home-test] .mir-app-m08.has-thread .mir-app-message-list{display:flex!important}
+  body[data-field-shell=true][data-field-design=home-test] .mir-app-m08:not(.has-thread),body[data-field-shell=true][data-field-design=home-test] .mir-app-p10{max-width:680px;margin-inline:auto}
+  body[data-field-shell=true][data-field-design=home-test] .mir-app-product-list{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-height:650px){
+  body[data-field-shell=true][data-field-design=home-test] #portal-main{padding-block:10px!important}
+  body[data-field-shell=true][data-field-design=home-test] .mir-app-heading{margin-bottom:8px!important}
+  body[data-field-shell=true][data-field-design=home-test] .mir-app-heading .mir-app-eyebrow{display:none}
+  body[data-field-shell=true][data-field-design=home-test] .mir-app-c02 .field-store-controls{display:none!important}
+  body[data-field-shell=true][data-field-design=home-test] .mir-app-c02 .field-store-results{min-height:64px}
+  body[data-field-shell=true][data-field-design=home-test] .mir-app-c02 #employee-browse{gap:6px}
+  body[data-field-shell=true][data-field-design=home-test] .mir-app-message-filters{margin-block:0 8px}
+  body[data-field-shell=true][data-field-design=home-test] .mir-app-message-filters button{min-height:52px;flex-direction:row;align-items:center;gap:6px;padding:8px;font-size:.75rem}
+  body[data-field-shell=true][data-field-design=home-test] .mir-app-message-actions{gap:6px;padding-top:8px}
+}
+@media(max-height:490px){
+  body[data-field-shell=true][data-field-design=home-test] .mir-app-c02,body[data-field-shell=true][data-field-design=home-test] .mir-app-drawing{height:auto!important;min-height:var(--field-available-height)}
+  body[data-field-shell=true][data-field-design=home-test] .mir-app-c02 .field-store-results{max-height:230px;min-height:120px}
+}
+@media(prefers-reduced-motion:reduce){body[data-field-shell=true][data-field-design=home-test] *{scroll-behavior:auto!important}}
+
+body[data-field-shell=true][data-field-design=home-test] .mir-app-order-actions{display:flex;justify-content:flex-end;margin-bottom:14px}
