@@ -42,12 +42,14 @@ async function closeSurface(p,id,{escape=false}={}){
  else await p.locator(id+' .close-dialog,'+id+' #mir-pdf-close,'+id+' #estimate-close,'+id+' > button').first().click();
  await p.locator(id).waitFor({state:'hidden'});
 }
-async function rasterPreparedPDF(p,name){
- const pages=await p.evaluate(async()=>{
+async function rasterPreparedPDF(p,name,downloadedBytes){
+ const pages=await p.evaluate(async downloadedBytes=>{
   const PDF=await import('./vendor/pdfjs/pdf.min.mjs');PDF.GlobalWorkerOptions.workerSrc=new URL('./vendor/pdfjs/pdf.worker.min.mjs',location.href).href;
-  const bytes=new Uint8Array(await(await fetch(document.querySelector('#mir-pdf-ready a[download]').href)).arrayBuffer());
+  // Read the actual Playwright download. TEST deliberately forbids fetch(blob:)
+  // via connect-src; the QA reader must honour that policy rather than relax it.
+  const bytes=new Uint8Array(downloadedBytes);
   window.__mirQaPDFDocument=await PDF.getDocument({data:bytes,isEvalSupported:false}).promise;return window.__mirQaPDFDocument.numPages;
- });
+ },Array.from(downloadedBytes));
  const dir=path.join(folder,'pdf-pages',name);fs.mkdirSync(dir,{recursive:true});const rasters=[];
  try{for(let number=1;number<=pages;number++){
   const raster=await p.evaluate(async number=>{const page=await __mirQaPDFDocument.getPage(number),base=page.getViewport({scale:1}),viewport=page.getViewport({scale:1600/Math.max(base.width,base.height)}),canvas=document.createElement('canvas');canvas.width=Math.ceil(viewport.width);canvas.height=Math.ceil(viewport.height);const ctx=canvas.getContext('2d');await page.render({canvasContext:ctx,viewport}).promise;return{width:canvas.width,height:canvas.height,paper:[base.width,base.height],corner:[...ctx.getImageData(10,10,1,1).data],png:canvas.toDataURL('image/png').split(',')[1]};},number);
@@ -82,7 +84,7 @@ async function exportPDF(p,size,locale,{technical=false}={}){
  const bytes=fs.readFileSync(await item.path());assert.equal(bytes.subarray(0,5).toString(),'%PDF-');
  const filename=locale+'-'+size.width+'-'+(phase==='before'?'':technical?'detailed-':'simple-')+item.suggestedFilename();fs.writeFileSync(path.join(folder,filename),bytes);
  fs.writeFileSync(path.join(folder,locale+'-'+size.width+'-export-faces.json'),JSON.stringify(faces,null,2)+'\n');
- const rasters=size.width===1440?await rasterPreparedPDF(p,locale+'-'+(technical?'detailed':'simple')):[];
+ const rasters=size.width===1440?await rasterPreparedPDF(p,locale+'-'+(technical?'detailed':'simple'),bytes):[];
  await closeSurface(p,'#mir-pdf-ready');
  return{panel,file:filename,bytes:bytes.length,sha256:sha(bytes),proof,rasters,faces:faces.map(f=>({key:f.key,name:f.name,svgSha256:sha(f.svg),summary:f.summary,scaleNote:f.scaleNote,footerNote:f.footerNote}))};
 }
