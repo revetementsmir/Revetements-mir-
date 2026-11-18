@@ -1,6 +1,7 @@
 'use strict';
-const test=require('node:test'),assert=require('node:assert/strict');
+const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs');
 const M=require('../dist/production-model.js');
+const S=require('../dist/mir-pliage-surfaces.js');
 
 function profile(direction='left'){
  return M.buildProfile({kind:'profile',template:'custom',name:'L replié',unit:'in',
@@ -96,4 +97,37 @@ test('sans opt-in les sorties historiques et le mode illustratif restent stricte
   const previous=M.profileDiagramContent(model,mapped,options);
   assert.equal(M.profileDiagramContent(model,mapped,{...options,showMeasurements:!illustrative,hemSideMarkers:false}),previous);
  }
+});
+
+function compactFieldRenderer(width,height,indices,production=M){
+ const app=fs.readFileSync(require.resolve('../dist/production-app.js'),'utf8');
+ const source=name=>{const start=app.indexOf('function '+name+'('),end=app.indexOf('\nfunction ',start+1);assert.ok(start>=0,name);return app.slice(start,end);};
+ const code=['bendAngleLabel','profileAnglesOverlay','publicProfileDiagramContent','fieldProfileDiagramSVG'].map(source).join('\n');
+ const win={MIRPliageSurfaces:S,MIRPliage03:{measurementIndices:()=>indices}},host={clientWidth:width,clientHeight:height};
+ return new Function('M','window','$','innerWidth','pointOnView','fmt','esc','profileMeasureInput','publicPliage03',
+  'const fieldPliage03=true,tool="select",selectedClientAngle=0;let drawTransform;\n'+code+'\nreturn model=>({svg:fieldProfileDiagramSVG(model),transform:drawTransform});')(
+  production,win,()=>host,width,(point,tr)=>[tr.ox+point[0]*tr.scale,tr.oy-point[1]*tr.scale],value=>String(Math.round(value*10000)/10000),String,()=>true,()=>true);
+}
+
+test('le vrai aperçu compact agrandit le L sans réduire ou couper les mesures et conserve la projection acceptée',()=>{
+ for(const height of [140,156,180])for(const direction of ['left','right']){
+  const model=profile(direction),before=JSON.stringify(model),{svg,transform}=compactFieldRenderer(377,height,[0,1,2])(model);
+  assert.match(svg,/data-measurement-presentation="dimensions"/);assert.doesNotMatch(svg,/mir-field-dimension-legend/);
+  const result=markers(svg);assert.equal(result.length,3);
+  const a=result[0],drawingHeight=Math.abs(a.end[1]-a.start[1]),previousHeight=Math.max(24,height-120);
+  assert.ok(drawingHeight>=previousHeight*1.7,JSON.stringify({height,direction,drawingHeight,previousHeight}));
+  if(height<=156)assert.ok(drawingHeight>previousHeight*2);
+  assert.match(svg,/font-size="15"/);
+  for(const marker of result){
+   const angle=marker.angle*Math.PI/180,bw=Math.abs(Math.cos(angle))*marker.width+Math.abs(Math.sin(angle))*marker.height,
+    bh=Math.abs(Math.sin(angle))*marker.width+Math.abs(Math.cos(angle))*marker.height;
+   assert.ok(marker.center[0]-bw/2>=7.99&&marker.center[0]+bw/2<=369.01);
+   assert.ok(marker.center[1]-bh/2>=7.99&&marker.center[1]+bh/2<=height-7.99);
+  }
+  assert.ok(outsidePair(result[1],result[2]));assert.ok(outsidePair(result[2],result[1]));
+  assert.ok(Math.abs(a.start[0]-(transform.ox+model.pointsMM[0][0]*transform.scale))<.0002);
+  assert.ok(Math.abs(a.end[1]-(transform.oy-model.pointsMM[1][1]*transform.scale))<.0002);
+  assert.equal(JSON.stringify(model),before);
+ }
+ assert.throws(()=>compactFieldRenderer(377,156,[0,1,2],{...M,profileDiagramContent(){throw Error('Erreur géométrique inattendue');}})(profile()),/Erreur géométrique inattendue/);
 });

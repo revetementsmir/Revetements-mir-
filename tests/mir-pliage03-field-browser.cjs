@@ -185,7 +185,7 @@ async function main(){
   }
   await frame.locator('[data-drawing-undo]').click();const afterUndo=await state(frame);assert.deepEqual(afterUndo.drawPointsMM,beforeUndo.drawPointsMM.slice(0,-1),'undo removes only the last point');
   await frame.locator('#client-new-trace').click();await frame.locator('#production-dialog[open]').waitFor();assert.deepEqual((await state(frame)).drawPointsMM,afterUndo.drawPointsMM,'restart opens a confirmation without clearing the draft');
-  await frame.locator('#production-dialog [data-close-production-dialog]').click();assert.deepEqual((await state(frame)).drawPointsMM,afterUndo.drawPointsMM,'cancelling restart preserves the drawing');
+  await frame.locator('#production-dialog').getByRole('button',{name:'Garder mon tracé',exact:true}).click();assert.deepEqual((await state(frame)).drawPointsMM,afterUndo.drawPointsMM,'cancelling restart preserves the drawing');
   await frame.locator('#client-new-trace').click();await frame.locator('#confirm-client-new-trace').click();assert.equal((await state(frame)).drawPointsMM.length,0,'confirmed restart clears this drawing');
   assert.deepEqual(await frame.evaluate(()=>({order:MIRProductionWorkspace.getEstimationDossier(),cart:MIRUnifiedOrderCart.list()})),archiveBefore,'undo and restart never change the saved order or cart');await untouched(frame);await shot(page,'field-compact-restarted-393x500');
   report.checks.push({name:'samsung-height-500-real-hem-measures-keyboard-back-undo-restart',passed:true,viewport:{width:393,height:851},iframeHeight:500,measurements:compactBefore,threeQuarterReturn:compactQuarter});

@@ -628,27 +628,34 @@ function fieldProfileDiagramSVG(model,{illustrative=false}={}){
  const host=$('#production-drawing'),width=Math.max(240,Math.round(host.clientWidth||innerWidth-32)),height=Math.max(140,Math.round(host.clientHeight||220));
  const points=model.pointsMM||[];if(points.length<2)return '';
  const xs=points.map(point=>point[0]),ys=points.map(point=>point[1]),minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);
- // SVG units are CSS pixels here. The two annotation lanes and the physical
- // hem gap stay readable even when the app gives the preview little height.
- const scale=Math.min(Math.max(24,width-144)/Math.max(1,maxX-minX),Math.max(24,height-120)/Math.max(1,maxY-minY));
- const tr={scale,ox:width/2-(minX+maxX)*scale/2,oy:(height-10)/2+(minY+maxY)*scale/2};
- drawTransform=tr;
- const mapped=points.map(point=>pointOnView(point,tr));
+ // Keep SVG units equal to CSS pixels. Start with a larger drawing and reserve
+ // extra annotation space only on the side that needs it, without shrinking text.
+ const project=([top,bottom])=>{
+  const scale=Math.min(Math.max(24,width-144)/Math.max(1,maxX-minX),Math.max(24,height-top-bottom)/Math.max(1,maxY-minY));
+  const tr={scale,ox:width/2-(minX+maxX)*scale/2,oy:(height+top-bottom)/2+(minY+maxY)*scale/2};
+  return {tr,mapped:points.map(point=>pointOnView(point,tr))};
+ };
  const markerIndices=window.MIRPliage03?.measurementIndices?.(model.segments.length)||model.segments.map((_,index)=>index).slice(0,3);
  const shownAngles={...model,bends:(model.bends||[]).map((bend,index)=>markerIndices.includes(index)&&markerIndices.includes(index+1)?bend:null)};
  const options={bends:model.bends||[],markerModel:model,markerIndices,markers:true,illustrative,paintedMarker:'star',highContrast:true,horizontalBounds:[0,width],verticalBounds:[0,height],angleOverlay:(section,labels,handles)=>profileAnglesOverlay(shownAngles,section,labels,handles,[0,width],[0,height])};
- let content,legend='';
- try{content=publicProfileDiagramContent(model,mapped,options);}
- catch(error){
-  if(!String(error.message||'').startsWith('Cotation technique sans espace'))throw error;
+ let content,accepted,legend='';
+ for(const margins of [[12,12],[12,24],[24,12],[12,52],[52,12],[12,62],[62,12],[55,65]]){
+  const projection=project(margins);
+  try{content=publicProfileDiagramContent(model,projection.mapped,options);accepted=projection;break;}
+  catch(error){if(!String(error.message||'').startsWith('Cotation technique sans espace'))throw error;}
+ }
+ if(!accepted){
   // Dense profiles retain their side labels and an explicit measured legend;
   // no entered dimension is silently removed or replaced by a sample value.
-  content=publicProfileDiagramContent(model,mapped,{...options,showMeasurements:false,angleOverlay:undefined});
+  const projection=project([55,65]);
+  content=publicProfileDiagramContent(model,projection.mapped,{...options,showMeasurements:false,angleOverlay:undefined});
+  accepted=projection;
   if(!illustrative){
    const cell=(width-16)/Math.max(1,markerIndices.length);
    legend='<g class="mir-field-dimension-legend"><rect x="4" y="'+(height-28)+'" width="'+(width-8)+'" height="26" rx="5" fill="#252624"/>'+markerIndices.map((index,position)=>'<text x="'+fmt(8+cell*(position+.5))+'" y="'+(height-14)+'" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#f2efe6">'+esc(model.segments[index].label+' · '+M.formatMeasurement(model.segments[index].lengthMM,model.unit))+'</text>').join('')+'</g>';
   }
  }
+ drawTransform=accepted.tr;
  if(!illustrative)content=content.replace(/<g class="profile-side-marker" data-marker-label="([^"]+)"[^>]*>/g,(match,label)=>{
   const index=model.segments.findIndex(segment=>segment.label===label);
   return index>=0&&profileMeasureInput(index,label)?match.replace(/\s+pointer-events="none"/,'').replace(/\s+aria-hidden="true"/,'').replace(/>$/,` data-edit-profile-measure="${index}" role="button" tabindex="0" aria-label="Modifier la cote ${esc(label)}" style="cursor:pointer">`):match;
