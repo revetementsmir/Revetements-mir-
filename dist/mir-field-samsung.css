@@ -98,3 +98,15 @@ body[data-field-shell=true] .field-home-job-choice{margin:0;display:block}body[d
 body[data-field-shell=true] .field-home-job-select>.mir-choice-chevron{font-size:1.25rem!important;line-height:1!important;height:auto!important;min-height:44px;align-self:stretch}
 /* Touch-up containers keep their photo; their chosen shade needs a visible caption. */
 .field-store-detail .product-preview-caption[data-keep-product-photo-caption]:not(:empty){display:block;margin:0;padding:8px 12px 0;font-size:.8125rem;line-height:1.4}
+
+body[data-field-shell=true] .field-home-list .field-home-punch-primary {
+  background: var(--field-accent);
+  border-color: var(--field-accent);
+  color: var(--field-action-text);
+}
+body[data-field-shell=true] .field-home-list .field-home-punch-primary svg {
+  color: inherit;
+}
+body[data-field-shell=true] #portal-navigation.field-bottom button span {
+  font-size: clamp(.75rem, 3vw, .875rem);
+}

@@ -2,8 +2,67 @@
 (function(g){'use strict';const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function render(c){const{view,state,job,jobs,actor,icon}=c,chef=c.mode==='chef_equipe',assignedChef=chef&&state.lead?.assignment?.jobId===job?.id,b=(label,attrs,secondary=true)=>`<button type="button" class="button ${secondary?'secondary':''}" ${attrs}>${label}</button>`,h=(title,sub='')=>`<header class="field-heading"><h1>${title}</h1><p>${esc(sub)}</p></header>`,row=(label,attrs,sub='')=>`<button class="field-row" type="button" ${attrs}><span><strong>${label}</strong>${sub?`<small>${esc(sub)}</small>`:''}</span>${icon('arrow')}</button>`,choose=()=>jobs.length?`<label class="field-job-choice">Chantier<select data-field-job>${jobs.map(j=>`<option value="${esc(j.id)}"${j.id===job?.id?' selected':''}>${esc(j.number||'')} ${esc(j.name)} · ${esc(j.address||'Adresse à préciser')}</option>`).join('')}</select></label>`:'<p>Aucun chantier assigné. Contactez le bureau.</p>';
 if(view==='day'){
- const weather=job?g.MIRToday?.weather(job,entry=>{const target=document.querySelector('[data-field-weather]');if(target?.dataset.fieldWeather===job.id){target.textContent=entry.label;target.title=entry.reason||'';}}):null,shift=state.punch?.activeShift,pointed=jobs.find(j=>j.id===shift?.segment?.job_id),elsewhere=!!(shift?.segment?.segment_type==='job'&&shift?.segment?.job_id&&job&&shift.segment.job_id!==job.id),notices=state.notifications?.items||[],priority={urgent:2,action_required:1,information:0},notice=[...notices].sort((a,b)=>Number(!b.readAt)-Number(!a.readAt)||(priority[b.priority]||0)-(priority[a.priority]||0)||Date.parse(b.createdAt||b.created_at)-Date.parse(a.createdAt||a.created_at))[0],created=notice?.createdAt||notice?.created_at,stamp=created&&Number.isFinite(Date.parse(created))?new Date(created).toLocaleString('fr-CA',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'Date à préciser',count=Number(state.notifications?.unreadCount||0);
- return `<section class="field-home field-home-list"><div class="field-home-top"><div><time>${new Intl.DateTimeFormat('fr-CA',{weekday:'short',day:'numeric',month:'short'}).format(new Date())}</time>${h(`${actor?.name?.includes('@')||(actor?.name||'').split(' ')[0].length>18?'Bonjour':'Bonjour, '+esc((actor?.name||'Équipe').split(' ')[0])}`)}</div><span data-field-weather="${esc(job?.id||'')}" title="${esc(weather?.reason||'')}">${esc(weather?.label||'Météo indisponible')}</span></div><article class="field-job-hero"><label class="field-home-job-choice"><span class="sr-only">Chantier de ma journée</span><select data-field-home-job aria-label="Changer de chantier"><option value=""${job?'':' selected'}>Choisir mon chantier</option>${jobs.map(j=>`<option value="${esc(j.id)}" data-choice-title="${esc(j.name)}" data-choice-detail="${esc(j.address||'Adresse à préciser')}" data-choice-caption="JOB ${esc(j.number||'—')}"${j.id===job?.id?' selected':''}>JOB ${esc(j.number||'—')} · ${esc(j.name)} · ${esc(j.address||'Adresse à préciser')}</option>`).join('')}</select></label><p class="field-job-address">${esc(job?.address||(job?'Adresse à préciser':'Aucune affectation confirmée.'))}</p><div class="field-actions">${job?b('Dossier','data-view="job"',false):b('Contacter le bureau','data-field-office')}${job?.address?b('Itinéraire',`data-route-job="${esc(job.id)}"`):''}</div></article><button type="button" class="field-home-punch" data-view="punch" aria-label="${shift?'Ouvrir Punch · '+esc(pointed?.name||'chantier à vérifier'):'Ouvrir Punch'}">${icon('clock')}<span><strong>${shift?shift.segment?.segment_type==='travel'?'Déplacement en cours':elsewhere?'En cours ailleurs':'Pointage en cours':'Prêt à commencer'}</strong>${shift?`<small data-confirmed-start="${esc(shift.started_at||'')}">${g.MIRFieldRuntime?.duration(g.MIRFieldRuntime.elapsed(shift.started_at))||'00:00:00'}</small>`:'<small>Aucun pointage en cours</small>'}</span><span>Punch ${icon('arrow')}</span></button><div class="field-home-tools">${job?row(icon('plan')+'Plans du chantier','data-view="plans"')+row(icon('camera')+'Ajouter une photo','data-field-request="photo"')+row(icon('info')+'Signaler un problème','data-field-request="issue"'):row('Mes chantiers','data-view="jobs"')}${chef?row(icon('people')+'Mon équipe','data-field-team-summary'):''}</div><button type="button" class="field-notice-summary" data-view="notifications">${icon('bell')}<span><strong>${count>0?count+' avis non lu'+(count>1?'s':''):notice?'Avis récents · aucun non lu':'Aucun avis non lu'}</strong><small>${notice?esc(stamp)+' · '+esc(c.noticeTitle?.(notice)||notice.title||'Événement MIR'):'Aucun nouvel avis'}</small></span>${icon('arrow')}</button></section>`;
+ const weather=job?g.MIRToday?.weather(job,entry=>{
+  const target=document.querySelector('[data-field-weather]');
+  if(target?.dataset.fieldWeather===job.id){target.textContent=entry.label;target.title=entry.reason||'';}
+ }):null;
+ const shift=state.punch?.activeShift;
+ const segment=shift?.segment;
+ const pointed=jobs.find(j=>j.id===segment?.job_id);
+ const pending=c.punchPending;
+ const segmentLabel={travel:'Déplacement en cours',break:'Pause en cours',warehouse:'Entrepôt en cours'}[segment?.segment_type]||'Pointage en cours';
+ const startAction=!shift&&!pending&&state.punch?.enabled;
+ const punchLabel=pending?'Pointage en attente de synchronisation':shift?segmentLabel:startAction?'Ouvrir le punch':'Pointage indisponible';
+ const pointedLabel=segment?.segment_type==='job'?(pointed?.name||'Chantier à vérifier'):'';
+ const travelOrigin=segment?.segment_type==='travel'&&pointed?'Chantier de départ : '+pointed.name:'';
+ const punchLabelParts=[punchLabel,pointedLabel||travelOrigin];
+ const elapsed=shift&&!pending?g.MIRFieldRuntime?.duration(g.MIRFieldRuntime.elapsed(shift.started_at))||'00:00:00':'';
+ const teamReady=assignedChef&&!!job&&!job.closed&&state.lead?.selectedJobId===job.id;
+ const teamPending=teamReady?(state.lead.team||[]).filter(member=>member.status==='unconfirmed').length:0;
+ const teamDetail=teamPending===0?'Aucune présence à confirmer':teamPending+' présence'+(teamPending===1?'':'s')+' à confirmer';
+ const notices=state.notifications?.items||[];
+ const priority={urgent:2,action_required:1,information:0};
+ const notice=[...notices].sort((a,b)=>Number(!b.readAt)-Number(!a.readAt)||(priority[b.priority]||0)-(priority[a.priority]||0)||Date.parse(b.createdAt||b.created_at)-Date.parse(a.createdAt||a.created_at))[0];
+ const created=notice?.createdAt||notice?.created_at;
+ const stamp=created&&Number.isFinite(Date.parse(created))?new Date(created).toLocaleString('fr-CA',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'Date à préciser';
+ const count=Number(state.notifications?.unreadCount||0);
+ const firstName=actor?.name?.split(' ')[0];
+ const greeting=!firstName||actor.name.includes('@')||firstName.length>18?'Bonjour':'Bonjour, '+esc(firstName);
+ return `<section class="field-home field-home-list">
+  <div class="field-home-top">
+   <div><time>${new Intl.DateTimeFormat('fr-CA',{weekday:'short',day:'numeric',month:'short'}).format(new Date())}</time>${h(greeting)}</div>
+   <span data-field-weather="${esc(job?.id||'')}" title="${esc(weather?.reason||'')}">${esc(weather?.label||'Météo indisponible')}</span>
+  </div>
+  <article class="field-job-hero">
+   <label class="field-home-job-choice">
+    <span class="sr-only">Chantier consulté</span>
+    <select data-field-home-job aria-label="Choisir le chantier à consulter">
+     <option value=""${job?'':' selected'}>Choisir mon chantier</option>
+     ${jobs.map(j=>`<option value="${esc(j.id)}" data-choice-title="${esc(j.name)}" data-choice-detail="${esc(j.address||'Adresse à préciser')}" data-choice-caption="JOB ${esc(j.number||'—')}"${j.id===job?.id?' selected':''}>JOB ${esc(j.number||'—')} · ${esc(j.name)} · ${esc(j.address||'Adresse à préciser')}</option>`).join('')}
+    </select>
+   </label>
+   <p class="field-job-address">${esc(job?.address||(job?'Adresse à préciser':'Aucune affectation confirmée.'))}</p>
+   <div class="field-actions">${job?b('Dossier','data-view="job"'):b('Contacter le bureau','data-field-office')}${job?.address?b('Itinéraire',`data-route-job="${esc(job.id)}"`):''}</div>
+  </article>
+  <button type="button" class="field-home-punch${startAction?' field-home-punch-primary':''}" data-view="punch" aria-label="${esc(punchLabelParts.filter(Boolean).join(' · '))}">
+   ${icon('clock')}
+   <span>
+    <strong>${punchLabel}</strong>
+    ${pointedLabel?`<small>${pending?'Dernier chantier confirmé · ':''}${esc(pointedLabel)}</small>`:''}
+    ${elapsed?`<small data-confirmed-start="${esc(shift.started_at||'')}">${elapsed}</small>`:''}
+   </span>
+   <span aria-hidden="true">${icon('arrow')}</span>
+  </button>
+  ${teamReady?`<div class="field-home-tools field-home-team">
+   ${row(icon('people')+'Mon équipe','data-view="lead-team"',teamDetail)}
+   ${row(icon('plan')+'Rapport de journée','data-lead-report')}
+  </div>`:''}
+  <div class="field-home-tools">
+   ${job?row(icon('plan')+'Plans du chantier','data-view="plans"')+row(icon('camera')+'Ajouter une photo','data-field-request="photo"')+row(icon('info')+'Signaler un problème','data-field-request="issue"'):row('Mes chantiers','data-view="jobs"')}
+   ${chef?'':row(icon('fold')+'Commander un pliage','data-field-catalogue="fold"')}
+  </div>
+  <button type="button" class="field-notice-summary" data-view="notifications">${icon('bell')}<span><strong>${count>0?count+' avis non lu'+(count>1?'s':''):notice?'Avis récents · aucun non lu':'Aucun avis non lu'}</strong><small>${notice?esc(stamp)+' · '+esc(c.noticeTitle?.(notice)||notice.title||'Événement MIR'):'Aucun nouvel avis'}</small></span>${icon('arrow')}</button>
+ </section>`;
 }
 if(view==='command')return `<section class="field-fixed-page field-command-page">${h('Commande')}<button type="button" class="field-command-job" data-view="jobs"><span><strong>${esc(job?.name||'Chantier à confirmer')}</strong><small>${esc(job?.address||'Choisir le chantier de la commande')}</small></span>${icon('arrow')}</button><div class="field-command-entries" data-field-hub-step="${c.commandStep||0}">${row(icon('box')+'Magasin','data-field-catalogue="material" data-field-hub-entry="0"')}${row(icon('fold')+'Banque de pliages','data-field-catalogue="fold" data-field-hub-entry="1"')}${row(icon('plus')+'Dessiner une moulure','data-field-draw data-field-hub-entry="2"')}</div><div class="field-command-adaptive"><button type="button" data-field-hub-page="previous" aria-label="Entrée précédente">←</button><span>${(c.commandStep||0)+1} / 3</span><button type="button" data-field-command-options>Actions</button><button type="button" data-field-hub-page="next" aria-label="Entrée suivante">→</button></div><button class="field-cart-summary" type="button" data-field-cart>${icon('cart')}<span>Mon panier</span><strong>${c.cartCount} ligne(s)</strong></button><div class="field-command-follow">${b('Suivre mes commandes','data-view="orders"')}${b('Matériel et livraisons','data-view="material"')}</div></section>`;
 if(view==='punch'){
