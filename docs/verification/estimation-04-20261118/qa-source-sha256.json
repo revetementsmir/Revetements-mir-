@@ -1,0 +1,7 @@
+{
+  "dist/estimation.html": "1d26c8bbfa142d60800ab47433a897123835cd88790b937b0499bdc305bcb0b4",
+  "dist/mir-estimate.js": "e8cf75925b8f758b6d6437416792d743fc90d427a9c39dd758307f4ce1a4e867",
+  "dist/mir-estimation-04.js": "87887b0919332aa22141472502cd721a1c7e8cef80ce74531a512a7f1f5999b9",
+  "dist/mir-estimation-04.css": "51b57e04cb839f9d5f631fedb9f034a4474d4f2ee38183d58c9a6a9689422714",
+  "tests/mir-estimation-04-browser.cjs": "32a63d777366fc1e4755f0dd7d1d5d10cc447cf677a1d8514aff016fef02a142"
+}

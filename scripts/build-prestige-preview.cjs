@@ -9,6 +9,14 @@ const revision=/^[a-f0-9]{40}$/.test(process.env.VERCEL_GIT_COMMIT_SHA||'')?proc
 const captureManifest=path.join(root,'docs/verification/prestige-20261117/captures-gallery-manifest.json');
 if(fs.existsSync(captureManifest))cp.execFileSync(process.execPath,[path.join(root,'scripts/export-prestige-gallery.cjs'),'--manifest',captureManifest,'--archive'],{cwd:root,stdio:'pipe'});
 build(path.join(root,'dist'),path.join(output,'test'),revision);
+// Estimation 04 can save actual PDF files to its existing IndexedDB draft in
+// this offline preview. The limits come from the real service contract. This
+// read-only local configuration never enables submission or simulates receipt.
+const {LIMITS,PROJECT_DETAILS_VERSION}=require('../supabase/functions/_shared/estimate-contract.mjs');
+const estimatePreview=path.join(output,'test','estimate-preview-api');
+fs.mkdirSync(estimatePreview,{recursive:true});
+fs.writeFileSync(path.join(estimatePreview,'config'),JSON.stringify({enabled:false,preview:true,limits:LIMITS,projectDetailsVersion:PROJECT_DETAILS_VERSION,transport:'multipart'}));
+fs.appendFileSync(path.join(output,'test','mir-estimate-config.js'),`\nif(location.pathname.endsWith('/estimation.html'))window.MIREstimateConfig=Object.freeze({environment:'test',preview:true,apiBase:new URL('estimate-preview-api',location.href).href});\n`);
 // This layer exists only in the generated preview. It never changes live Auth,
 // application endpoints, account state, business forms or the drawing engines.
 function previewGuard(){

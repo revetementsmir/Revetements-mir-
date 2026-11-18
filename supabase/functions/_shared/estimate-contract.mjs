@@ -1,11 +1,20 @@
 /* Shared, runtime-independent validation. Used by Node and Supabase Edge. */
 const LIMITS=Object.freeze({maxFiles:5,maxFileBytes:20*1024*1024,maxTotalFileBytes:25*1024*1024,maxPayloadBytes:8*1024*1024});
+const PROJECT_DETAILS_VERSION=1;
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const canonical=value=>JSON.stringify(value&&typeof value==='object'&&!Array.isArray(value)?Object.fromEntries(Object.keys(value).sort().map(k=>[k,JSON.parse(canonical(value[k]))])):Array.isArray(value)?value.map(x=>JSON.parse(canonical(x))):value);
 const clone=value=>JSON.parse(JSON.stringify(value));
 class EstimateError extends Error{constructor(code,message,status=400,retryable=false){super(message);Object.assign(this,{code,status,retryable});}}
 const error=(code,message,status,retryable)=>new EstimateError(code,message,status,retryable);
 function text(value,max,required=false){if(typeof value!=='string'||value.length>max||/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/.test(value))throw error('INPUT','Un champ est invalide ou trop long.');const out=value.trim();if(required&&!out)throw error('INPUT','Complétez les coordonnées et l’adresse du chantier.');return out;}
+function projectDetailsOf(value){
+ if(!value||typeof value!=='object'||Array.isArray(value)||Object.keys(value).some(k=>!['type','timeline','dimensions','materials'].includes(k)))throw error('PROJECT_DETAILS','Les détails du projet sont invalides.');
+ if(!['house','chalet','multi_unit','renovation'].includes(value.type))throw error('PROJECT_TYPE','Choisissez un type de projet valide.');
+ const out={type:value.type};
+ if(Object.hasOwn(value,'timeline')){if(!['undecided','asap','within_3_months','within_6_months','later'].includes(value.timeline))throw error('PROJECT_TIMELINE','Choisissez un échéancier valide.');out.timeline=value.timeline;}
+ for(const key of ['dimensions','materials'])if(Object.hasOwn(value,key))out[key]=text(value[key],2000);
+ return out;
+}
 function payloadOf(raw,limit){
  if(typeof raw!=='string'||new TextEncoder().encode(raw).byteLength>limit)throw error('PAYLOAD_SIZE','Les choix du projet dépassent la taille permise.',413);
  let p;try{p=JSON.parse(raw);}catch{throw error('INPUT','Le résumé de la demande est illisible.');}
@@ -18,7 +27,9 @@ function payloadOf(raw,limit){
  if(['cart','bending'].includes(p.source)&&(!p.selection||typeof p.selection!=='object'))throw error('SELECTION_REQUIRED','La sélection du dossier est manquante.');
  // The server never injects client HTML into an email or a private page. The
  // snapshot is JSON only; originals are delivered as attachments, never inline.
- return {version:1,source:p.source,contact,address,note:text(p.note||'',5000),...(p.selection?{selection:clone(p.selection)}:{}),...(p.studio?{studio:clone(p.studio)}:{})};
+ // Keep legacy snapshots byte-for-byte equivalent after normalization: no new
+ // property or default is added when projectDetails was absent.
+ return {version:1,source:p.source,contact,address,note:text(p.note||'',5000),...(p.selection?{selection:clone(p.selection)}:{}),...(p.studio?{studio:clone(p.studio)}:{}),...(Object.hasOwn(p,'projectDetails')?{projectDetails:projectDetailsOf(p.projectDetails)}:{})};
 }
 
 function fileMetadata(file,index,limits=LIMITS){
@@ -39,4 +50,4 @@ function submissionManifest(input,limits=LIMITS){
  return {id,payload,files};
 }
 function pdfSignature(bytes){return new TextDecoder().decode(bytes.subarray(0,5))==='%PDF-'&&new TextDecoder().decode(bytes.subarray(Math.max(0,bytes.length-4096))).includes('%%EOF');}
-export {LIMITS,UUID,canonical,EstimateError,error,text,payloadOf,fileMetadata,submissionManifest,pdfSignature};
+export {LIMITS,PROJECT_DETAILS_VERSION,UUID,canonical,EstimateError,error,text,projectDetailsOf,payloadOf,fileMetadata,submissionManifest,pdfSignature};

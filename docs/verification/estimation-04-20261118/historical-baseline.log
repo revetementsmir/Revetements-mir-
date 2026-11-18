@@ -1,0 +1,12 @@
+locator.waitFor: Timeout 30000ms exceeded.
+Call log:
+[2m  - waiting for locator('#estimate-limits').filter({ hasText: '5 PDF' }) to be visible[22m
+[2m    62 × locator resolved to hidden <p id="estimate-limits" data-mir-page-visible="false">Limites du service : 5 PDF au total, 20 Mo par fi…</p>[22m
+
+    at /tmp/mir-est04-historical-baseline-qlqM51/tests/mir-estimate-browser.cjs:8:91 {
+  log: [
+    "  - waiting for locator('#estimate-limits').filter({ hasText: '5 PDF' }) to be visible",
+    '    62 × locator resolved to hidden <p id="estimate-limits" data-mir-page-visible="false">Limites du service : 5 PDF au total, 20 Mo par fi…</p>'
+  ],
+  name: 'TimeoutError'
+}

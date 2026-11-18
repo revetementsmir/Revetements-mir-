@@ -1,0 +1,53 @@
+name: MIR — Estimation 04 TEST
+on:
+  push:
+    branches: [codex/estimation-04-images-20261118]
+  pull_request:
+    paths:
+      - 'dist/estimation.html'
+      - 'dist/mir-estimation-04.*'
+      - 'dist/mir-estimate*'
+      - 'dist/assets/estimation-04/**'
+      - 'server/estimate-service.cjs'
+      - 'supabase/functions/_shared/estimate-*'
+      - 'scripts/build-prestige-preview.cjs'
+      - 'tests/mir-estimation-04-*'
+      - '.github/workflows/mir-estimation-04.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    env:
+      MIR_CHROMIUM_BIN: /usr/bin/google-chrome
+      MIR_ESTIMATION04_OUT: /tmp/mir-estimation04-proof
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install local browser tools
+        run: npm install --no-save playwright@1.58.2 pngjs@7
+      - name: Compatible estimate contracts — local fixtures only
+        run: node --test --test-concurrency=1 tests/mir-estimate-config.cjs tests/mir-estimate-presentation.cjs tests/mir-estimate-edge.cjs tests/mir-estimate-service.cjs tests/mir-estimation-04-contract.cjs
+      - name: Capture immutable reference
+        run: MIR_ESTIMATION04_PHASE=before node tests/mir-estimation-04-browser.cjs
+      - name: Form, languages, responsive and protected pages
+        run: MIR_ESTIMATION04_PHASE=after node tests/mir-estimation-04-browser.cjs
+      - name: Draft recovery and old-service protection
+        run: node tests/mir-estimation-04-engine-browser.cjs
+      - name: Existing cart, bending and Studio estimate dialogs
+        run: node tests/mir-estimation-04-modal-browser.cjs
+      - name: Build read-only TEST preview
+        run: node scripts/build-prestige-preview.cjs
+      - name: Verify offline preview and real local PDF drafts
+        run: MIR_ESTIMATION04_PHASE=preview node tests/mir-estimation-04-browser.cjs
+      - name: Upload browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mir-estimation04-proof
+          path: /tmp/mir-estimation04-proof/

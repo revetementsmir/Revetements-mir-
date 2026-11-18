@@ -1,0 +1,244 @@
+{
+  "createdAt": "2026-11-18T11:55:27.449Z",
+  "transport": "Loopback HTTP fixture, in-memory mailbox; no real backend",
+  "physicalDevices": false,
+  "checks": [
+    {
+      "source": "bending",
+      "width": 390,
+      "height": 844,
+      "passed": true,
+      "files": [
+        {
+          "field": "plans",
+          "filename": "plan-original-est04.pdf",
+          "bytes": 51,
+          "sha256": "4579fbf2740104b473bd355e10bad2bc7534f0496119a9390915199f1db01180"
+        },
+        {
+          "field": "dossier",
+          "filename": "MIR-dossier-pliage.pdf",
+          "bytes": 48157,
+          "sha256": "fbe380d854e2d488a8bc7a66f70e2838db0689204141d72067d5a98594614df9"
+        }
+      ],
+      "projectDetailsAbsent": true,
+      "receiptResumed": true
+    },
+    {
+      "source": "cart",
+      "width": 390,
+      "height": 844,
+      "passed": true,
+      "files": [
+        {
+          "field": "plans",
+          "filename": "plan-original-est04.pdf",
+          "bytes": 51,
+          "sha256": "4579fbf2740104b473bd355e10bad2bc7534f0496119a9390915199f1db01180"
+        },
+        {
+          "field": "dossier",
+          "filename": "MIR-dossier-complet-projet.pdf",
+          "bytes": 45270,
+          "sha256": "66936af75ebae9fb02abf17f70b5468b96fae4df1edb1fc5689898f1c73f8984"
+        }
+      ],
+      "projectDetailsAbsent": true,
+      "receiptResumed": true
+    },
+    {
+      "source": "studio",
+      "width": 390,
+      "height": 844,
+      "passed": true,
+      "files": [
+        {
+          "field": "plans",
+          "filename": "plan-original-est04.pdf",
+          "bytes": 51,
+          "sha256": "4579fbf2740104b473bd355e10bad2bc7534f0496119a9390915199f1db01180"
+        }
+      ],
+      "projectDetailsAbsent": true,
+      "receiptResumed": true
+    },
+    {
+      "source": "bending",
+      "width": 834,
+      "height": 1112,
+      "passed": true,
+      "files": [
+        {
+          "field": "plans",
+          "filename": "plan-original-est04.pdf",
+          "bytes": 51,
+          "sha256": "4579fbf2740104b473bd355e10bad2bc7534f0496119a9390915199f1db01180"
+        },
+        {
+          "field": "dossier",
+          "filename": "MIR-dossier-pliage.pdf",
+          "bytes": 48165,
+          "sha256": "ed1bf0758de8f8716cd063ffa36ce24fe36c242db921f69738d3204de7ff0c0c"
+        }
+      ],
+      "projectDetailsAbsent": true,
+      "receiptResumed": true
+    },
+    {
+      "source": "cart",
+      "width": 834,
+      "height": 1112,
+      "passed": true,
+      "files": [
+        {
+          "field": "plans",
+          "filename": "plan-original-est04.pdf",
+          "bytes": 51,
+          "sha256": "4579fbf2740104b473bd355e10bad2bc7534f0496119a9390915199f1db01180"
+        },
+        {
+          "field": "dossier",
+          "filename": "MIR-dossier-complet-projet.pdf",
+          "bytes": 45270,
+          "sha256": "088714e980b027e3d17bc00fd5ee19e1b47a2c9409829cc23c61acae2b87098c"
+        }
+      ],
+      "projectDetailsAbsent": true,
+      "receiptResumed": true
+    },
+    {
+      "source": "studio",
+      "width": 834,
+      "height": 1112,
+      "passed": true,
+      "files": [
+        {
+          "field": "plans",
+          "filename": "plan-original-est04.pdf",
+          "bytes": 51,
+          "sha256": "4579fbf2740104b473bd355e10bad2bc7534f0496119a9390915199f1db01180"
+        }
+      ],
+      "projectDetailsAbsent": true,
+      "receiptResumed": true
+    },
+    {
+      "source": "bending",
+      "width": 1440,
+      "height": 900,
+      "passed": true,
+      "files": [
+        {
+          "field": "plans",
+          "filename": "plan-original-est04.pdf",
+          "bytes": 51,
+          "sha256": "4579fbf2740104b473bd355e10bad2bc7534f0496119a9390915199f1db01180"
+        },
+        {
+          "field": "dossier",
+          "filename": "MIR-dossier-pliage.pdf",
+          "bytes": 48400,
+          "sha256": "5c5e1da450f0aec3c691b7ea14f778e2356063aca3b267f438b53daa6579fcc0"
+        }
+      ],
+      "projectDetailsAbsent": true,
+      "receiptResumed": true
+    },
+    {
+      "source": "cart",
+      "width": 1440,
+      "height": 900,
+      "passed": true,
+      "files": [
+        {
+          "field": "plans",
+          "filename": "plan-original-est04.pdf",
+          "bytes": 51,
+          "sha256": "4579fbf2740104b473bd355e10bad2bc7534f0496119a9390915199f1db01180"
+        },
+        {
+          "field": "dossier",
+          "filename": "MIR-dossier-complet-projet.pdf",
+          "bytes": 45270,
+          "sha256": "948f3636b935043c0efe98cf556f0a97d8ee1ac5de53142219e0a6faea128594"
+        }
+      ],
+      "projectDetailsAbsent": true,
+      "receiptResumed": true
+    },
+    {
+      "source": "studio",
+      "width": 1440,
+      "height": 900,
+      "passed": true,
+      "files": [
+        {
+          "field": "plans",
+          "filename": "plan-original-est04.pdf",
+          "bytes": 51,
+          "sha256": "4579fbf2740104b473bd355e10bad2bc7534f0496119a9390915199f1db01180"
+        }
+      ],
+      "projectDetailsAbsent": true,
+      "receiptResumed": true
+    }
+  ],
+  "failures": [],
+  "blocked": [
+    {
+      "source": "bending",
+      "width": 390,
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_bend_tariff",
+      "method": "GET"
+    },
+    {
+      "source": "cart",
+      "width": 390,
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "source": "cart",
+      "width": 390,
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "source": "bending",
+      "width": 834,
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_bend_tariff",
+      "method": "GET"
+    },
+    {
+      "source": "cart",
+      "width": 834,
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "source": "cart",
+      "width": 834,
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "source": "bending",
+      "width": 1440,
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_bend_tariff",
+      "method": "GET"
+    },
+    {
+      "source": "cart",
+      "width": 1440,
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "source": "cart",
+      "width": 1440,
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    }
+  ]
+}

@@ -5,7 +5,7 @@ const presentation=require('../dist/mir-estimate-presentation.js');
  * A queued/stored record is never reported as received before email acceptance. */
 const fs=require('node:fs/promises'),path=require('node:path');
 const {createHash,createHmac,randomUUID}=require('node:crypto');
-const {LIMITS,UUID,canonical,EstimateError,error,payloadOf,text}=require('../supabase/functions/_shared/estimate-contract.mjs');
+const {LIMITS,PROJECT_DETAILS_VERSION,UUID,canonical,EstimateError,error,payloadOf,text}=require('../supabase/functions/_shared/estimate-contract.mjs');
 const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
 async function boundedBody(request,max){
  const declared=request.headers.get('content-length');if(declared&&Number(declared)>max)throw error('REQUEST_SIZE','La demande et ses fichiers dépassent la taille permise.',413);
@@ -81,7 +81,7 @@ function createService({repository,provider,authenticateStaff,config,now=()=>Dat
   if(request.method==='OPTIONS')return new Response(null,{status:204,headers:cors});
   try{
    const route=new URL(request.url).pathname.replace(/\/$/,'');
-   if(route==='/api/estimates/config'&&request.method==='GET')return reply({version:1,enabled:configured(),limits,recipient:config.recipient||'estimation@revetementsmir.com',missingConfiguration:configured()?[]:(config.missingConfiguration||['MIR_ESTIMATE_ENABLED','MIR_ESTIMATE_DATA_DIR','MIR_ESTIMATE_FROM','MIR_ESTIMATE_TO','MIR_ESTIMATE_PRIVATE_URL','RESEND_API_KEY','MIR_ESTIMATE_ORGANIZATION_ID','MIR_ESTIMATE_SUPABASE_URL','MIR_ESTIMATE_SUPABASE_PUBLIC_KEY','MIR_ESTIMATE_RATE_SECRET']),privacy:'Accès équipe authentifié. Les PDF et la 3D ne sont jamais publics.'},200,cors);
+   if(route==='/api/estimates/config'&&request.method==='GET')return reply({version:1,projectDetailsVersion:PROJECT_DETAILS_VERSION,enabled:configured(),limits,recipient:config.recipient||'estimation@revetementsmir.com',missingConfiguration:configured()?[]:(config.missingConfiguration||['MIR_ESTIMATE_ENABLED','MIR_ESTIMATE_DATA_DIR','MIR_ESTIMATE_FROM','MIR_ESTIMATE_TO','MIR_ESTIMATE_PRIVATE_URL','RESEND_API_KEY','MIR_ESTIMATE_ORGANIZATION_ID','MIR_ESTIMATE_SUPABASE_URL','MIR_ESTIMATE_SUPABASE_PUBLIC_KEY','MIR_ESTIMATE_RATE_SECRET']),privacy:'Accès équipe authentifié. Les PDF et la 3D ne sont jamais publics.'},200,cors);
    if(route==='/api/estimates'&&request.method==='POST'){
     if(!configured())throw error('UNCONFIGURED','Le service d’estimation n’est pas encore raccordé. Votre brouillon est conservé.',503,true);
     await repository.rateLimit?.(clientAddress,config.rateSecret,{max:config.rateMax||8});

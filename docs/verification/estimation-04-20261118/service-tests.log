@@ -1,0 +1,51 @@
+PASS configuration Estimation P0: production et recette TEST explicites, sans secret ni appel réseau
+✔ tests/mir-estimate-config.cjs (41.075581ms)
+mir_estimates_rpc prepare 400 P0001
+✔ Edge : quatre sources, instantané immuable, PDF exact et destinataire serveur (91.140718ms)
+mir_estimates_rpc received 503 mock-lost-receipt
+mir_estimates_rpc claim 400 P0001
+✔ Edge : doubles clics, panne, accusé perdu et reprises conservent la même clé et le même courriel (34.182325ms)
+✔ Edge : aucun accès privé par lien exact pour visiteur, client, employé non autorisé ou autre organisme (14.132695ms)
+mir_estimates_rpc claim 400 P0001
+mir_estimates_rpc claim 400 P0001
+✔ Edge : limites, signature, antiabus, capacité de reprise et attente de rapprochement après 23 heures (12.762591ms)
+✔ Edge : configuration manquante garde le public fermé et permet seulement le diagnostic admin MIR TEST sans faux reçu (4.16173ms)
+✔ Edge : un téléversement TUS expiré reprend la même fiche avec une nouvelle session privée (298.504128ms)
+✔ Edge : courriel de recette admin TEST avec destinataire confirmé sans ouvrir l’envoi public (12.542866ms)
+✔ Edge : une empreinte de destinataire autorise une boîte de recette sans modifier MIR_ESTIMATE_TO (3.283432ms)
+✔ Edge : préparation DNS Resend limitée au sous-domaine MIR, privée, sans DNS ni forfait modifiés (7.689133ms)
+✔ Edge : voies de recette interdites en production même à un administrateur (1.153525ms)
+✔ Libellés communs : matériaux et pliages sans sélection technique injectée (2.421538ms)
+✔ Courriel court HTML et texte, échappement, dossier privé et lecture sans image (0.694747ms)
+✔ Studio : groupes à estimer et aperçu exclus, sans objet brut (0.249538ms)
+✔ Edge et navigateur utilisent exactement le même formateur (0.999447ms)
+✔ Sélections anciennes ou incomplètes : aucune erreur ni objet brut (0.254145ms)
+✔ Les quatre entrées utilisent le même service, leurs PDF originaux sont exacts et les notices restent privées (146.859918ms)
+✔ Double clic, rechargement du serveur et réponse perdue ne dupliquent ni fiche ni envoi (37.172057ms)
+✔ Échec transport, reprise du brouillon et acceptation non journalisée gardent la même clé fournisseur (36.789562ms)
+✔ La garantie de 24 h n’est pas supposée illimitée : rapprochement obligatoire après 23 h (20.82038ms)
+✔ Validation PDF, nombre et taille refusent avant stockage ; général sans plan permis (6.51376ms)
+✔ Configuration absente, CORS et traversées de chemins échouent sans faux reçu (3.552321ms)
+✔ L’authentification équipe vérifie utilisateur, organisation et rôle depuis le serveur (1.058074ms)
+✔ Adaptateur HTTP exécutable : POST réel, fichier privé et destinataire de test capturé (35.326975ms)
+✔ Estimation04 : anciennes formes et empreintes conservées pour les quatre provenances (3.918673ms)
+✔ Estimation04 : quatre types distincts, cinq échéanciers et champs complets jusqu’à 2000 caractères (1.711039ms)
+✔ Estimation04 : erreur explicite au lieu de perdre un type, échéancier ou champ non pris en charge (0.871468ms)
+✔ Estimation04 : les deux configurations annoncent la capacité sans activer l’envoi (26.545413ms)
+✔ Estimation04 : Node conserve projet, coordonnées, sélection, notes et PDF ; reprise sans double notification (98.058523ms)
+mir_estimates_rpc prepare 400 P0001
+mir_estimates_rpc prepare 400 P0001
+mir_estimates_rpc prepare 400 P0001
+mir_estimates_rpc prepare 400 P0001
+✔ Estimation04 : Edge simule stockage et lecture intégraux avec documents et reprise identiques (36.364468ms)
+✔ Estimation04 : demandes historiques déjà reçues restent reprenables avec leur empreinte existante (16.974403ms)
+✔ Estimation04 : données de projet invalides refusées avant stockage ou notification dans les deux transports (3.633802ms)
+✔ Estimation04 : résumé des notifications sans troncature des nouveaux champs, avec échappement HTML (26.491403ms)
+ℹ tests 33
+ℹ suites 0
+ℹ pass 33
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1293.371422

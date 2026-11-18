@@ -1,0 +1,13 @@
+{
+  "startedAt": "2026-11-18T11:50:08.375Z",
+  "finishedAt": "2026-11-18T11:50:39.441Z",
+  "script": "tests/mir-estimate-browser.cjs",
+  "sourceSha256": "14426eb789ea6c0ff64f36e4694342c849924536ead16fe775de09742d8bd7e7",
+  "copySha256": "14426eb789ea6c0ff64f36e4694342c849924536ead16fe775de09742d8bd7e7",
+  "unchanged": true,
+  "exitCode": 1,
+  "signal": null,
+  "isolatedOutputDirectory": "/tmp/mir-est04-historical-D6H3x5",
+  "realUiTestExcluded": "mir-estimate-real-ui.cjs explicitly uses real Supabase/Storage/Resend",
+  "log": "historical-browser.log"
+}

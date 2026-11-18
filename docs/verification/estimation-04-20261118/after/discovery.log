@@ -1,0 +1,77 @@
+PASS layout-five-steps-1280-fr-CA
+PASS layout-five-steps-1280-en-CA
+PASS layout-five-steps-1440-fr-CA
+PASS layout-five-steps-1440-en-CA
+PASS layout-five-steps-1920-fr-CA
+PASS layout-five-steps-1920-en-CA
+PASS layout-five-steps-834-fr-CA
+PASS layout-five-steps-834-en-CA
+PASS layout-five-steps-390-fr-CA
+PASS layout-five-steps-390-en-CA
+FAIL renovation-draft-pdf-locale-retry-fr-CA: Expected values to be strictly equal:
+
+false !== true
+
+FAIL renovation-draft-pdf-locale-retry-en-CA: Expected values to be strictly equal:
+
+false !== true
+
+PASS unknown-details-allowed
+PASS old-service-blocks-new-details
+PASS frozen-legacy-submission-unchanged
+PASS unconfigured-source-keeps-draft
+FAIL keyboard-navigation: locator.fill: Timeout 20000ms exceeded.
+Call log:
+[2m  - waiting for locator('[name="dimensions"]')[22m
+[2m    - locator resolved to <textarea rows="5" maxlength="2000" name="dimensions" id="estimate04-dimensions" aria-describedby="estimate04-dimensions-error" placeholder="Ex. : largeur et hauteur des murs, superficie connue…"></textarea>[22m
+[2m    - fill("À confirmer")[22m
+[2m  - attempting fill action[22m
+[2m    2 × waiting for element to be visible, enabled and editable[22m
+[2m      - element is not visible[22m
+[2m    - retrying fill action[22m
+[2m    - waiting 20ms[22m
+[2m    2 × waiting for element to be visible, enabled and editable[22m
+[2m      - element is not visible[22m
+[2m    - retrying fill action[22m
+[2m      - waiting 100ms[22m
+[2m    40 × waiting for element to be visible, enabled and editable[22m
+[2m       - element is not visible[22m
+[2m     - retrying fill action[22m
+[2m       - waiting 500ms[22m
+
+PASS chrome-desktop-980
+PASS zoom200-640-fr-CA
+PASS zoom200-640-en-CA
+PASS zoom200-720-fr-CA
+PASS zoom200-720-en-CA
+CAPTURE after-accueil-fr-CA-1280x800.png
+CAPTURE after-maison-fr-CA-1280x800.png
+CAPTURE after-accueil-en-CA-1280x800.png
+CAPTURE after-maison-en-CA-1280x800.png
+CAPTURE after-accueil-fr-CA-1440x900.png
+CAPTURE after-maison-fr-CA-1440x900.png
+CAPTURE after-accueil-en-CA-1440x900.png
+CAPTURE after-maison-en-CA-1440x900.png
+CAPTURE after-accueil-fr-CA-1920x1080.png
+CAPTURE after-maison-fr-CA-1920x1080.png
+CAPTURE after-accueil-en-CA-1920x1080.png
+CAPTURE after-maison-en-CA-1920x1080.png
+CAPTURE after-accueil-fr-CA-834x1194.png
+CAPTURE after-maison-fr-CA-834x1194.png
+CAPTURE after-accueil-en-CA-834x1194.png
+CAPTURE after-maison-en-CA-834x1194.png
+CAPTURE after-accueil-fr-CA-390x844.png
+CAPTURE after-maison-fr-CA-390x844.png
+CAPTURE after-accueil-en-CA-390x844.png
+CAPTURE after-maison-en-CA-390x844.png
+PASS accueil-and-maison-protected
+AssertionError [ERR_ASSERTION]: see results.json
+    at main (/workspace/mir-estimation04/tests/mir-estimation-04-browser.cjs:93:1068)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}

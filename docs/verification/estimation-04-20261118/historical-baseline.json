@@ -1,0 +1,22 @@
+{
+  "startedAt": "2026-11-18T12:00:00.878Z",
+  "finishedAt": "2026-11-18T12:00:32.680Z",
+  "actuallyExecuted": true,
+  "baselineRepository": "/workspace/mir-inspiration",
+  "baselineCommit": "7ae54b3525dc792ba10aafa7079addeb3829a4fe",
+  "baselineCleanBefore": true,
+  "script": "tests/mir-estimate-browser.cjs",
+  "sourceSha256": "14426eb789ea6c0ff64f36e4694342c849924536ead16fe775de09742d8bd7e7",
+  "copySha256": "14426eb789ea6c0ff64f36e4694342c849924536ead16fe775de09742d8bd7e7",
+  "unchanged": true,
+  "exitCode": 1,
+  "signal": null,
+  "isolatedOutputDirectory": "/tmp/mir-est04-historical-baseline-qlqM51",
+  "transport": "Unchanged historical script with HTTP loopback fixture and HTTPS aborted",
+  "log": "historical-baseline.log",
+  "baselineCleanAfter": true,
+  "failureBeforeFillAndSubmit": true,
+  "failureSelector": "#estimate-limits",
+  "failureReason": "Present but hidden by the existing initial-page pager",
+  "sameFirstFailureAsEstimation04": true
+}

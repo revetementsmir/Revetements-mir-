@@ -1,0 +1,14 @@
+{
+  "result": "PASS",
+  "steps": 5,
+  "validationFocus": true,
+  "municipalityEnterAdvancesWithoutSubmission": true,
+  "filesRestored": 1,
+  "localeDataStable": true,
+  "oldServiceBlocked": true,
+  "local503Attempts": 1,
+  "immutableSubmissionRestored": true,
+  "frozenUnsupportedMessagePreserved": true,
+  "fileRemovalEnglish": true,
+  "pageErrors": []
+}

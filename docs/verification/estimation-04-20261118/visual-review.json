@@ -1,0 +1,748 @@
+{
+  "reviewedAt": "2026-11-18T11:54:40.577Z",
+  "reviewer": "/root/public_pages",
+  "baseRevision": "7ae54b3525dc792ba10aafa7079addeb3829a4fe",
+  "source": "working tree, no commit by visual reviewer",
+  "sourceSha256": {
+    "dist/estimation.html": "1d26c8bbfa142d60800ab47433a897123835cd88790b937b0499bdc305bcb0b4",
+    "dist/mir-estimation-04.css": "51b57e04cb839f9d5f631fedb9f034a4474d4f2ee38183d58c9a6a9689422714",
+    "dist/mir-estimation-04.js": "1bfb9142efda99382620ed549393d5879956b52a8a5e9ac5ee92eafad384478c",
+    "dist/mir-estimate.js": "e8cf75925b8f758b6d6437416792d743fc90d427a9c39dd758307f4ce1a4e867",
+    "dist/mir-prestige.css": "467e53a77cd61024135750c43f1cd4ca6515cf34249c46f9c64721b5d5e1d108",
+    "dist/mir-client-pages.css": "6144f0c930670a64f9622d45264df9847255c8019afca6aece0e3a2ce37ca3a1"
+  },
+  "method": {
+    "browser": "Chromium /usr/bin/chromium, Playwright, headless DPR1",
+    "target": "Local source estimation.html. No service response fixtures, remote requests or non-GET permitted.",
+    "contrast": "Actual getComputedStyle foreground/background, ancestor backgrounds and opacity alpha-composited over browser canvas; WCAG sRGB relative luminance ratio. Text antialiasing is excluded per contrast convention.",
+    "scope": "Visual/contrast review only, separate from functional browser QA.",
+    "captureState": "Initial French first step, house selected, service disconnected, single saved-draft status."
+  },
+  "layouts": [
+    {
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "scroll": {
+        "width": 1280,
+        "height": 800
+      },
+      "allFourImagesVisible": true,
+      "footerBottom": 800,
+      "errors": []
+    },
+    {
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "scroll": {
+        "width": 1440,
+        "height": 900
+      },
+      "allFourImagesVisible": true,
+      "footerBottom": 900,
+      "errors": []
+    },
+    {
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "scroll": {
+        "width": 1920,
+        "height": 1080
+      },
+      "allFourImagesVisible": true,
+      "footerBottom": 1080,
+      "errors": []
+    }
+  ],
+  "contrast": [
+    {
+      "name": "title",
+      "selector": "#estimate04-title",
+      "pseudo": null,
+      "text": "Quel bâtiment préparez-vous ?",
+      "computed": {
+        "color": "rgb(244, 241, 234)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "fontSize": "59.04px",
+        "fontWeight": "400",
+        "opacity": "1"
+      },
+      "compositedForeground": "#f4f1ea",
+      "compositedBackground": "#242522",
+      "contrastRatio": 13.661,
+      "largeText": true,
+      "thresholdAA": 3,
+      "disabledControl": false,
+      "aaResult": "pass",
+      "ancestorBackgrounds": [
+        {
+          "tag": "MAIN",
+          "id": "contenu",
+          "className": "mir-est04-main mir-client-pages-main",
+          "backgroundColor": "rgb(36, 37, 34)",
+          "opacity": 1
+        },
+        {
+          "tag": "BODY",
+          "id": "",
+          "className": "mir-signature mir-estimate-page mir-estimation-04 mir-prestige",
+          "backgroundColor": "rgb(36, 37, 34)",
+          "opacity": 1
+        }
+      ]
+    },
+    {
+      "name": "title_italic",
+      "selector": "#estimate04-title em",
+      "pseudo": null,
+      "text": "préparez-vous ?",
+      "computed": {
+        "color": "rgb(189, 168, 137)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "fontSize": "60.2208px",
+        "fontWeight": "400",
+        "opacity": "1"
+      },
+      "compositedForeground": "#bda889",
+      "compositedBackground": "#242522",
+      "contrastRatio": 6.697,
+      "largeText": true,
+      "thresholdAA": 3,
+      "disabledControl": false,
+      "aaResult": "pass",
+      "ancestorBackgrounds": [
+        {
+          "tag": "MAIN",
+          "id": "contenu",
+          "className": "mir-est04-main mir-client-pages-main",
+          "backgroundColor": "rgb(36, 37, 34)",
+          "opacity": 1
+        },
+        {
+          "tag": "BODY",
+          "id": "",
+          "className": "mir-signature mir-estimate-page mir-estimation-04 mir-prestige",
+          "backgroundColor": "rgb(36, 37, 34)",
+          "opacity": 1
+        }
+      ]
+    },
+    {
+      "name": "subtitle",
+      "selector": ".mir-est04-heading p",
+      "pseudo": null,
+      "text": "Choisissez le point de départ de votre demande.",
+      "computed": {
+        "color": "rgb(198, 195, 186)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "fontSize": "15px",
+        "fontWeight": "400",
+        "opacity": "1"
+      },
+      "compositedForeground": "#c6c3ba",
+      "compositedBackground": "#242522",
+      "contrastRatio": 8.744,
+      "largeText": false,
+      "thresholdAA": 4.5,
+      "disabledControl": false,
+      "aaResult": "pass",
+      "ancestorBackgrounds": [
+        {
+          "tag": "MAIN",
+          "id": "contenu",
+          "className": "mir-est04-main mir-client-pages-main",
+          "backgroundColor": "rgb(36, 37, 34)",
+          "opacity": 1
+        },
+        {
+          "tag": "BODY",
+          "id": "",
+          "className": "mir-signature mir-estimate-page mir-estimation-04 mir-prestige",
+          "backgroundColor": "rgb(36, 37, 34)",
+          "opacity": 1
+        }
+      ]
+    },
+    {
+      "name": "card_active",
+      "selector": ".mir-est04-building:has(input:checked) .mir-est04-building-label>span",
+      "pseudo": null,
+      "text": "Maison",
+      "computed": {
+        "color": "rgb(244, 241, 234)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "fontSize": "18px",
+        "fontWeight": "400",
+        "opacity": "1"
+      },
+      "compositedForeground": "#f4f1ea",
+      "compositedBackground": "#242522",
+      "contrastRatio": 13.661,
+      "largeText": false,
+      "thresholdAA": 4.5,
+      "disabledControl": false,
+      "aaResult": "pass",
+      "ancestorBackgrounds": [
+        {
+          "tag": "SPAN",
+          "id": "",
+          "className": "mir-est04-building-label",
+          "backgroundColor": "rgb(36, 37, 34)",
+          "opacity": 1
+        },
+        {
+          "tag": "MAIN",
+          "id": "contenu",
+          "className": "mir-est04-main mir-client-pages-main",
+          "backgroundColor": "rgb(36, 37, 34)",
+          "opacity": 1
+        },
+        {
+          "tag": "BODY",
+          "id": "",
+          "className": "mir-signature mir-estimate-page mir-estimation-04 mir-prestige",
+          "backgroundColor": "rgb(36, 37, 34)",
+          "opacity": 1
+        }
+      ]
+    },
+    {
+      "name": "card_inactive",
+      "selector": ".mir-est04-building:has(input[value=\"chalet\"]) .mir-est04-building-label>span",
+      "pseudo": null,
+      "text": "Chalet",
+      "computed": {
+        "color": "rgb(244, 241, 234)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "fontSize": "18px",
+        "fontWeight": "400",
+        "opacity": "1"
+      },
+      "compositedForeground": "#f4f1ea",
+      "compositedBackground": "#30312b",
+      "contrastRatio": 11.636,
+      "largeText": false,
+      "thresholdAA": 4.5,
+      "disabledControl": false,
+      "aaResult": "pass",
+      "ancestorBackgrounds": [
+        {
+          "tag": "SPAN",
+          "id": "",
+          "className": "mir-est04-building-label",
+          "backgroundColor": "rgb(48, 49, 43)",
+          "opacity": 1
+        },
+        {
+          "tag": "MAIN",
+          "id": "contenu",
+          "className": "mir-est04-main mir-client-pages-main",
+          "backgroundColor": "rgb(36, 37, 34)",
+          "opacity": 1
+        },
+        {
+          "tag": "BODY",
+          "id": "",
+          "className": "mir-signature mir-estimate-page mir-estimation-04 mir-prestige",
+          "backgroundColor": "rgb(36, 37, 34)",
+          "opacity": 1
+        }
+      ]
+    },
+    {
+      "name": "field_label",
+      "selector": ".mir-est04-project-fields label:first-child .mir-est04-field-label",
+      "pseudo": null,
+      "text": "Municipalité",
+      "computed": {
+        "color": "rgb(244, 241, 234)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "fontSize": "13px",
+        "fontWeight": "400",
+        "opacity": "1"
+      },
+      "compositedForeground": "#f4f1ea",
+      "compositedBackground": "#242522",
+      "contrastRatio": 13.661,
+      "largeText": false,
+      "thresholdAA": 4.5,
+      "disabledControl": false,
+      "aaResult": "pass",
+      "ancestorBackgrounds": [
+        {
+          "tag": "MAIN",
+          "id": "contenu",
+          "className": "mir-est04-main mir-client-pages-main",
+          "backgroundColor": "rgb(36, 37, 34)",
+          "opacity": 1
+        },
+        {
+          "tag": "BODY",
+          "id": "",
+          "className": "mir-signature mir-estimate-page mir-estimation-04 mir-prestige",
+          "backgroundColor": "rgb(36, 37, 34)",
+          "opacity": 1
+        }
+      ]
+    },
+    {
+      "name": "field_placeholder",
+      "selector": "input[name=\"city\"]",
+      "pseudo": "::placeholder",
+      "text": "Ex. Québec",
+      "computed": {
+        "color": "rgb(176, 174, 164)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "fontSize": "15px",
+        "fontWeight": "400",
+        "opacity": "1"
+      },
+      "compositedForeground": "#b0aea4",
+      "compositedBackground": "#2d2e29",
+      "contrastRatio": 6.15,
+      "largeText": false,
+      "thresholdAA": 4.5,
+      "disabledControl": false,
+      "aaResult": "pass",
+      "ancestorBackgrounds": [
+        {
+          "tag": "INPUT",
+          "id": "",
+          "className": "",
+          "backgroundColor": "rgb(45, 46, 41)",
+          "opacity": 1
+        },
+        {
+          "tag": "MAIN",
+          "id": "contenu",
+          "className": "mir-est04-main mir-client-pages-main",
+          "backgroundColor": "rgb(36, 37, 34)",
+          "opacity": 1
+        },
+        {
+          "tag": "BODY",
+          "id": "",
+          "className": "mir-signature mir-estimate-page mir-estimation-04 mir-prestige",
+          "backgroundColor": "rgb(36, 37, 34)",
+          "opacity": 1
+        }
+      ]
+    },
+    {
+      "name": "field_value",
+      "selector": "select[name=\"timeline\"]",
+      "pseudo": null,
+      "text": "À déterminer\nDès que possible\nD’ici 3 mois\nD’ici 6 mois\nPlus tard",
+      "computed": {
+        "color": "rgb(244, 241, 234)",
+        "backgroundColor": "rgb(45, 46, 41)",
+        "fontSize": "15px",
+        "fontWeight": "400",
+        "opacity": "1"
+      },
+      "compositedForeground": "#f4f1ea",
+      "compositedBackground": "#2d2e29",
+      "contrastRatio": 12.133,
+      "largeText": false,
+      "thresholdAA": 4.5,
+      "disabledControl": false,
+      "aaResult": "pass",
+      "ancestorBackgrounds": [
+        {
+          "tag": "SELECT",
+          "id": "estimate04-timeline",
+          "className": "",
+          "backgroundColor": "rgb(45, 46, 41)",
+          "opacity": 1
+        },
+        {
+          "tag": "MAIN",
+          "id": "contenu",
+          "className": "mir-est04-main mir-client-pages-main",
+          "backgroundColor": "rgb(36, 37, 34)",
+          "opacity": 1
+        },
+        {
+          "tag": "BODY",
+          "id": "",
+          "className": "mir-signature mir-estimate-page mir-estimation-04 mir-prestige",
+          "backgroundColor": "rgb(36, 37, 34)",
+          "opacity": 1
+        }
+      ]
+    },
+    {
+      "name": "primary_button",
+      "selector": "#estimate04-next",
+      "pseudo": null,
+      "text": "Continuer →",
+      "computed": {
+        "color": "rgb(36, 37, 34)",
+        "backgroundColor": "rgb(189, 168, 137)",
+        "fontSize": "15px",
+        "fontWeight": "500",
+        "opacity": "1"
+      },
+      "compositedForeground": "#242522",
+      "compositedBackground": "#bda889",
+      "contrastRatio": 6.697,
+      "largeText": false,
+      "thresholdAA": 4.5,
+      "disabledControl": false,
+      "aaResult": "pass",
+      "ancestorBackgrounds": [
+        {
+          "tag": "BUTTON",
+          "id": "estimate04-next",
+          "className": "mir-button",
+          "backgroundColor": "rgb(189, 168, 137)",
+          "opacity": 1
+        },
+        {
+          "tag": "MAIN",
+          "id": "contenu",
+          "className": "mir-est04-main mir-client-pages-main",
+          "backgroundColor": "rgb(36, 37, 34)",
+          "opacity": 1
+        },
+        {
+          "tag": "BODY",
+          "id": "",
+          "className": "mir-signature mir-estimate-page mir-estimation-04 mir-prestige",
+          "backgroundColor": "rgb(36, 37, 34)",
+          "opacity": 1
+        }
+      ]
+    },
+    {
+      "name": "progress_active",
+      "selector": ".mir-est04-progress button[aria-current=\"step\"] .mir-est04-step-label",
+      "pseudo": null,
+      "text": "Projet",
+      "computed": {
+        "color": "rgb(244, 241, 234)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "fontSize": "14px",
+        "fontWeight": "400",
+        "opacity": "1"
+      },
+      "compositedForeground": "#f4f1ea",
+      "compositedBackground": "#242522",
+      "contrastRatio": 13.661,
+      "largeText": false,
+      "thresholdAA": 4.5,
+      "disabledControl": false,
+      "aaResult": "pass",
+      "ancestorBackgrounds": [
+        {
+          "tag": "MAIN",
+          "id": "contenu",
+          "className": "mir-est04-main mir-client-pages-main",
+          "backgroundColor": "rgb(36, 37, 34)",
+          "opacity": 1
+        },
+        {
+          "tag": "BODY",
+          "id": "",
+          "className": "mir-signature mir-estimate-page mir-estimation-04 mir-prestige",
+          "backgroundColor": "rgb(36, 37, 34)",
+          "opacity": 1
+        }
+      ]
+    },
+    {
+      "name": "progress_inactive",
+      "selector": ".mir-est04-progress button[data-estimate-go=\"1\"] .mir-est04-step-label",
+      "pseudo": null,
+      "text": "Dimensions",
+      "computed": {
+        "color": "rgb(154, 154, 144)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "fontSize": "14px",
+        "fontWeight": "400",
+        "opacity": "1"
+      },
+      "compositedForeground": "#9a9a90",
+      "compositedBackground": "#242522",
+      "contrastRatio": 5.429,
+      "largeText": false,
+      "thresholdAA": 4.5,
+      "disabledControl": true,
+      "aaResult": "exempt-disabled",
+      "ancestorBackgrounds": [
+        {
+          "tag": "MAIN",
+          "id": "contenu",
+          "className": "mir-est04-main mir-client-pages-main",
+          "backgroundColor": "rgb(36, 37, 34)",
+          "opacity": 1
+        },
+        {
+          "tag": "BODY",
+          "id": "",
+          "className": "mir-signature mir-estimate-page mir-estimation-04 mir-prestige",
+          "backgroundColor": "rgb(36, 37, 34)",
+          "opacity": 1
+        }
+      ]
+    },
+    {
+      "name": "progress_active_number",
+      "selector": ".mir-est04-progress button[aria-current=\"step\"] .mir-est04-step-number",
+      "pseudo": null,
+      "text": "1",
+      "computed": {
+        "color": "rgb(36, 37, 34)",
+        "backgroundColor": "rgb(189, 168, 137)",
+        "fontSize": "12px",
+        "fontWeight": "400",
+        "opacity": "1"
+      },
+      "compositedForeground": "#242522",
+      "compositedBackground": "#bda889",
+      "contrastRatio": 6.697,
+      "largeText": false,
+      "thresholdAA": 4.5,
+      "disabledControl": false,
+      "aaResult": "pass",
+      "ancestorBackgrounds": [
+        {
+          "tag": "SPAN",
+          "id": "",
+          "className": "mir-est04-step-number",
+          "backgroundColor": "rgb(189, 168, 137)",
+          "opacity": 1
+        },
+        {
+          "tag": "MAIN",
+          "id": "contenu",
+          "className": "mir-est04-main mir-client-pages-main",
+          "backgroundColor": "rgb(36, 37, 34)",
+          "opacity": 1
+        },
+        {
+          "tag": "BODY",
+          "id": "",
+          "className": "mir-signature mir-estimate-page mir-estimation-04 mir-prestige",
+          "backgroundColor": "rgb(36, 37, 34)",
+          "opacity": 1
+        }
+      ]
+    },
+    {
+      "name": "draft_status",
+      "selector": "#estimate-status",
+      "pseudo": null,
+      "text": "Brouillon conservé sur cet appareil. L’envoi n’est pas encore raccordé.",
+      "computed": {
+        "color": "rgb(198, 195, 186)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "fontSize": "12px",
+        "fontWeight": "400",
+        "opacity": "1"
+      },
+      "compositedForeground": "#c6c3ba",
+      "compositedBackground": "#242522",
+      "contrastRatio": 8.744,
+      "largeText": false,
+      "thresholdAA": 4.5,
+      "disabledControl": false,
+      "aaResult": "pass",
+      "ancestorBackgrounds": [
+        {
+          "tag": "MAIN",
+          "id": "contenu",
+          "className": "mir-est04-main mir-client-pages-main",
+          "backgroundColor": "rgb(36, 37, 34)",
+          "opacity": 1
+        },
+        {
+          "tag": "BODY",
+          "id": "",
+          "className": "mir-signature mir-estimate-page mir-estimation-04 mir-prestige",
+          "backgroundColor": "rgb(36, 37, 34)",
+          "opacity": 1
+        }
+      ]
+    },
+    {
+      "name": "footer_signature",
+      "selector": ".mir-est04-footer p",
+      "pseudo": null,
+      "text": "Votre maison. Les bons matériaux. Les bons détails.",
+      "computed": {
+        "color": "rgb(198, 195, 186)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "fontSize": "12px",
+        "fontWeight": "400",
+        "opacity": "1"
+      },
+      "compositedForeground": "#c6c3ba",
+      "compositedBackground": "#242522",
+      "contrastRatio": 8.744,
+      "largeText": false,
+      "thresholdAA": 4.5,
+      "disabledControl": false,
+      "aaResult": "pass",
+      "ancestorBackgrounds": [
+        {
+          "tag": "FOOTER",
+          "id": "",
+          "className": "mir-signature-footer mir-est04-footer",
+          "backgroundColor": "rgb(36, 37, 34)",
+          "opacity": 1
+        },
+        {
+          "tag": "BODY",
+          "id": "",
+          "className": "mir-signature mir-estimate-page mir-estimation-04 mir-prestige",
+          "backgroundColor": "rgb(36, 37, 34)",
+          "opacity": 1
+        }
+      ]
+    }
+  ],
+  "contrastSummary": {
+    "activeTextPass": true,
+    "minimumNonDisabledRatio": 6.15,
+    "disabledRows": [
+      {
+        "name": "progress_inactive",
+        "ratio": 5.429,
+        "note": "Inactive steps are disabled; text contrast requirement does not apply. Actual ratio is retained."
+      }
+    ]
+  },
+  "visualComparison": {
+    "result": "pass at requested PC dimensions after final styling",
+    "items": [
+      {
+        "requirement": "Shared anthracite header, original MIR logo, search/cart/languages/account",
+        "finding": "Same shared shell as Particuliers; local desktop composition, header90px, logo166px. No home/shared CSS changed by visual owner."
+      },
+      {
+        "requirement": "Five horizontal steps, exact title and sand italic",
+        "finding": "Five stages aligned; title Quel bâtiment préparez-vous ? with final italic sand emphasis. Subtitle concise and readable."
+      },
+      {
+        "requirement": "Four generous equal cards in a single PC row",
+        "finding": "Four cards visible together. Selected card keeps anthracite label, sand outline and sand checked circle. Native radio focus retained."
+      },
+      {
+        "requirement": "Photo composition",
+        "finding": "Maison retains timber entrance and both gables in displayed crop; Chalet retains full facade and roof; Multilogement retains three floors/four balconies; Renovation shows siding detail. Original approved assets unchanged."
+      },
+      {
+        "requirement": "Municipality, timeline and Continue on same lower row",
+        "finding": "Desktop fields and action aligned under one separator. One service/draft status remains visible; errors are not hidden."
+      },
+      {
+        "requirement": "Compact footer and no first-step PC scroll",
+        "finding": "Footer inside viewport at1280×800,1440×900,1920×1080. No overflow masking used."
+      },
+      {
+        "requirement": "Subsequent stages preserve useful functions",
+        "finding": "Dimensions, documents and contact/summary visually inspected with original engine. English interface labels shown; entered French details retained verbatim."
+      }
+    ]
+  },
+  "responsiveEvidence": {
+    "tablet": {
+      "viewport": [
+        834,
+        1112
+      ],
+      "document": [
+        834,
+        1264
+      ],
+      "layout": "Two columns, natural vertical scroll, no horizontal page overflow."
+    },
+    "phone": {
+      "viewport": [
+        390,
+        844
+      ],
+      "frenchDocument": [
+        390,
+        1161
+      ],
+      "englishDocument": [
+        390,
+        1157
+      ],
+      "layout": "Two columns. English multiline card labels align without gaps. Horizontal progress bar scrolls; later steps remain reachable through Continue."
+    },
+    "limits": [
+      "Chromium viewport emulation only; no physical phone/tablet or Safari claim.",
+      "At zoom or short viewport heights, natural vertical scrolling preserves all fields and actions; one-screen fit is promised only for the three measured desktop sizes.",
+      "Browser-native PDF picker strings follow the browser/OS language. Application labels and attachment controls are localized separately.",
+      "This visual review does not certify real delivery, email, production, Supabase or payment. No request was submitted.",
+      "Supporting copied screenshots were captured during final styling; current contrast screenshot and source hashes identify the exact state measured by this report. Official interaction screenshots belong to the independent QA report."
+    ]
+  },
+  "network": {
+    "policy": "Local GET only; all other traffic aborted",
+    "blockedRequests": []
+  },
+  "captures": [
+    {
+      "file": "visual/visual-review-fr-1280.png",
+      "originalCapturedAt": "2026-11-18T11:48:46.159Z",
+      "sha256": "0e02634955e443ed47fd7715e7a39cece39252ee700430748c505c6685537acc",
+      "kind": "direct-copy-of-local-browser-capture",
+      "note": "No pixel editing. Supporting visual review; interaction QA has separate official captures."
+    },
+    {
+      "file": "visual/visual-review-fr-1440.png",
+      "originalCapturedAt": "2026-11-18T11:48:46.879Z",
+      "sha256": "26617d9e29bc8b2c939362ae378e84b70329d0183f6dfef26dfffd86dbe1125b",
+      "kind": "direct-copy-of-local-browser-capture",
+      "note": "No pixel editing. Supporting visual review; interaction QA has separate official captures."
+    },
+    {
+      "file": "visual/visual-review-fr-1920.png",
+      "originalCapturedAt": "2026-11-18T11:48:47.639Z",
+      "sha256": "a65cd5c0352aec724e88d2b46d65e7447aece511d4e8f31b9d0127c94aa1eb46",
+      "kind": "direct-copy-of-local-browser-capture",
+      "note": "No pixel editing. Supporting visual review; interaction QA has separate official captures."
+    },
+    {
+      "file": "visual/visual-review-fr-834.png",
+      "originalCapturedAt": "2026-11-18T11:48:48.295Z",
+      "sha256": "7f0836e6e91fd351da407e55260a4e305f594c2becc39ce74846a258364f7572",
+      "kind": "direct-copy-of-local-browser-capture",
+      "note": "No pixel editing. Supporting visual review; interaction QA has separate official captures."
+    },
+    {
+      "file": "visual/visual-review-fr-390.png",
+      "originalCapturedAt": "2026-11-18T11:48:48.835Z",
+      "sha256": "421d112803f33bbef483523df60a58b4980af528b073d78814ffa8c190b67841",
+      "kind": "direct-copy-of-local-browser-capture",
+      "note": "No pixel editing. Supporting visual review; interaction QA has separate official captures."
+    },
+    {
+      "file": "visual/visual-review-en-1280.png",
+      "originalCapturedAt": "2026-11-18T11:49:21.126Z",
+      "sha256": "bd62618e5871977897c2a81ea8734cc5a965d997e55f47ddfa5df23cf03f2ee3",
+      "kind": "direct-copy-of-local-browser-capture",
+      "note": "No pixel editing. Supporting visual review; interaction QA has separate official captures."
+    },
+    {
+      "file": "visual/visual-review-en-390.png",
+      "originalCapturedAt": "2026-11-18T11:50:14.774Z",
+      "sha256": "d81f1b8ce565c4b8d8995b3bd23083ad50c47d03295a1369482f2ee19ab5b8e0",
+      "kind": "direct-copy-of-local-browser-capture",
+      "note": "No pixel editing. Supporting visual review; interaction QA has separate official captures."
+    }
+  ],
+  "currentContrastCapture": {
+    "file": "visual/contrast-current-fr-1440.png",
+    "sha256": "26617d9e29bc8b2c939362ae378e84b70329d0183f6dfef26dfffd86dbe1125b"
+  }
+}
