@@ -123,15 +123,40 @@ public class MirRealRolesTest extends MirDeviceSetup {
  private String drawingTargetExpression(String selector){
   return "(()=>{const f=document.querySelector('#field-drawing-frame'),d=f?.contentDocument,n=d?.querySelector("+JSONObject.quote(selector)+");if(!f||!d||!n||!n.isConnected||n.matches(':disabled'))return{ready:false};const r=n.getBoundingClientRect(),frame=f.getBoundingClientRect();if(f.offsetWidth<=0||f.offsetHeight<=0||frame.width<=0||frame.height<=0)return{ready:false};const cx=r.left+r.width/2,cy=r.top+r.height/2,sx=frame.width/f.offsetWidth,sy=frame.height/f.offsetHeight,x=frame.left+(f.clientLeft+cx)*sx,y=frame.top+(f.clientTop+cy)*sy,hit=d.elementFromPoint(cx,cy),parentHit=document.elementFromPoint(x,y);return{ready:r.width>0&&r.height>0&&cx>=0&&cy>=0&&cx<f.contentWindow.innerWidth&&cy<f.contentWindow.innerHeight&&x>=0&&y>=0&&x<innerWidth&&y<innerHeight&&!!hit&&(hit===n||n.contains(hit))&&parentHit===f,x,y,width:innerWidth,height:innerHeight,w:r.width,h:r.height,childHit:!!hit&&(hit===n||n.contains(hit)),parentHit:parentHit===f};})()";
  }
+ private int drawingTapSequence=0,compactTracePointIndex=0;
+ private JSONObject writeDrawingTapDiagnostic(ActivityScenario<MainActivity>s,String selector,int sequence,String phase,boolean capture)throws Exception{
+  JSONObject proof=(JSONObject)js(s,"(()=>{const targetGate="+drawingTargetExpression(selector)+",selector="+JSONObject.quote(selector)+";"+"""
+   const f=document.querySelector('#field-drawing-frame'),d=f?.contentDocument,w=f?.contentWindow,n=d?.querySelector(selector);
+   const identity=node=>node?{tag:node.tagName,id:node.id||'',classes:node.getAttribute?.('class')||''}:null;
+   const describe=node=>{if(!node)return null;const style=node.ownerDocument.defaultView.getComputedStyle(node);return{...identity(node),rect:node.getBoundingClientRect().toJSON(),scrollTop:node.scrollTop,scrollLeft:node.scrollLeft,scrollHeight:node.scrollHeight,clientHeight:node.clientHeight,scrollWidth:node.scrollWidth,clientWidth:node.clientWidth,overflow:style.overflow,overflowY:style.overflowY,height:style.height,minHeight:style.minHeight,maxHeight:style.maxHeight,position:style.position};};
+   const viewport=win=>win?{width:win.innerWidth,height:win.innerHeight,scrollX:win.scrollX,scrollY:win.scrollY,visualViewport:win.visualViewport?{width:win.visualViewport.width,height:win.visualViewport.height,offsetTop:win.visualViewport.offsetTop,offsetLeft:win.visualViewport.offsetLeft,scale:win.visualViewport.scale}:null}:null;
+   const r=n?.getBoundingClientRect(),cx=r?r.left+r.width/2:null,cy=r?r.top+r.height/2:null,childHit=r?d.elementFromPoint(cx,cy):null,parentHit=Number.isFinite(targetGate.x)&&Number.isFinite(targetGate.y)?document.elementFromPoint(targetGate.x,targetGate.y):null;
+   return{selector,targetGate,stage:d?.body?.dataset.clientStage||'',entry:d?.body?.dataset.clientEntry||'',drawPointCount:w?.MIRProductionWorkspace?.getLivePreviewState?.()?.drawPointsMM?.length??null,active:identity(d?.activeElement),targetFocused:n===d?.activeElement,target:describe(n),childCenter:{x:cx,y:cy},childHit:identity(childHit),parentHit:identity(parentHit),parentViewport:viewport(window),childViewport:viewport(w),frame:describe(f),parentWrappers:['html','body','#portal-main','.mir-app-drawing','#portal-navigation'].map(q=>({selector:q,node:describe(document.querySelector(q))})),childWrappers:['html','body','.production-workspace','#production-preview','#drawing-tools','#client-step-scroll','.client-trace-options','.client-keyboard-trace'].map(q=>({selector:q,node:describe(d?.querySelector(q))}))};
+   })()
+   """);
+  int[] nativeBounds=new int[7];float[] font={0};s.onActivity(a->{android.webkit.WebView web=a.getBridge().getWebView();web.getLocationOnScreen(nativeBounds);nativeBounds[2]=web.getWidth();nativeBounds[3]=web.getHeight();nativeBounds[4]=web.getSettings().getTextZoom();nativeBounds[5]=a.getResources().getDisplayMetrics().densityDpi;font[0]=a.getResources().getConfiguration().fontScale;androidx.core.view.WindowInsetsCompat insets=androidx.core.view.ViewCompat.getRootWindowInsets(web);nativeBounds[6]=insets==null?0:insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.ime()).bottom;});
+  proof.put("sequence",sequence).put("phase",phase).put("tracePointIndex",compactTracePointIndex).put("physicalDevice",false).put("keyboardVisible",drawingKeyboardVisible(s)).put("imeBottomPx",nativeBounds[6]).put("fontScale",font[0]).put("textZoom",nativeBounds[4]).put("densityDpi",nativeBounds[5]).put("webView",new JSONObject().put("left",nativeBounds[0]).put("top",nativeBounds[1]).put("width",nativeBounds[2]).put("height",nativeBounds[3]));
+  String name=String.format(java.util.Locale.ROOT,"drawing-tap-%03d-%s",sequence,phase);
+  // Diagnostic reads add no wait, scroll, focus or replacement input action.
+  if(capture){android.graphics.Bitmap bitmap=InstrumentationRegistry.getInstrumentation().getUiAutomation().takeScreenshot();assertNotNull(bitmap);try{proof.put("screenshot",saveScreenshot(name,bitmap,null));}finally{bitmap.recycle();}}
+  File file=new File(proofDirectory(),name+".json");assertFalse("Never overwrite drawing tap diagnostic",file.exists());java.nio.file.Files.write(file.toPath(),proof.toString(2).getBytes(java.nio.charset.StandardCharsets.UTF_8));return proof;
+ }
  private void tapDrawing(ActivityScenario<MainActivity>s,String selector)throws Exception{
+  int sequence=++drawingTapSequence;
+  try{
   waitFor(s,"drawing target enabled "+selector,"(()=>{const n=document.querySelector('#field-drawing-frame')?.contentDocument?.querySelector("+JSONObject.quote(selector)+");return !!n&&n.isConnected&&!n.matches(':disabled')&&n.getBoundingClientRect().height>0;})()");
+  writeDrawingTapDiagnostic(s,selector,sequence,"before-scroll",false);
   js(s,"document.querySelector('#field-drawing-frame').contentDocument.querySelector("+JSONObject.quote(selector)+").scrollIntoView({block:'nearest',inline:'nearest',behavior:'instant'});true");
   presentFrame(s);
+  writeDrawingTapDiagnostic(s,selector,sequence,"before-tap",false);
   waitFor(s,"drawing target presented without child or parent interception "+selector,"("+drawingTargetExpression(selector)+").ready");
   JSONObject point=(JSONObject)js(s,drawingTargetExpression(selector));
   assertTrue("Drawing native target is still presented and enabled",point.getBoolean("ready"));
   int[] loc=new int[4];s.onActivity(a->{android.webkit.WebView web=a.getBridge().getWebView();web.getLocationOnScreen(loc);loc[2]=web.getWidth();loc[3]=web.getHeight();});
   assertTrue("Native drawing tap delivered",androidx.test.uiautomator.UiDevice.getInstance(InstrumentationRegistry.getInstrumentation()).click(loc[0]+(int)Math.round(point.getDouble("x")*loc[2]/point.getDouble("width")),loc[1]+(int)Math.round(point.getDouble("y")*loc[3]/point.getDouble("height"))));
+  }catch(AssertionError|Exception failure){
+   try{JSONObject diagnostic=writeDrawingTapDiagnostic(s,selector,sequence,"failed",true);failure.addSuppressed(new AssertionError("Native drawing tap evidence="+diagnostic.toString()));}catch(AssertionError|Exception diagnosticFailure){failure.addSuppressed(diagnosticFailure);}throw failure;
+  }
  }
  private void chooseDrawingOption(ActivityScenario<MainActivity>s,String selector,String value)throws Exception{
   waitFor(s,"drawing option available "+selector,"(()=>{const n=document.querySelector('#field-drawing-frame')?.contentDocument?.querySelector("+JSONObject.quote(selector)+");return !!n&&[...n.options].some(o=>o.value==="+JSONObject.quote(value)+"&&!o.disabled);})()");
@@ -192,11 +217,12 @@ public class MirRealRolesTest extends MirDeviceSetup {
   tapDrawing(s,"#client-new-trace");tapDrawing(s,"#confirm-client-new-trace");waitFor(s,"confirmed restart clears only the current trace","document.querySelector('#field-drawing-frame').contentWindow.MIRProductionWorkspace.getLivePreviewState().drawPointsMM.length===0");assertEquals("Restart preserves existing cart",cart,js(s,"JSON.stringify(MIRUnifiedOrderCart.list().map(row=>row.id))"));
   tapDrawing(s,".client-trace-options > summary");tapDrawing(s,".client-keyboard-trace > summary");
   String[][] points={{"2","2"},{"2","7.5"},{"5","7.5"},{"4.25","7.5"}};
-  for(int i=0;i<points.length;i++){
+  try{for(int i=0;i<points.length;i++){
+   compactTracePointIndex=i+1;
    typeDrawingNumber(s,"#client-point-x",points[i][0]);typeDrawingNumber(s,"#client-point-y",points[i][1]);closeDrawingKeyboard(s);tapDrawing(s,"#client-keyboard-point");
    if(i==3){waitFor(s,"hem direction choice is presented","!!document.querySelector('#field-drawing-frame').contentDocument.querySelector('#production-dialog[open] #trace-hem-form')");tapDrawing(s,"#trace-hem-form label:has(input[value=left])");tapDrawing(s,"#trace-hem-form button[type=submit]");}
    waitFor(s,"native entered trace point "+(i+1),"document.querySelector('#field-drawing-frame').contentWindow.MIRProductionWorkspace.getLivePreviewState().drawPointsMM.length==="+(i+1));
-  }
+  }}finally{compactTracePointIndex=0;}
   closeDrawingKeyboard(s);if(Boolean.TRUE.equals(js(s,"document.querySelector('#field-drawing-frame').contentDocument.querySelector('.client-trace-options')?.open===true")))tapDrawing(s,".client-trace-options > summary");
   proof.put("undoRemovedOnePoint",true).put("cancelRestartPreservedTrace",true).put("confirmedRestartPreservedCart",true).put("construction","native keyboard and native hem choice");return proof;
  }

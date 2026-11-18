@@ -100,7 +100,10 @@ function mount(){
  // The embedded personal drawing already lives below the parent's native
  // status/safe-area chrome. Keep local errors, but never add a second fixed
  // TEST/network banner or a second 30px top inset over the drawing title.
- const style=document.createElement('style');style.textContent=(fieldPliageFrame?'#mir-native-state{position:static}':'body{padding-top:calc(env(safe-area-inset-top) + 30px)!important;padding-bottom:env(safe-area-inset-bottom)}#mir-native-state{position:fixed;top:0;left:0;right:0;z-index:10000}')+'#mir-native-state{background:var(--mir-surface-soft,#e9eee7);color:var(--mir-text,#24422e);padding:5px 10px;font:13px system-ui;min-height:20px}button,input,select{scroll-margin-bottom:100px}.mir-native-signin .mir-help-launch{position:static!important;transform:none!important;pointer-events:auto!important;display:block;margin:16px}';document.head.append(style);
+ // The compact drawing owns its inner scrollers. A 100px focus margin cannot
+ // fit in their keyboard-height viewport and can scroll the input out of view.
+ const controlScrollMargin=fieldPliageFrame?'button,input,select{scroll-margin-block:8px}':'button,input,select{scroll-margin-bottom:100px}';
+ const style=document.createElement('style');style.textContent=(fieldPliageFrame?'#mir-native-state{position:static}':'body{padding-top:calc(env(safe-area-inset-top) + 30px)!important;padding-bottom:env(safe-area-inset-bottom)}#mir-native-state{position:fixed;top:0;left:0;right:0;z-index:10000}')+'#mir-native-state{background:var(--mir-surface-soft,#e9eee7);color:var(--mir-text,#24422e);padding:5px 10px;font:13px system-ui;min-height:20px}'+controlScrollMargin+'.mir-native-signin .mir-help-launch{position:static!important;transform:none!important;pointer-events:auto!important;display:block;margin:16px}';document.head.append(style);
  const banner=document.createElement('div');banner.id='mir-native-state';banner.setAttribute('role','status');document.body.prepend(banner);networkState();
  const observer=new MutationObserver(()=>{
   restoreAbsence();

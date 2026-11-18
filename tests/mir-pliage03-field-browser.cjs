@@ -1,7 +1,7 @@
 'use strict';
 // Actual embedded production UI with a labelled local parent fixture. No backend
 // mutations, accounts, customer drafts or external requests are used by this test.
-const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const {chromium}=require('playwright'),{serve}=require('./helpers/mir-static-http.cjs');
 const root=path.resolve(__dirname,'..');
 const out=path.resolve(process.env.MIR_FIELD_PLIAGE_OUT||'/tmp/mir-pliage03-field-proof');
@@ -10,13 +10,39 @@ const publicDraft=JSON.stringify({version:1,journeyVersion:2,draft:{kind:'profil
 const publicOrder=JSON.stringify({version:1,order:{id:'QA-CLIENT-UNTOUCHED',items:[],nextNumber:1}});
 const report={fixture:'same-origin parent contract + real production.html UI',customerData:false,backendWrites:false,checks:[],captures:[],blocked:[],pageErrors:[]};
 const contextData=(owner='worker-a',job='job-a',extra={})=>({personal:true,ownerId:owner,jobId:job,presentation:'pliage03',...extra});
-function fixture(data,{height=null}={}){const bounded=Number.isFinite(height)&&height>0;return `<!doctype html><html lang="fr-CA"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;height:100%;background:#242522}.qa-chrome{box-sizing:border-box;height:160px;padding:28px 16px;color:#c6c3ba;font:14px Arial,sans-serif}iframe{display:block;width:100%;height:${bounded?height+'px':'100dvh'};border:0}</style><script>window.MIRFieldDrawingContext=()=>(${JSON.stringify(data).replaceAll('<','\\u003c')});window.__openedCart=0;</script>${bounded?'<header class="qa-chrome">Fixture locale équipe · iframe courte '+height+' px</header>':''}<iframe id="drawing" title="QA fictif du parcours équipe" src="production.html?mode=client&source=store&kind=profile"></iframe><script>document.querySelector('iframe').addEventListener('load',event=>{event.target.contentDocument.addEventListener('click',event=>{const a=event.target.closest('a[href]');if(!a)return;const u=new URL(a.href);if(u.origin===location.origin&&u.pathname.endsWith('/chantier.html')&&u.searchParams.get('view')==='orders'){event.preventDefault();window.__openedCart++;}},true);});</script></html>`;}
+function nativeFieldStyle(){
+ // Execute the actual native mount style declaration. The regression must not
+ // silently omit (or duplicate) native scroll margins again.
+ const source=fs.readFileSync(path.join(root,'mobile/web/bootstrap.js'),'utf8');
+ const block=source.match(/const controlScrollMargin=[\s\S]*?document\.head\.append\(style\);/);
+ assert.ok(block,'native field scroll-margin declaration is present');
+ const styles=[];
+ vm.runInNewContext(block[0],{fieldPliageFrame:true,document:{createElement:()=>({textContent:''}),head:{append:style=>styles.push(style.textContent)}}});
+ assert.equal(styles.length,1);return styles[0];
+}
+function fixture(data,{height=null,width=null}={}){const bounded=Number.isFinite(height)&&height>0,narrow=Number.isFinite(width)&&width>0;return `<!doctype html><html lang="fr-CA"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;height:100%;background:#242522}.qa-chrome{box-sizing:border-box;height:160px;padding:28px 16px;color:#c6c3ba;font:14px Arial,sans-serif}iframe{display:block;width:${narrow?width+'px':'100%'};max-width:100%;height:${bounded?height+'px':'100dvh'};margin-inline:auto;border:0}</style><script>window.MIRFieldDrawingContext=()=>(${JSON.stringify(data).replaceAll('<','\\u003c')});window.__openedCart=0;</script>${bounded?'<header class="qa-chrome">Fixture locale équipe · iframe courte '+height+' px</header>':''}<iframe id="drawing" title="QA fictif du parcours équipe" src="production.html?mode=client&source=store&kind=profile"></iframe><script>document.querySelector('iframe').addEventListener('load',event=>{event.target.contentDocument.addEventListener('click',event=>{const a=event.target.closest('a[href]');if(!a)return;const u=new URL(a.href);if(u.origin===location.origin&&u.pathname.endsWith('/chantier.html')&&u.searchParams.get('view')==='orders'){event.preventDefault();window.__openedCart++;}},true);});</script></html>`;}
 async function ready(frame){await frame.waitForFunction(()=>!!window.MIRProductionWorkspace);}
 async function state(frame){return frame.evaluate(()=>MIRProductionWorkspace.getLivePreviewState());}
 async function stage(frame,n){await frame.waitForFunction(n=>document.body.dataset.clientStage===String(n),n);}
 async function layout(frame){const info=await frame.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth,body:document.body.scrollWidth}));assert.ok(info.scroll<=info.width+1&&info.body<=info.width+1,'no horizontal overflow '+JSON.stringify(info));return info;}
 async function shot(page,name){await page.screenshot({path:path.join(out,name+'.png'),animations:'disabled',caret:'hide'});report.captures.push(name+'.png');}
 async function settled(frame){await frame.evaluate(async()=>{await document.fonts.ready;await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));});}
+async function traceFocusLayout(frame,height){
+ await settled(frame);
+ const proof=await frame.evaluate(()=>{
+  const input=document.querySelector('#client-point-x'),tools=document.querySelector('#drawing-tools'),r=input.getBoundingClientRect(),clipped=[];
+  for(let p=input.parentElement;p;p=p.parentElement){const s=getComputedStyle(p),b=p.getBoundingClientRect();if(/hidden|clip|auto|scroll/.test(s.overflowY)&&(r.top<b.top+p.clientTop-1||r.bottom>b.top+p.clientTop+p.clientHeight+1))clipped.push(p.id||p.className||p.tagName);}
+  const hit=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);
+  return{width:innerWidth,height:innerHeight,active:document.activeElement?.id,input:{top:r.top,bottom:r.bottom,left:r.left,right:r.right,height:r.height,hit:hit===input,clipped,value:input.value,scrollMargin:getComputedStyle(input).scrollMarginBottom},y:document.querySelector('#client-point-y').value,tools:{top:tools.scrollTop,height:tools.clientHeight,scroll:tools.scrollHeight},wrappers:['html','body','#production-main','.production-workspace','#production-preview'].map(selector=>({selector,top:document.querySelector(selector).scrollTop})),steps:[...document.querySelectorAll('#client-step-list button')].map(node=>{const b=node.getBoundingClientRect();return{top:b.top,bottom:b.bottom};})};
+ });
+ assert.equal(proof.width,355);assert.equal(proof.height,height);assert.equal(proof.active,'client-point-x','adding a point keeps the next X field focused');
+ assert.equal(proof.input.scrollMargin,'8px','the actual native field style replaces the former 100px scroll margin');
+ assert.equal(proof.input.hit,true,'the focused X field has a real unobstructed hit target');assert.deepEqual(proof.input.clipped,[],'the complete focused field is visible in the internal scroller');
+ assert.ok(proof.input.top>=0&&proof.input.bottom<=height&&proof.input.height>=44);
+ for(const wrapper of proof.wrappers)assert.equal(wrapper.top,0,wrapper.selector+' stays anchored while only the tools can scroll');
+ for(const step of proof.steps)assert.ok(step.top>=0&&step.bottom<=height,'the four step buttons stay fully inside the child viewport');
+ return proof;
+}
 async function seedPersonalProfile(frame,spec){
  // Only this synthetic worker/chantier draft is seeded. Rendering, pagination,
  // keyboard edits and navigation below execute the production controllers.
@@ -107,6 +133,12 @@ async function main(){
   const req=route.request(),url=new URL(req.url());
   if(url.origin===srv.base&&req.method()==='GET'){
    if(url.pathname==='/__field-fixture.html')return route.fulfill({contentType:'text/html; charset=utf-8',body:fixture(current,fixtureOptions)});
+   if(fixtureOptions.native&&url.pathname==='/production.html'){
+    const source=fs.readFileSync(path.join(root,'dist/production.html'),'utf8');
+    const native='<link rel="stylesheet" href="/__qa-native-team.css"><style id="qa-native-mount-style">'+nativeFieldStyle()+'</style><script>document.documentElement.dataset.mirNative="true";</script>';
+    return route.fulfill({contentType:'text/html; charset=utf-8',body:source.replace('</head>',native+'</head>')});
+   }
+   if(url.pathname==='/__qa-native-team.css')return route.fulfill({contentType:'text/css; charset=utf-8',body:fs.readFileSync(path.join(root,'mobile/web/team.css'),'utf8')});
    return route.continue();
   }
   report.blocked.push({url:req.url(),method:req.method()});return route.abort();
@@ -215,6 +247,41 @@ async function main(){
   assert.ok(Number(await frame.locator('#production-dimensions').getAttribute('data-field-measure-page-count'))>1,'834px field layout really paginates long profiles');await frame.locator('[data-field-measure-page-step="1"]').click();await settled(frame);
   const tabletSecondPage=await compactLayout(frame,{width:834});assert.deepEqual(tabletSecondPage.visibleSides,[2,3,4]);await untouched(frame);await shot(page,'field-compact-tablet-834x500');
   report.checks.push({name:'field-breakpoint-834-height-500-keeps-readable-cotes-and-bounded-pages',passed:true,measures:tabletCompact,firstPage:tabletFirstPage,secondPage:tabletSecondPage});
+  await page.setViewportSize({width:393,height:755});
+  frame=await open(contextData('worker-native-ime-qa','job-native-ime-qa',{entry:'draw',entryRequestId:'native-ime-qa'}),{width:355,height:524,native:true});
+  await stage(frame,1);assert.equal((await state(frame)).drawPointsMM.length,0);
+  const nativeArchive=await frame.evaluate(()=>({order:MIRProductionWorkspace.getEstimationDossier(),cart:MIRUnifiedOrderCart.list()})),nativeResizeProof=[];
+  await frame.locator('.client-trace-options>summary').click();await frame.locator('.client-keyboard-trace>summary').click();
+  const keyboardPoints=[[2,2],[2,7.5],[5,7.5],[4.25,7.5]];
+  for(let i=0;i<keyboardPoints.length;i++){
+   const [x,y]=keyboardPoints[i];
+   await frame.locator('#client-point-x').fill(String(x));await frame.locator('#client-point-y').fill(String(y));await frame.locator('#client-keyboard-point').click();
+   if(i===3){
+    await frame.locator('#trace-hem-form').waitFor();
+    assert.equal(await frame.evaluate(()=>document.querySelector('#production-dialog').contains(document.activeElement)),true,'the underlying X input never steals focus from the hem choice');
+    await frame.locator('#trace-hem-form label:has(input[value="left"])').click();await frame.locator('#trace-hem-form button[type=submit]').click();
+   }else{
+    await frame.waitForFunction(()=>document.activeElement?.id==='client-point-x');
+    nativeResizeProof.push(await traceFocusLayout(frame,524));
+    // Resize only the labelled fixture's iframe, as adjustResize does when the
+    // Android IME appears. Product CSS, input values and focus remain untouched.
+    await page.locator('#drawing').evaluate(node=>node.style.height='240px');
+    nativeResizeProof.push(await traceFocusLayout(frame,240));
+    assert.equal(await frame.locator('#client-point-x').inputValue(),String(x));assert.equal(await frame.locator('#client-point-y').inputValue(),String(y));
+    if(i===0)await shot(page,'field-native-trace-ime-355x240');
+    await page.locator('#drawing').evaluate(node=>node.style.height='524px');
+    nativeResizeProof.push(await traceFocusLayout(frame,524));
+    if(i===0)await shot(page,'field-native-trace-ime-return-355x524');
+   }
+   const points=(await state(frame)).drawPointsMM;assert.equal(points.length,i+1,'each keyboard Add appends exactly one actual point');
+   points.forEach((point,index)=>point.forEach((value,axis)=>assert.ok(Math.abs(value-keyboardPoints[index][axis]*25.4)<1e-7,'keyboard coordinates survive resize without replacement')));
+  }
+  if(await frame.locator('.client-trace-options').evaluate(node=>node.open))await frame.locator('.client-trace-options>summary').click();
+  for(const selector of ['[data-drawing-undo]','#client-new-trace','[data-draw-tool="draw"]'])assert.equal(await frame.locator(selector).isEnabled(),true,'real trace action remains available '+selector);
+  await frame.getByRole('button',{name:'Suivant — terminer le dessin',exact:true}).click();await stage(frame,2);
+  const nativeModel=(await state(frame)).model;assert.equal(nativeModel.valid,true);assert.equal(nativeModel.bends[1].mode,'hem');
+  assert.deepEqual(await frame.evaluate(()=>({order:MIRProductionWorkspace.getEstimationDossier(),cart:MIRUnifiedOrderCart.list()})),nativeArchive,'native input and resizing preserve saved orders and the common cart');await untouched(frame);
+  report.checks.push({name:'native-css-keyboard-points-355x524-to-240-to-524',passed:true,nativeStyleSource:'mobile/web/bootstrap.js mount + mobile/web/team.css',keyboard:'Playwright input with real iframe resize; Android IME is verified separately',views:nativeResizeProof});
   for(const candidate of [contextData('worker-c','job-c',{presentation:'legacy'}),contextData('','job-c'),contextData('   ','job-c'),{personal:false,ownerId:'worker-c',jobId:'job-c',presentation:'pliage03'}]){
    frame=await open(candidate);assert.equal(await frame.locator('body.mir-pliage03').count(),0);assert.equal(await frame.locator('.mir-pliage03-heading').count(),0);assert.equal(await frame.evaluate(()=>MIRProductionWorkspace.editFieldOrderItem('M001')),false);
   }

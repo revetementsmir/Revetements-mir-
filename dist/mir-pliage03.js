@@ -15,6 +15,28 @@
  const put=(node,value)=>{if(node&&node.textContent!==T(value))node.textContent=T(value);};
  let mounted=false;
  let measurePage=0,measurePageSize=3,measureSignature='',measureStep=1,measureLayout='';
+ let traceFocusFrame=0;
+ function revealFieldTraceInput(){
+  traceFocusFrame=0;
+  const input=document.activeElement,host=$('#drawing-tools');
+  if(!fieldPliage03||!matchMedia('(max-width:959px)').matches||document.body.dataset.clientEntry!=='draw'||!input?.matches('#client-point-x,#client-point-y')||!host?.contains(input)||$('dialog[open]'))return;
+  if(!input.getClientRects().length||!host.clientHeight)return;
+  const box=host.getBoundingClientRect(),target=(input.closest('label')||input).getBoundingClientRect();
+  let top=Math.max(0,box.top+host.clientTop),bottom=Math.min(innerHeight,box.top+host.clientTop+host.clientHeight);
+  for(let parent=host.parentElement;parent;parent=parent.parentElement){
+   if(!/hidden|clip|auto|scroll/.test(getComputedStyle(parent).overflowY))continue;
+   const bounds=parent.getBoundingClientRect();
+   top=Math.max(top,bounds.top+parent.clientTop);bottom=Math.min(bottom,bounds.top+parent.clientTop+parent.clientHeight);
+  }
+  if(bottom<=top)return;
+  const margin=Math.min(8,Math.max(0,(bottom-top-target.height)/2));
+  const delta=target.top<top+margin?target.top-top-margin:target.bottom>bottom-margin?target.bottom-bottom+margin:0;
+  if(Math.abs(delta)>.5)host.scrollTop=Math.max(0,Math.min(host.scrollHeight-host.clientHeight,host.scrollTop+delta));
+ }
+ function queueFieldTraceInput(){
+  if(traceFocusFrame)cancelAnimationFrame(traceFocusFrame);
+  traceFocusFrame=requestAnimationFrame(revealFieldTraceInput);
+ }
  function measurementIndices(count){
   const start=Math.min(measurePage*(measurePageSize-1),Math.max(0,count-1));
   return Array.from({length:Math.max(0,Math.min(measurePageSize,count-start))},(_,index)=>start+index);
@@ -63,7 +85,11 @@
    measurePage+=Number(button.dataset.fieldMeasurePageStep);
    syncFieldMeasurementPages();
   });
-  window.addEventListener('resize',()=>requestAnimationFrame(syncFieldMeasurementPages));
+  document.addEventListener('focusin',event=>{if(event.target.matches?.('#client-point-x,#client-point-y'))queueFieldTraceInput();});
+  window.addEventListener('resize',()=>{requestAnimationFrame(syncFieldMeasurementPages);queueFieldTraceInput();});
+  window.visualViewport?.addEventListener('resize',queueFieldTraceInput);
+  window.visualViewport?.addEventListener('scroll',queueFieldTraceInput);
+  if(typeof ResizeObserver==='function'&&$('#drawing-tools'))new ResizeObserver(queueFieldTraceInput).observe($('#drawing-tools'));
  }
  function sync({model,step,entry,product,editing,selectedAngle}){
   if(!document.body.classList.contains('mir-pliage03'))return;
