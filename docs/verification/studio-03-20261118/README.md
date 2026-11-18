@@ -28,6 +28,7 @@
 - `dist/mir-client-workspaces.js` laisse ce client au nouvel adaptateur ; l’ancien paginateur reste disponible pour les autres contextes.
 - `scripts/build-prestige-preview.cjs` fournit au Studio TEST la même configuration locale explicitement désactivée que l’Estimation 04. Le brouillon se conserve sans contacter un service distant. Les gardes réseau restent inchangés.
 - Les palettes complètes sont accessibles par expansion et recherche. Les noms officiels restent identiques en FR/EN ; les contrôles génériques sont traduits.
+- La revue visuelle des six onglets a révélé que les proxys de finition ignoraient les chemins locaux `./assets/` : ils sont maintenant reconnus, avec les vrais échantillons Kaycan. Les références Westlake AlumiPro qui ne possèdent ni image ni valeur chromatique dans le catalogue restent des choix textuels explicitement signalés ; aucune couleur n’est inventée.
 - Les réglages avancés, documents, formats, calepinages et outils de zones restent disponibles dans les sections dépliables. Les trois exports sont regroupés sous « Exporter mes choix ».
 - L’estimation utilise le mécanisme existant : capture structurée du Studio et PDF original du projet importé. Ce contrat ne crée pas automatiquement un fichier `dossier` dans le brouillon Studio ; le PDF des quatre élévations reste un export distinct.
 
@@ -78,4 +79,5 @@ Les essais de soumission restent bloqués par le périmètre TEST. Le manifeste 
 - Pas de certification de nouveaux algorithmes PDF→3D ni des changements concurrentiels non intégrés.
 - Les quantités de l’étude restent des estimations à valider ; la refonte ne les transforme pas en quantités de commande.
 - Les couleurs numériques ne remplacent pas les échantillons physiques et ne créent aucune disponibilité commerciale.
+- Certaines gammes, notamment Westlake AlumiPro 132419, fournissent des noms et codes sans échantillon numérique. Le sélecteur conserve toutes ces références et indique cette limite.
 

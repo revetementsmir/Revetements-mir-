@@ -100,6 +100,10 @@ body[data-mir-studio-layout="materials-bottom"] .mir-studio-03-palette-group :is
 body[data-mir-studio-layout="materials-bottom"] .mir-studio-03-palette-group .product-swatch i{display:block;flex:none;width:100%;height:30px;border:1px solid #ffffff26;border-radius:1px}
 body[data-mir-studio-layout="materials-bottom"] .mir-studio-03-palette-group :is(.product-swatch i img,.extra-colors>button>img){display:block;width:100%;height:30px;object-fit:cover;border-radius:1px}
 body[data-mir-studio-layout="materials-bottom"] .mir-studio-03-palette-group :is(.product-swatch,.extra-colors>button)>span{min-width:0;max-width:100%;font-size:10px;line-height:1.25;overflow-wrap:anywhere}
+body[data-mir-studio-layout="materials-bottom"] .mir-studio-03-palette-label{margin:0 0 8px;color:var(--s03-muted);font:400 12px/1.4 "DM Sans",Arial,sans-serif}
+body[data-mir-studio-layout="materials-bottom"] .mir-studio-03-palette-unillustrated .extra-colors>button{justify-content:center;min-height:48px;padding:8px 17px 8px 7px;border-color:var(--s03-line)}
+body[data-mir-studio-layout="materials-bottom"] .mir-studio-03-palette-unillustrated .extra-colors>button>span{font-size:12px;line-height:1.35}
+body[data-mir-studio-layout="materials-bottom"] .mir-studio-03-sample-note{margin:8px 0 0;color:var(--s03-muted);font:400 12px/1.5 "DM Sans",Arial,sans-serif}
 body[data-mir-studio-layout="materials-bottom"] .mir-studio-03-palette-tools{display:flex;align-items:center;flex-wrap:wrap;justify-content:space-between;gap:7px 12px;margin-top:6px}
 body[data-mir-studio-layout="materials-bottom"] .mir-studio-03-palette-search{flex:1;min-width:100px;max-width:240px}
 body[data-mir-studio-layout="materials-bottom"] input.mir-studio-03-palette-search,body[data-mir-studio-layout="materials-bottom"] .mir-studio-03-palette-search input{width:100%;min-height:32px;padding:5px 8px;font-size:12px}

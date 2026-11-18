@@ -41,6 +41,15 @@
     const face = pairs.find(pair => pair.includes(match[2]));
     text(node, match[1] + (language() === 'en' ? 'ELEVATION ' : 'ÉLÉVATION ') + (face ? face[language() === 'en' ? 1 : 0] : match[2]));
   }
+  function localizeCornerControls() {
+    for (const [selector,fr,en] of [
+      ['label[for="mir-corner-scope"]','Appliquer la finition à','Apply finish to'],
+      ['label[for="mir-corner-product"]','Nuancier de pliage','Bending colour palette'],
+      ['#mir-corner-scope option[value="all"]','Tous les coins','All corners']
+    ]) {
+      const node = $(selector); if (node) localized(node,fr,en);
+    }
+  }
   function disclosure(className, id, fr, en) {
     const details = element('details', className, id);
     details.append(localized(element('summary'), fr, en));
@@ -67,8 +76,9 @@
     const search = element('input', 'mir-studio-03-palette-search');
     search.type = 'search'; search.dataset.studio03PaletteSearch = ''; search.autocomplete = 'off';
     const empty = element('p', 'mir-studio-03-palette-empty'); empty.setAttribute('role', 'status');
-    tools.append(toggle, search, empty); host.append(tools);
-    const state = {container, host, tools, toggle, search, empty, key, currentKey: null};
+    const sampleNote = element('p', 'mir-studio-03-sample-note'); sampleNote.hidden = true;
+    tools.append(toggle, search, empty); host.append(tools, sampleNote);
+    const state = {container, host, tools, toggle, search, empty, sampleNote, key, currentKey: null};
     palettes.add(state);
     toggle.addEventListener('click', () => {
       const saved = paletteMemory.get(state.currentKey); if (!saved) return;
@@ -104,6 +114,14 @@
     if (state.search.value !== saved.search) state.search.value = saved.search;
     state.empty.hidden = !saved.expanded || count > 0;
     text(state.empty, language() === 'en' ? 'No matching colour.' : 'Aucune couleur correspondante.');
+    const productId = key.split(':').slice(key.startsWith('extra:') ? 2 : 1).join(':');
+    const material = finishCatalogue.get(productId);
+    const documentedVisual = (material?.colors || []).some(colour => colour.swatchUrl || /^#[\da-f]{6}$/i.test(colour.hex || ''));
+    const renderedVisual = !!$('img[src]',state.container) || all('i[style]',state.container).some(chip => chip.style.background || chip.style.backgroundColor);
+    const unillustrated = buttons.length > 0 && !!material && !documentedVisual && !renderedVisual;
+    state.host.classList.toggle('mir-studio-03-palette-unillustrated',unillustrated);
+    state.sampleNote.hidden = !unillustrated;
+    text(state.sampleNote, language() === 'en' ? 'Visual samples are unavailable for this range.' : 'Échantillons visuels indisponibles pour cette gamme.');
   }
   function mount() {
     if ($('#mir-studio-03-zone')) return;
@@ -201,6 +219,7 @@
       observer.disconnect();
       try {
         enhanceDynamic();
+        localizeCornerControls();
         const state = window.MIR_STUDY?.snapshot?.();
         const kind = state?.selected?.kind || 'zone';
         const buttons = all('[data-select-zone]', $('#zone-list'));
@@ -284,7 +303,7 @@
           const chip = element('i');
           if (/^#[\da-f]{6}$/i.test(colour?.hex || '')) chip.style.background = colour.hex;
           else chip.className = 'no-swatch';
-          if (/^assets\/[\w./%()+ -]+\.(webp|png|jpe?g|avif|svg)(\?[^#]*)?$/i.test(colour?.swatchUrl || '')) {
+          if (/^(?:\.\/)?assets\/[\w./%()+ -]+\.(webp|png|jpe?g|avif|svg)(\?[^#]*)?$/i.test(colour?.swatchUrl || '')) {
             const image = element('img'); image.src = colour.swatchUrl; image.alt = ''; image.loading = 'lazy'; image.width = 20; image.height = 20; chip.append(image);
           }
           const label = element('span'); label.textContent = option.textContent; button.append(chip,label); proxy.append(button);
