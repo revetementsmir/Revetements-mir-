@@ -26,7 +26,7 @@ const server=http.createServer((req,res)=>{
 let browser,base,checks=0;
 const results={sourceSha:cp.execFileSync('git',['rev-parse','HEAD'],{cwd:repo,encoding:'utf8'}).trim(),referenceSha:reference,physicalDevice:false,backend:'local fixture only',checks:[],screens:[],homePunchComparisons:[]};
 function pass(name,detail){checks++;results.checks.push({name,result:'passed',...detail});}
-async function screenshot(page,name){await page.screenshot({path:path.join(out,name),fullPage:true});results.screens.push(name);}
+async function screenshot(page,name){await page.locator('#portal-toast.visible').waitFor({state:'hidden',timeout:6000});await page.screenshot({path:path.join(out,name),fullPage:true});results.screens.push(name);}
 async function desktopReference(){
  const page=await browser.newPage({viewport:{width:1440,height:1000},locale:'fr-CA',colorScheme:'dark'});
  try{
@@ -77,7 +77,7 @@ async function seedMessages(page){await page.evaluate(()=>{const x=__fieldFixtur
     assert.equal(await page.locator('body').getAttribute('data-field-design'),'home-test');assert.ok(await page.locator('[data-field-catalogue="fold"]').isVisible());assert.ok(await page.locator('[data-field-draw]').isVisible());
     const colors=await page.evaluate(()=>{const s=getComputedStyle(document.body);return{bg:s.backgroundColor,font:s.fontFamily,accent:s.getPropertyValue('--field-accent').trim()};});assert.equal(colors.bg,'rgb(36, 37, 34)');assert.match(colors.font,/DM Sans/);assert.equal(colors.accent,'#bda889');pass(role+' '+width+' direct magasin',{colors});
     await layout(page,role+' '+width+' C02');await screenshot(page,`${role}-c02-${width}.png`);
-    await page.locator('#catalogue-search').fill('zzqa-inexistant-article');await page.waitForFunction(()=>document.querySelectorAll('[data-field-product]').length===0);assert.ok(await page.locator('#catalogue-count').isVisible());await page.locator('#catalogue-search').fill('');await page.locator('[data-field-product]').first().waitFor();pass(role+' '+width+' catalogue search');
+    await page.locator('#catalogue-search').fill('zzqa-inexistant-article');await page.waitForFunction(()=>document.querySelectorAll('[data-field-product]').length===0);assert.ok(await page.locator('#catalogue-count').isVisible());await page.locator('#catalogue-search').fill('');await page.locator('.mir-app-product-list [data-field-product]').first().waitFor();pass(role+' '+width+' catalogue search');
     if(width===390){
      await page.locator('.mir-app-product-list [data-field-product]').first().click();const qty=page.locator('#portal-dialog [data-product-qty]');await qty.waitFor();assert.equal(await qty.inputValue(),'');const countBefore=await page.locator('[data-field-store-cart]').innerText();await page.locator('#portal-dialog [data-add-item]').click();assert.equal(await page.locator('[data-field-store-cart]').innerText(),countBefore);assert.equal(await qty.inputValue(),'');
      // Complete ordinary product choices, then add a real local cart line.

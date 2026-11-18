@@ -125,6 +125,14 @@ public class MirRealRolesTest extends MirDeviceSetup {
   int[] loc=new int[4];s.onActivity(a->{android.webkit.WebView web=a.getBridge().getWebView();web.getLocationOnScreen(loc);loc[2]=web.getWidth();loc[3]=web.getHeight();});
   assertTrue("Native drawing tap delivered",androidx.test.uiautomator.UiDevice.getInstance(InstrumentationRegistry.getInstrumentation()).click(loc[0]+(int)Math.round(point.getDouble("x")*loc[2]/point.getDouble("width")),loc[1]+(int)Math.round(point.getDouble("y")*loc[3]/point.getDouble("height"))));
  }
+ private void chooseDrawingOption(ActivityScenario<MainActivity>s,String selector,String value)throws Exception{
+  waitFor(s,"drawing option available "+selector,"(()=>{const n=document.querySelector('#field-drawing-frame')?.contentDocument?.querySelector("+JSONObject.quote(selector)+");return !!n&&[...n.options].some(o=>o.value==="+JSONObject.quote(value)+"&&!o.disabled);})()");
+  int index=((Number)js(s,"[...document.querySelector('#field-drawing-frame').contentDocument.querySelector("+JSONObject.quote(selector)+").options].findIndex(o=>o.value==="+JSONObject.quote(value)+")")).intValue();
+  assertTrue("Requested drawing choice exists",index>=0);tapDrawing(s,selector+"+button");
+  waitFor(s,"native drawing selector is open","document.querySelector('#field-drawing-frame')?.contentWindow.MIRFieldChoices.isOpen()===true");
+  tapDrawing(s,".mir-choice-sheet[open] [data-choice-index=\""+index+"\"]");
+  waitFor(s,"native drawing choice applied","(()=>{const f=document.querySelector('#field-drawing-frame');return f?.contentDocument.querySelector("+JSONObject.quote(selector)+")?.value==="+JSONObject.quote(value)+"&&!f.contentWindow.MIRFieldChoices.isOpen();})()");
+ }
  private android.graphics.Rect contentArea(ActivityScenario<MainActivity>s)throws Exception{
   JSONObject p=(JSONObject)js(s,"(()=>{const h=document.querySelector('#field-header').getBoundingClientRect(),n=document.querySelector('#portal-navigation').getBoundingClientRect(),b=document.querySelector('#mir-native-state')?.getBoundingClientRect();return{width:innerWidth,height:innerHeight,top:Math.max(h.bottom,b?.bottom||0)+8,bottom:n.top-8};})()");
   int[] loc=new int[4];s.onActivity(a->{android.webkit.WebView web=a.getBridge().getWebView();web.getLocationOnScreen(loc);loc[2]=web.getWidth();loc[3]=web.getHeight();});double sx=loc[2]/p.getDouble("width"),sy=loc[3]/p.getDouble("height");return new android.graphics.Rect(loc[0]+(int)(8*sx),loc[1]+(int)Math.ceil(p.getDouble("top")*sy),loc[0]+loc[2]-(int)(8*sx),loc[1]+(int)Math.floor(p.getDouble("bottom")*sy));
@@ -198,14 +206,46 @@ public class MirRealRolesTest extends MirDeviceSetup {
    homeProof=renderedScreenshot(s,"v130004-"+role+"-home",fieldContent("day"),fieldCrop,java.util.Collections.emptySet());
    tap(s,"#portal-navigation [data-view=command]");
    tap(s,"[data-field-draw]");
-   waitFor(s,"drawing engine and MIR choices ready","!!document.querySelector('#field-drawing-frame')?.contentWindow?.MIRFieldChoices && !!document.querySelector('#field-drawing-frame')?.contentDocument.querySelector('#client-draw-profile')");
-   tapDrawing(s,"#client-draw-profile");
+   waitFor(s,"direct Pliage03 drawing entry and four steps ready","(()=>{const f=document.querySelector('#field-drawing-frame'),d=f?.contentDocument,w=f?.contentWindow,steps=[...d?.querySelectorAll('#client-step-list button')||[]];return !!w?.MIRFieldChoices&&w.MIRProductionWorkspace?.getLivePreviewState().tool==='draw'&&d.body.dataset.clientEntry==='draw'&&d.body.dataset.clientStage==='1'&&d.body.classList.contains('mir-pliage03')&&steps.length===4&&steps.every(n=>n.getBoundingClientRect().width>0&&n.getBoundingClientRect().height>0);})()");
+   tapDrawing(s,"#client-example-l");
+   waitFor(s,"native example creates actual L geometry","document.querySelector('#field-drawing-frame')?.contentWindow.MIRProductionWorkspace.getLivePreviewState().drawPointsMM.length===3");
+   js(s,"(()=>{const f=document.querySelector('#field-drawing-frame'),m=f.contentWindow.MIRProductionWorkspace.getLivePreviewState().model;window.nativePliageGeometry=JSON.stringify({points:m.pointsMM,bends:m.bends});window.nativePliageCartIds=MIRUnifiedOrderCart.list().map(x=>x.id);window.nativePliageContext=MIRFieldDrawingContext();return true;})()");
+   screenshot(s,"v130004-"+role+"-pliage-1-drawing");
    waitFor(s,"drawing trace scale MIR facade ready","!!document.querySelector('#field-drawing-frame')?.contentDocument.querySelector('#trace-height+button')");
    tapDrawing(s,"#trace-height+button");
    waitFor(s,"drawing MIR choice opened by native tap","document.querySelector('#field-drawing-frame')?.contentWindow.MIRFieldChoices.isOpen()===true");
    js(s,"window.nativeDrawingFrame=document.querySelector('#field-drawing-frame');window.nativeDrawingDocument=nativeDrawingFrame.contentDocument;window.nativeDrawingValue=nativeDrawingDocument.querySelector('#trace-height').value;true");
    androidx.test.uiautomator.UiDevice.getInstance(InstrumentationRegistry.getInstrumentation()).pressBack();
    waitFor(s,"native Back closes only child choice and restores child focus","(()=>{const f=document.querySelector('#field-drawing-frame'),d=f?.contentDocument;return !!f && f===window.nativeDrawingFrame && d===window.nativeDrawingDocument && !!f.contentWindow?.MIRFieldChoices && !f.contentWindow.MIRFieldChoices.isOpen() && d.activeElement===d.querySelector('#trace-height+button') && d.querySelector('#trace-height')?.value===window.nativeDrawingValue;})()");
+   tapDrawing(s,".draw-primary[data-draw-tool=draw]");
+   waitFor(s,"native Pliage03 measurements stage","document.querySelector('#field-drawing-frame')?.contentDocument.body.dataset.clientStage==='2'");
+   screenshot(s,"v130004-"+role+"-pliage-2-measures");
+   tapDrawing(s,"#client-step-next");
+   waitFor(s,"native Pliage03 finish stage","document.querySelector('#field-drawing-frame')?.contentDocument.body.dataset.clientStage==='3'");
+   chooseDrawingOption(s,"#material-type","aluminium");
+   chooseDrawingOption(s,"#production-material","kaycan-coil-0721-30m");
+   String color=(String)js(s,"[...document.querySelector('#field-drawing-frame').contentDocument.querySelectorAll('[data-production-color]')].find(n=>n.textContent.includes('Sable'))?.dataset.productionColor");
+   assertNotNull("Actual manufacturer's Sable colour available",color);tapDrawing(s,"[data-production-color="+JSONObject.quote(color)+"]");
+   tapDrawing(s,"[data-client-face=left]");
+   waitFor(s,"painted left surface selected","(()=>{const f=document.querySelector('#field-drawing-frame');return f?.contentWindow.MIRProductionWorkspace.getLivePreviewState().model.coloredFace.side==='left'&&f.contentDocument.querySelector('#production-drawing .mir-pliage-painted-surface')?.dataset.paintedSide==='left';})()");
+   String leftSurface=(String)js(s,"document.querySelector('#field-drawing-frame').contentDocument.querySelector('#production-drawing .mir-pliage-painted-surface').getAttribute('d')");
+   tapDrawing(s,"[data-client-face=right]");
+   waitFor(s,"painted right surface selected without geometry change","(()=>{const f=document.querySelector('#field-drawing-frame'),m=f?.contentWindow.MIRProductionWorkspace.getLivePreviewState().model;return m?.coloredFace.side==='right'&&m.finish.name==='Sable'&&JSON.stringify({points:m.pointsMM,bends:m.bends})===window.nativePliageGeometry&&f.contentDocument.querySelector('#production-drawing .mir-pliage-painted-surface')?.dataset.paintedSide==='right';})()");
+   assertNotEquals("Changing painted side changes the actual surface path",leftSurface,js(s,"document.querySelector('#field-drawing-frame').contentDocument.querySelector('#production-drawing .mir-pliage-painted-surface').getAttribute('d')"));
+   screenshot(s,"v130004-"+role+"-pliage-3-finish");
+   tapDrawing(s,"#client-step-next");
+   waitFor(s,"native Pliage03 review requires quantity","(()=>{const d=document.querySelector('#field-drawing-frame')?.contentDocument;return d?.body.dataset.clientStage==='4'&&d.querySelector('#production-quantity')?.value===''&&d.querySelector('#client-step-next')?.disabled;})()");
+   tapDrawing(s,"#production-quantity");
+   assertTrue("Native quantity key delivered",androidx.test.uiautomator.UiDevice.getInstance(InstrumentationRegistry.getInstrumentation()).pressKeyCode(android.view.KeyEvent.KEYCODE_2));
+   waitFor(s,"native quantity enables add to own cart","(()=>{const d=document.querySelector('#field-drawing-frame')?.contentDocument;return d?.querySelector('#production-quantity')?.value==='2'&&!d.querySelector('#client-step-next')?.disabled;})()");
+   screenshot(s,"v130004-"+role+"-pliage-4-review");
+   tapDrawing(s,"#client-step-next");
+   waitFor(s,"native Pliage03 piece added locally","!!document.querySelector('#field-drawing-frame')?.contentDocument.querySelector('#production-dialog[open] a.primary-button')");
+   JSONObject pliage=(JSONObject)js(s,"(()=>{const c=window.nativePliageContext,added=MIRUnifiedOrderCart.list().filter(x=>!window.nativePliageCartIds.includes(x.id)),line=added[0];window.nativePliageLineId=line?.id;return{count:added.length,owner:line?.ownerId,job:line?.jobId,expectedOwner:c.ownerId,expectedJob:c.jobId,quantity:line?.quantity,geometryPreserved:JSON.stringify(line?.snapshot.geometry.pointsMM)===JSON.stringify(JSON.parse(window.nativePliageGeometry).points),finish:line?.snapshot.spec.finish.name,paintedSide:line?.snapshot.spec.coloredFace.side};})()");
+   assertEquals("Exactly one local fabrication line",1,pliage.getInt("count"));assertEquals(pliage.getString("expectedOwner"),pliage.getString("owner"));assertEquals(pliage.getString("expectedJob"),pliage.getString("job"));assertEquals(2,pliage.getInt("quantity"));assertTrue(pliage.getBoolean("geometryPreserved"));assertEquals("Sable",pliage.getString("finish"));assertEquals("right",pliage.getString("paintedSide"));
+   tapDrawing(s,"#production-dialog[open] a.primary-button");
+   waitFor(s,"native return to own parent cart","document.body.dataset.fieldView==='catalogue'&&!document.querySelector('#field-drawing-frame')&&document.querySelector('#portal-content h1')?.textContent==='Mon panier'&&[...document.querySelectorAll('#order-cart [data-cart-qty]')].some(n=>n.dataset.cartQty===window.nativePliageLineId&&n.value==='2')");
+   screenshot(s,"v130004-"+role+"-pliage-parent-cart");fixture.put("nativePliageJourney",pliage);
    tap(s,"#portal-navigation [data-view=day]");waitFor(s,fieldContent("day"));
    fixture.put("androidFontScaleTrials",assertAndroidFontScales(s,role));tap(s,"#portal-navigation [data-view=day]");waitFor(s,fieldContent("day"));tap(s,"[data-field-profile]");waitFor(s,"document.querySelector('#portal-dialog')?.open===true && document.querySelector('#portal-dialog h2')?.textContent==="+JSONObject.quote(expectedName));
   }else{
