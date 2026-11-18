@@ -26,6 +26,7 @@
 - `dist/mir-studio-03.js` déplace les vrais contrôles, conserve les IDs/délégations du moteur et synchronise le sélecteur de zone. Les fabricants et options restent issus des données natives.
 - `dist/mir-studio-03.css` applique le charbon, les accents sable, la vue pleine largeur et les réglages inférieurs uniquement au client éligible.
 - `dist/mir-client-workspaces.js` laisse ce client au nouvel adaptateur ; l’ancien paginateur reste disponible pour les autres contextes.
+- `scripts/build-prestige-preview.cjs` fournit au Studio TEST la même configuration locale explicitement désactivée que l’Estimation 04. Le brouillon se conserve sans contacter un service distant. Les gardes réseau restent inchangés.
 - Les palettes complètes sont accessibles par expansion et recherche. Les noms officiels restent identiques en FR/EN ; les contrôles génériques sont traduits.
 - Les réglages avancés, documents, formats, calepinages et outils de zones restent disponibles dans les sections dépliables. Les trois exports sont regroupés sous « Exporter mes choix ».
 - L’estimation utilise le mécanisme existant : capture structurée du Studio et PDF original du projet importé. Ce contrat ne crée pas automatiquement un fichier `dossier` dans le brouillon Studio ; le PDF des quatre élévations reste un export distinct.
@@ -61,11 +62,13 @@ Les essais de soumission restent bloqués par le périmètre TEST. Le manifeste 
 - Les quatre suites moteur existantes passent sans modification.
 - Clics réels SVG et canvas 3D à 1440 et 390 px : quatre sélections par événements fiables souris/tactile, sélecteur synchronisé, caméra et géométrie conservées (`picking/results.json`).
 - Matrice Chromium : 15 groupes sur 16 réussis à la passe complète. Le seul échec était une lecture trop précoce du brouillon IndexedDB dans le harnais ; après attente atomique, le scénario import/reprise 390 réussit. Les fichiers de l’application sont restés identiques. Rapports originaux et reprise ciblée conservés, sans réécriture d’un échec en succès.
+- Cause finale du harnais identifiée dans Playwright : `waitForFunction` ne repolle pas la résolution d’un prédicat `async`. Les deux attentes concernées utilisent maintenant un polling asynchrone explicite et borné. Les trois imports et les deux exports/estimations source passent avec ce correctif (`browser-async-polling-followup.json`). Aucune assertion retirée.
 - Les 16 groupes sont relancés ensemble en CI sur le commit final. Le résultat distant fait partie de la livraison, séparément des essais locaux.
 - 12 comparaisons Accueil/Particuliers : zéro pixel différent, sans masque.
 - Quatre fabricants/références de palette vérifiés, y compris une référence sans palette. Rendu du canvas réellement modifié par une couleur, avec caméra et géométrie inchangées. Les choix restent identiques après rechargement.
 - Import original vérifié par SHA-256, sauvegarde/reprise et transfert du même fichier vers le brouillon local d’estimation.
 - Exports JSON/SVG/PDF téléchargés en FR/EN. Les PDF A3 comportent 5 pages : Avant, continuation Avant, Droite, Arrière, Gauche. Leur présentation native n’est pas refondue dans ce lot.
+- Les deux parcours export/estimation du build candidat passent après ajout de la configuration locale désactivée : endpoint même origine, réponse `enabled:false`, brouillon réellement conservé, aucun transport externe (`preview-config-followup.json`).
 - Aucune erreur JavaScript, erreur console ou requête externe pendant la passe complète. Aucun envoi réel tenté.
 
 ## Limites
