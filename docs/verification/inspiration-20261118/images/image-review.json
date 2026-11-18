@@ -1,0 +1,19 @@
+{
+  "generatedImages": 28,
+  "distinctSourceHashes": 28,
+  "webpFiles": 56,
+  "webpBytes": 12995024,
+  "webpHashAndDecodeErrors": [],
+  "temporaryWebpFiles": [],
+  "reviewed": "All 28 final illustrations, including final Farmhouse 01-03 retakes and Quebecois 02-04, visually inspected. Original and panoramic diagnostic sheets used.",
+  "objectPositions": {
+    "contemporain-04": "50% 70%",
+    "nordique-01": "50% 65%",
+    "chalet-01": "50% 65%",
+    "chalet-04": "50% 65%",
+    "quebecois-01": "50% 65%"
+  },
+  "generationCalls": 31,
+  "sourcePngStorage": "/workspace/mir-inspiration-originals (not versioned; SHA/source locations recorded per image)",
+  "scope": "Illustration assets only; no approved homepage image altered; no production operation."
+}

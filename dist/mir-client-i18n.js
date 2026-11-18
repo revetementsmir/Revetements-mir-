@@ -16,7 +16,7 @@
   const clientFiles=Object.freeze([
     'index.html','boutique.html','materiaux.html','produit.html','selection.html',
     'pliage.html','contact.html','realisations.html','plan.html','production.html',
-    'estimation.html','estimation-dossier.html','studio.html','chantier.html','maison.html','chantiers.html','aide.html'
+    'estimation.html','estimation-dossier.html','studio.html','chantier.html','maison.html','chantiers.html','aide.html','inspiration.html'
   ]);
   const dict=root?.MIRClientEnglish || (typeof module==='object'&&module.exports?require('./mir-client-en-ca.js'):{});
   const cataloguePhrases=Object.keys(dict).filter(key=>key.length>=18&&dict[key]!==key).sort((a,b)=>b.length-a.length);

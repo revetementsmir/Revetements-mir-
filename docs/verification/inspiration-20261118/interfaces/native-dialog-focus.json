@@ -1,0 +1,506 @@
+{
+  "result": "PASS",
+  "browser": "155.0.8059.79",
+  "steps": [
+    {
+      "label": "opened",
+      "open": true,
+      "modal": true,
+      "hasFocus": true,
+      "active": {
+        "tag": "BUTTON",
+        "id": "",
+        "close": true,
+        "previous": false,
+        "next": false
+      },
+      "inside": true,
+      "body": false
+    },
+    {
+      "label": "clicked previous",
+      "open": true,
+      "modal": true,
+      "hasFocus": true,
+      "active": {
+        "tag": "BUTTON",
+        "id": "",
+        "close": false,
+        "previous": true,
+        "next": false
+      },
+      "inside": true,
+      "body": false
+    },
+    {
+      "label": "Tab 1",
+      "open": true,
+      "modal": true,
+      "hasFocus": true,
+      "active": {
+        "tag": "BUTTON",
+        "id": "",
+        "close": false,
+        "previous": false,
+        "next": true
+      },
+      "inside": true,
+      "body": false
+    },
+    {
+      "label": "Tab 2",
+      "open": true,
+      "modal": true,
+      "hasFocus": false,
+      "active": {
+        "tag": "BODY",
+        "id": "",
+        "close": false,
+        "previous": false,
+        "next": false
+      },
+      "inside": false,
+      "body": true
+    },
+    {
+      "label": "Tab 3",
+      "open": true,
+      "modal": true,
+      "hasFocus": true,
+      "active": {
+        "tag": "BUTTON",
+        "id": "",
+        "close": true,
+        "previous": false,
+        "next": false
+      },
+      "inside": true,
+      "body": false
+    },
+    {
+      "label": "Tab 4",
+      "open": true,
+      "modal": true,
+      "hasFocus": true,
+      "active": {
+        "tag": "BUTTON",
+        "id": "",
+        "close": false,
+        "previous": true,
+        "next": false
+      },
+      "inside": true,
+      "body": false
+    },
+    {
+      "label": "Tab 5",
+      "open": true,
+      "modal": true,
+      "hasFocus": true,
+      "active": {
+        "tag": "BUTTON",
+        "id": "",
+        "close": false,
+        "previous": false,
+        "next": true
+      },
+      "inside": true,
+      "body": false
+    },
+    {
+      "label": "Tab 6",
+      "open": true,
+      "modal": true,
+      "hasFocus": false,
+      "active": {
+        "tag": "BODY",
+        "id": "",
+        "close": false,
+        "previous": false,
+        "next": false
+      },
+      "inside": false,
+      "body": true
+    },
+    {
+      "label": "Tab 7",
+      "open": true,
+      "modal": true,
+      "hasFocus": true,
+      "active": {
+        "tag": "BUTTON",
+        "id": "",
+        "close": true,
+        "previous": false,
+        "next": false
+      },
+      "inside": true,
+      "body": false
+    },
+    {
+      "label": "Tab 8",
+      "open": true,
+      "modal": true,
+      "hasFocus": true,
+      "active": {
+        "tag": "BUTTON",
+        "id": "",
+        "close": false,
+        "previous": true,
+        "next": false
+      },
+      "inside": true,
+      "body": false
+    },
+    {
+      "label": "Tab 9",
+      "open": true,
+      "modal": true,
+      "hasFocus": true,
+      "active": {
+        "tag": "BUTTON",
+        "id": "",
+        "close": false,
+        "previous": false,
+        "next": true
+      },
+      "inside": true,
+      "body": false
+    },
+    {
+      "label": "Tab 10",
+      "open": true,
+      "modal": true,
+      "hasFocus": false,
+      "active": {
+        "tag": "BODY",
+        "id": "",
+        "close": false,
+        "previous": false,
+        "next": false
+      },
+      "inside": false,
+      "body": true
+    },
+    {
+      "label": "Shift+Tab 1",
+      "open": true,
+      "modal": true,
+      "hasFocus": true,
+      "active": {
+        "tag": "BUTTON",
+        "id": "",
+        "close": false,
+        "previous": false,
+        "next": true
+      },
+      "inside": true,
+      "body": false
+    },
+    {
+      "label": "Shift+Tab 2",
+      "open": true,
+      "modal": true,
+      "hasFocus": true,
+      "active": {
+        "tag": "BUTTON",
+        "id": "",
+        "close": false,
+        "previous": true,
+        "next": false
+      },
+      "inside": true,
+      "body": false
+    },
+    {
+      "label": "Shift+Tab 3",
+      "open": true,
+      "modal": true,
+      "hasFocus": true,
+      "active": {
+        "tag": "BUTTON",
+        "id": "",
+        "close": true,
+        "previous": false,
+        "next": false
+      },
+      "inside": true,
+      "body": false
+    },
+    {
+      "label": "Shift+Tab 4",
+      "open": true,
+      "modal": true,
+      "hasFocus": false,
+      "active": {
+        "tag": "BODY",
+        "id": "",
+        "close": false,
+        "previous": false,
+        "next": false
+      },
+      "inside": false,
+      "body": true
+    },
+    {
+      "label": "Shift+Tab 5",
+      "open": true,
+      "modal": true,
+      "hasFocus": true,
+      "active": {
+        "tag": "BUTTON",
+        "id": "",
+        "close": false,
+        "previous": false,
+        "next": true
+      },
+      "inside": true,
+      "body": false
+    },
+    {
+      "label": "Shift+Tab 6",
+      "open": true,
+      "modal": true,
+      "hasFocus": true,
+      "active": {
+        "tag": "BUTTON",
+        "id": "",
+        "close": false,
+        "previous": true,
+        "next": false
+      },
+      "inside": true,
+      "body": false
+    }
+  ],
+  "backgroundFocusAttempts": [
+    {
+      "tag": "A",
+      "id": "",
+      "href": "#contenu",
+      "label": "Aller au contenu",
+      "receivedFocus": false
+    },
+    {
+      "tag": "A",
+      "id": "",
+      "href": "/index.html",
+      "label": "Les Revêtements MIR, accueil",
+      "receivedFocus": false
+    },
+    {
+      "tag": "A",
+      "id": "",
+      "href": "/boutique.html#shop-search",
+      "label": "Rechercher un produit",
+      "receivedFocus": false
+    },
+    {
+      "tag": "A",
+      "id": "",
+      "href": "/selection.html",
+      "label": "Panier",
+      "receivedFocus": false
+    },
+    {
+      "tag": "BUTTON",
+      "id": "",
+      "href": null,
+      "label": "Français canadien, sélectionné",
+      "receivedFocus": false
+    },
+    {
+      "tag": "BUTTON",
+      "id": "",
+      "href": null,
+      "label": "Anglais canadien",
+      "receivedFocus": false
+    },
+    {
+      "tag": "A",
+      "id": "",
+      "href": "/chantier.html?view=account&clientLocale=1",
+      "label": "Mon compte",
+      "receivedFocus": false
+    },
+    {
+      "tag": "BUTTON",
+      "id": "mir-inspiration-tab-farmhouse",
+      "href": null,
+      "label": "Farmhouse contemporain",
+      "receivedFocus": false
+    },
+    {
+      "tag": "BUTTON",
+      "id": "mir-inspiration-tab-contemporain",
+      "href": null,
+      "label": "Contemporain moderne",
+      "receivedFocus": false
+    },
+    {
+      "tag": "BUTTON",
+      "id": "mir-inspiration-tab-nordique",
+      "href": null,
+      "label": "Scandinave / Nordique",
+      "receivedFocus": false
+    },
+    {
+      "tag": "BUTTON",
+      "id": "mir-inspiration-tab-chalet",
+      "href": null,
+      "label": "Chalet moderne / Rustique chic",
+      "receivedFocus": false
+    },
+    {
+      "tag": "BUTTON",
+      "id": "mir-inspiration-tab-craftsman",
+      "href": null,
+      "label": "Craftsman contemporain",
+      "receivedFocus": false
+    },
+    {
+      "tag": "BUTTON",
+      "id": "mir-inspiration-tab-mid-century",
+      "href": null,
+      "label": "Mid-Century Modern",
+      "receivedFocus": false
+    },
+    {
+      "tag": "BUTTON",
+      "id": "mir-inspiration-tab-quebecois",
+      "href": null,
+      "label": "Québécois traditionnel revisité",
+      "receivedFocus": false
+    },
+    {
+      "tag": "BUTTON",
+      "id": "",
+      "href": null,
+      "label": "Agrandir : Des volumes horizontaux autour d’une entrée en retrait.",
+      "receivedFocus": false
+    },
+    {
+      "tag": "BUTTON",
+      "id": "",
+      "href": null,
+      "label": "Agrandir : Un pignon vitré, entre bois et pierre claire.",
+      "receivedFocus": false
+    },
+    {
+      "tag": "BUTTON",
+      "id": "",
+      "href": null,
+      "label": "Agrandir : Un plain-pied contemporain sous les couleurs d’automne.",
+      "receivedFocus": false
+    },
+    {
+      "tag": "BUTTON",
+      "id": "",
+      "href": null,
+      "label": "Agrandir : Volumes décalés et bois chaleureux sous la neige.",
+      "receivedFocus": false
+    },
+    {
+      "tag": "A",
+      "id": "",
+      "href": "/index.html",
+      "label": "Accueil MIR",
+      "receivedFocus": false
+    }
+  ],
+  "focusEvents": [
+    {
+      "target": "BUTTON",
+      "id": "",
+      "inside": true,
+      "open": true,
+      "href": null
+    },
+    {
+      "target": "BUTTON",
+      "id": "",
+      "inside": true,
+      "open": true,
+      "href": null
+    },
+    {
+      "target": "BUTTON",
+      "id": "",
+      "inside": true,
+      "open": true,
+      "href": null
+    },
+    {
+      "target": "BUTTON",
+      "id": "",
+      "inside": true,
+      "open": true,
+      "href": null
+    },
+    {
+      "target": "BUTTON",
+      "id": "",
+      "inside": true,
+      "open": true,
+      "href": null
+    },
+    {
+      "target": "BUTTON",
+      "id": "",
+      "inside": true,
+      "open": true,
+      "href": null
+    },
+    {
+      "target": "BUTTON",
+      "id": "",
+      "inside": true,
+      "open": true,
+      "href": null
+    },
+    {
+      "target": "BUTTON",
+      "id": "",
+      "inside": true,
+      "open": true,
+      "href": null
+    },
+    {
+      "target": "BUTTON",
+      "id": "",
+      "inside": true,
+      "open": true,
+      "href": null
+    },
+    {
+      "target": "BUTTON",
+      "id": "",
+      "inside": true,
+      "open": true,
+      "href": null
+    },
+    {
+      "target": "BUTTON",
+      "id": "",
+      "inside": true,
+      "open": true,
+      "href": null
+    },
+    {
+      "target": "BUTTON",
+      "id": "",
+      "inside": true,
+      "open": true,
+      "href": null
+    },
+    {
+      "target": "BUTTON",
+      "id": "",
+      "inside": true,
+      "open": true,
+      "href": null
+    }
+  ],
+  "returnToOriginCard": true,
+  "conclusion": "Native Chromium modal may transfer sequential focus to browser UI: activeElement=BODY and document.hasFocus=false. This is distinct from background page focus, which remains blocked by native modal inertness."
+}

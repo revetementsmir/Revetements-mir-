@@ -1,0 +1,24 @@
+{
+  "passed": true,
+  "loading": {
+    "hidden": true,
+    "display": "none",
+    "width": 0,
+    "state": "loading"
+  },
+  "error": {
+    "hidden": true,
+    "display": "none",
+    "width": 0,
+    "state": "error"
+  },
+  "thumbnail": {
+    "hidden": true,
+    "display": "none",
+    "width": 0,
+    "state": "error"
+  },
+  "cardHeight": 205.5625,
+  "errorCardHeight": 205.5625,
+  "cssChangeNeeded": false
+}

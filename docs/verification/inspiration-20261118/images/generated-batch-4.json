@@ -1,0 +1,42 @@
+[
+  {
+    "id": "chalet-02",
+    "prompt": "Create ONE original photorealistic premium architectural photograph, landscape 16:9, of a newly built credible Quebec residence. Refined architecture magazine photography, restrained realistic colours and textures, straight verticals, eye-level camera from street with subtle three-quarter angle. Include the WHOLE building with breathing room on both sides; roof, doorway, foundation and steps all contained in the central 55 percent of image height so a panoramic web crop retains the entire facade. Credible Canadian foundations and connected walkways, steps with correctly supported railings where needed, Quebec deciduous trees and conifers, realistic landscaping. No people, vehicles, text, logo, watermark, collage, schematic drawing, construction site or renovation. A realistic architectural inspiration illustration, not a real MIR project. Modern rustic chic Quebec chalet of modest single-storey scale: broad hipped dark roof with deep eaves, chestnut horizontal siding, two stout stone piers supporting an inset porch on the right, horizontal strip windows on left. Fall Laurentian setting with blazing maple trees, rock outcrops, natural grasses, asphalt driveway sweeping in from right, two wide stone front steps. Not an A-frame. CAMERA FRAMING IS ESSENTIAL: pull back so the complete building, from highest roof to lowest front step, occupies ONLY the middle HALF of the total image height. Add generous real sky above and lawn/asphalt foreground below, never crop the facade.",
+    "caption": {
+      "fr": "Un chalet horizontal aux matières chaleureuses.",
+      "en": "A horizontal chalet with warm natural textures."
+    },
+    "status": "generated",
+    "original": "/workspace/generated_images/exec-3b41d330-078b-49c8-a0de-991723683ffc.png"
+  },
+  {
+    "id": "chalet-04",
+    "prompt": "Create ONE original photorealistic premium architectural photograph, landscape 16:9, of a newly built credible Quebec residence. Refined architecture magazine photography, restrained realistic colours and textures, straight verticals, eye-level camera from street with subtle three-quarter angle. Include the WHOLE building with breathing room on both sides; roof, doorway, foundation and steps all contained in the central 55 percent of image height so a panoramic web crop retains the entire facade. Credible Canadian foundations and connected walkways, steps with correctly supported railings where needed, Quebec deciduous trees and conifers, realistic landscaping. No people, vehicles, text, logo, watermark, collage, schematic drawing, construction site or renovation. A realistic architectural inspiration illustration, not a real MIR project. Modern rustic chic Quebec chalet with T-shaped footprint: central one-and-a-half-storey warm cedar front gable and two lower lateral wings of pale grey siding, three-sided glass sunroom at far left, natural granite chimney at right. Soft late-summer evening, mixed hardwood forest with low hydrangeas and ferns, simple concrete path, black asphalt driveway right, proper low porch railings. Human-scale attractive new construction. CAMERA FRAMING IS ESSENTIAL: pull back so the complete building, from highest roof to lowest front step, occupies ONLY the middle HALF of the total image height. Add generous real sky above and lawn/asphalt foreground below, never crop the facade.",
+    "caption": {
+      "fr": "Un pignon chaleureux et des ailes ouvertes.",
+      "en": "A warm central gable with open side wings."
+    },
+    "status": "generated",
+    "original": "/workspace/generated_images/exec-41801c16-86dd-4a7e-9d5f-6cd72e918beb.png"
+  },
+  {
+    "id": "chalet-03",
+    "prompt": "Create ONE original photorealistic premium architectural photograph, landscape 16:9, of a newly built credible Quebec residence. Refined architecture magazine photography, restrained realistic colours and textures, straight verticals, eye-level camera from street with subtle three-quarter angle. Include the WHOLE building with breathing room on both sides; roof, doorway, foundation and steps all contained in the central 55 percent of image height so a panoramic web crop retains the entire facade. Credible Canadian foundations and connected walkways, steps with correctly supported railings where needed, Quebec deciduous trees and conifers, realistic landscaping. No people, vehicles, text, logo, watermark, collage, schematic drawing, construction site or renovation. A realistic architectural inspiration illustration, not a real MIR project. Quebec modern rustic chalet built on a gentle wooded slope, split-level composition with stone lower left base and charcoal vertical standing-seam metal siding on the upper right living wing, with warm cedar accents at the entry under a mono-pitch roof, long upper balcony fully supported and protected by slim black metal railing, wood door on the lower front level reached by a short safe stair. Snowy spruce forest, ploughed asphalt access, winter afternoon warm window reflections, credible foundation following slope. CAMERA FRAMING IS ESSENTIAL: pull back so the complete building, from highest roof to lowest front step, occupies ONLY the middle HALF of the total image height. Add generous real sky above and lawn/asphalt foreground below, never crop the facade.",
+    "caption": {
+      "fr": "Un chalet à demi-niveaux dans les conifères.",
+      "en": "A split-level chalet among the evergreens."
+    },
+    "status": "generated",
+    "original": "/workspace/generated_images/exec-3c450874-55e5-4320-bb0c-8b1bf6783e5f.png"
+  },
+  {
+    "id": "craftsman-01",
+    "prompt": "Create ONE original photorealistic premium architectural photograph, landscape 16:9, of a newly built credible Quebec residence. Refined architecture magazine photography, restrained realistic colours and textures, straight verticals, eye-level camera from street with subtle three-quarter angle. Include the WHOLE building with breathing room on both sides; roof, doorway, foundation and steps all contained in the central 55 percent of image height so a panoramic web crop retains the entire facade. Credible Canadian foundations and connected walkways, steps with correctly supported railings where needed, Quebec deciduous trees and conifers, realistic landscaping. No people, vehicles, text, logo, watermark, collage, schematic drawing, construction site or renovation. A realistic architectural inspiration illustration, not a real MIR project. Contemporary Craftsman Quebec home, two-storey modest residence with broad low side-gabled roof, prominent front cross-gable above a deep porch, tapered square timber columns on sturdy stone piers, sage-grey horizontal lap siding and small shingle-textured accent under gable, tall divided-light windows. Summer residential Quebec setting, maples, manicured lawn, hydrangeas, asphalt drive to detached garage left. CAMERA FRAMING IS ESSENTIAL: pull back so the complete building, from highest roof to lowest front step, occupies ONLY the middle HALF of the total image height. Add generous real sky above and lawn/asphalt foreground below, never crop the facade.",
+    "caption": {
+      "fr": "Une galerie généreuse et des détails soignés.",
+      "en": "A generous porch and carefully considered details."
+    },
+    "status": "generated",
+    "original": "/workspace/generated_images/exec-5efe68cc-0926-46bc-99cc-0d2feaf67fc9.png"
+  }
+]

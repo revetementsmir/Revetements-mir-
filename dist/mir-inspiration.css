@@ -1,0 +1,161 @@
+/* MIR inspiration — this page only. Shared navigation, locale and cart remain
+   owned by MIR's public shell. Photo views keep their natural content at zoom. */
+body.mir-inspiration-page{
+ --mir-inspiration-ink:#242522;--mir-inspiration-paper:#f4f1ea;--mir-inspiration-accent:#bda889;
+ --mir-inspiration-muted:#c6c3ba;--mir-inspiration-line:#55554d;
+ --mir-inspiration-gutter:clamp(24px,4.1667vw,80px);
+ margin:0;background:var(--mir-inspiration-ink);color:var(--mir-inspiration-paper);
+ font-family:"DM Sans",Arial,Helvetica,sans-serif
+}
+body.mir-inspiration-page,body.mir-inspiration-page *{box-sizing:border-box}
+body.mir-inspiration-page .mir-inspiration-en{display:none}
+html[lang="en-CA"] body.mir-inspiration-page .mir-inspiration-en{display:contents}
+html[lang="en-CA"] body.mir-inspiration-page .mir-inspiration-fr{display:none}
+body.mir-inspiration-page :focus-visible{outline:2px solid var(--mir-inspiration-accent);outline-offset:4px}
+body.mir-inspiration-page .mir-inspiration-main{
+ display:flex;flex-direction:column;min-width:0;width:100%;max-width:none;
+ margin:0;padding:16px var(--mir-inspiration-gutter) 12px;
+ background:var(--mir-inspiration-ink);color:var(--mir-inspiration-paper)
+}
+body.mir-inspiration-page .mir-inspiration-heading{display:flex;align-items:center;justify-content:space-between;gap:24px;min-width:0}
+body.mir-inspiration-page .mir-inspiration-heading h1{
+ margin:0;color:var(--mir-inspiration-paper)!important;font:400 clamp(36px,3.125vw,52px)/1.3 "DM Sans",Arial,sans-serif;
+ letter-spacing:-.045em;text-wrap:balance
+}
+body.mir-inspiration-page .mir-inspiration-heading h1 em{color:var(--mir-inspiration-accent)!important;font:italic 400 1.03em/1.2 Georgia,"Times New Roman",serif}
+body.mir-inspiration-page .mir-inspiration-count{flex:none;margin:0;color:var(--mir-inspiration-muted);font:400 13px/1.5 "DM Sans",Arial,sans-serif;white-space:nowrap}
+body.mir-inspiration-page .mir-inspiration-tabs{
+ display:grid;grid-template-columns:repeat(7,minmax(0,1fr));align-items:stretch;gap:16px;flex:none;min-width:0;width:100%;
+ margin:10px 0 20px;border-bottom:1px solid var(--mir-inspiration-line)
+}
+body.mir-inspiration-page .mir-inspiration-tabs button{
+ appearance:none;display:block;flex:0 0 auto;min-width:0;min-height:49px;padding:8px 0;
+ margin:0 0 -1px;border:0;border-bottom:2px solid transparent;border-radius:0;
+ color:var(--mir-inspiration-muted);background:transparent;box-shadow:none;
+ font:400 13px/1.25 "DM Sans",Arial,sans-serif;text-align:left;white-space:normal;cursor:pointer
+}
+body.mir-inspiration-page .mir-inspiration-tabs button:hover{color:var(--mir-inspiration-paper)}
+body.mir-inspiration-page .mir-inspiration-tabs button[aria-selected="true"]{color:var(--mir-inspiration-accent);border-bottom-color:var(--mir-inspiration-accent)}
+body.mir-inspiration-page .mir-inspiration-tabs button:focus-visible{outline-offset:-3px}
+body.mir-inspiration-page .mir-inspiration-panel{min-width:0;min-height:0;flex:1}
+body.mir-inspiration-page .mir-inspiration-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 22px;min-width:0;height:100%}
+body.mir-inspiration-page .mir-inspiration-card{position:relative;display:grid;grid-template-rows:minmax(0,1fr) auto;gap:8px;min-width:0;min-height:0;margin:0;padding:0;border:0;background:transparent}
+body.mir-inspiration-page .mir-inspiration-open{
+ appearance:none;position:relative;display:block;min-width:0;min-height:0;width:100%;height:100%;
+ margin:0;padding:0;border:0;border-radius:0;box-shadow:none;background:transparent;color:var(--mir-inspiration-paper);cursor:zoom-in
+}
+body.mir-inspiration-page .mir-inspiration-open img{
+ display:block;width:100%;height:100%;object-fit:cover;object-position:var(--inspiration-position,50% 50%);border:0;border-radius:0
+}
+body.mir-inspiration-page .mir-inspiration-enlarge{
+ position:absolute;right:12px;bottom:12px;display:grid;place-items:center;width:32px;height:32px;
+ border:1px solid #ffffff65;background:#242522aa;color:#fff;border-radius:50%;opacity:0;transition:opacity .15s ease
+}
+body.mir-inspiration-page .mir-inspiration-enlarge svg{width:18px;height:18px}
+body.mir-inspiration-page .mir-inspiration-open:hover .mir-inspiration-enlarge,
+body.mir-inspiration-page .mir-inspiration-open:focus-visible .mir-inspiration-enlarge{opacity:1}
+body.mir-inspiration-page .mir-inspiration-card figcaption{margin:0;color:var(--mir-inspiration-muted);font:400 12px/1.35 "DM Sans",Arial,sans-serif;text-align:left}
+body.mir-inspiration-page .mir-inspiration-status{flex:none;margin:0;color:var(--mir-inspiration-muted);font:400 12px/1.5 "DM Sans",Arial,sans-serif}
+body.mir-inspiration-page .mir-inspiration-status:empty{display:none}
+body.mir-inspiration-page .mir-inspiration-status:not(:empty){padding-top:8px}
+body.mir-inspiration-page .mir-inspiration-error{position:absolute;inset:0 0 26px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:24px;background:var(--mir-inspiration-ink);color:var(--mir-inspiration-paper);text-align:center}
+body.mir-inspiration-page .mir-inspiration-error[hidden]{display:none}
+body.mir-inspiration-page .mir-inspiration-error p{margin:0;max-width:34em;font:400 14px/1.5 "DM Sans",Arial,sans-serif}
+body.mir-inspiration-page .mir-inspiration-error button{min-height:44px;padding:9px 20px;border:1px solid var(--mir-inspiration-accent);border-radius:0;background:transparent;color:var(--mir-inspiration-paper);font:500 13px/1.5 "DM Sans",Arial,sans-serif;cursor:pointer}
+body.mir-inspiration-page .mir-inspiration-footer{
+ display:grid!important;grid-template-columns:108px minmax(0,1fr) 108px;grid-template-rows:auto auto;
+ gap:8px 18px;width:calc(100% - 2*var(--mir-inspiration-gutter));max-width:none;min-height:74px;
+ margin:0 var(--mir-inspiration-gutter)!important;padding:8px 0 10px!important;border:0;border-top:1px solid var(--mir-inspiration-line);
+ background:var(--mir-inspiration-ink)!important;color:var(--mir-inspiration-muted)!important
+}
+body.mir-inspiration-page .mir-inspiration-footer .mir-inspiration-disclosure{grid-column:1/-1;margin:0;font:400 10px/1.4 "DM Sans",Arial,sans-serif;text-align:left;color:var(--mir-inspiration-muted)}
+body.mir-inspiration-page .mir-inspiration-footer .mir-signature-footer-logo{grid-row:2;grid-column:1;width:108px;min-height:27px;display:flex;align-items:center}
+body.mir-inspiration-page .mir-inspiration-footer .mir-signature-footer-logo img{display:block;width:100%;height:auto}
+body.mir-inspiration-page .mir-inspiration-footer .mir-inspiration-signature{grid-column:2;grid-row:2;align-self:center;margin:0;font:400 11px/1.45 "DM Sans",Arial,sans-serif;text-align:center;color:var(--mir-inspiration-muted)}
+/* The same 90px public header as the approved desktop entry. */
+@media(min-width:960px){
+ body.mir-inspiration-page{min-height:100svh}
+ body.mir-inspiration-page #mir-prestige-header{min-height:90px!important;height:90px!important;padding:20px var(--mir-inspiration-gutter) 0!important;grid-template-columns:1fr auto!important}
+ body.mir-inspiration-page #mir-prestige-header>.mir-client-brand{width:166px!important;margin-bottom:20px!important}
+ body.mir-inspiration-page #mir-prestige-header .mir-prestige-actions{margin-bottom:20px!important}
+ body.mir-inspiration-page #mir-prestige-header>nav.mir-prestige-nav{display:none!important}
+ body.mir-inspiration-page .mir-inspiration-main{height:calc(100svh - 164px);min-height:580px}
+ body.mir-inspiration-page .mir-inspiration-grid{grid-template-rows:repeat(2,minmax(0,1fr))}
+}
+/* Chrome desktop mode on a phone commonly exposes 980 CSS pixels. Its tall
+   virtual viewport must not turn the four landscape images into portrait crops. */
+@media(min-width:960px) and (max-width:1100px){
+ body.mir-inspiration-page .mir-inspiration-main{height:min(calc(100svh - 164px),66vw);min-height:580px}
+ body.mir-inspiration-page .mir-inspiration-tabs{gap:clamp(12px,1.6vw,18px)}
+ body.mir-inspiration-page .mir-inspiration-tabs button{font-size:12px}
+ body.mir-inspiration-page #mir-prestige-header{display:flex!important;padding:20px 28px!important;gap:22px!important}
+ body.mir-inspiration-page #mir-prestige-header>.mir-client-brand{margin:0 auto 0 0!important}
+ body.mir-inspiration-page #mir-prestige-header .mir-prestige-actions,
+ body.mir-inspiration-page #mir-prestige-header>nav.mir-prestige-nav,
+ body.mir-inspiration-page #mir-prestige-header.mir-client-menu-open>nav.mir-prestige-nav,
+ body.mir-inspiration-page #mir-prestige-header>nav.mir-prestige-nav[hidden]{display:contents!important}
+ body.mir-inspiration-page #mir-prestige-header>nav.mir-prestige-nav>a,
+ body.mir-inspiration-page #mir-prestige-header .mir-client-menu-button{display:none!important}
+ body.mir-inspiration-page #mir-prestige-header .mir-prestige-search{display:inline-flex!important;order:1!important}
+ body.mir-inspiration-page #mir-prestige-header .mir-public-cart{order:2!important}
+ body.mir-inspiration-page #mir-prestige-header .mir-cart-word{display:inline!important}
+ body.mir-inspiration-page #mir-prestige-header .mir-client-locale-switch{order:3!important;margin:0!important;padding:0!important;width:auto!important;background:transparent!important;border:0!important;border-radius:0!important;gap:1px!important}
+ body.mir-inspiration-page #mir-prestige-header .mir-public-account-avatar{order:4!important}
+}
+@media(max-width:959px){
+ body.mir-inspiration-page{--mir-inspiration-gutter:24px}
+ body.mir-inspiration-page .mir-inspiration-main{padding-top:26px;padding-bottom:26px}
+ body.mir-inspiration-page .mir-inspiration-heading{align-items:flex-start;flex-direction:column;gap:10px}
+ body.mir-inspiration-page .mir-inspiration-heading h1{font-size:38px;line-height:1.2}
+ body.mir-inspiration-page .mir-inspiration-tabs{display:flex;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:thin;scrollbar-color:var(--mir-inspiration-accent) transparent;gap:24px;margin-top:20px}
+ body.mir-inspiration-page .mir-inspiration-tabs button{white-space:nowrap}
+ body.mir-inspiration-page .mir-inspiration-grid{height:auto;gap:22px}
+ body.mir-inspiration-page .mir-inspiration-open{aspect-ratio:16/10;height:auto}
+ body.mir-inspiration-page .mir-inspiration-card figcaption{font-size:13px}
+ body.mir-inspiration-page .mir-inspiration-footer{min-height:78px}
+ body.mir-inspiration-page .mir-inspiration-footer .mir-inspiration-disclosure,
+ body.mir-inspiration-page .mir-inspiration-footer .mir-inspiration-signature{font-size:12px}
+}
+@media(max-width:600px){
+ body.mir-inspiration-page{--mir-inspiration-gutter:20px}
+ body.mir-inspiration-page .mir-inspiration-heading h1{font-size:35px}
+ body.mir-inspiration-page .mir-inspiration-grid{grid-template-columns:1fr;gap:26px}
+ body.mir-inspiration-page .mir-inspiration-open{aspect-ratio:16/10}
+ body.mir-inspiration-page .mir-inspiration-enlarge{opacity:1}
+ body.mir-inspiration-page .mir-inspiration-footer{grid-template-columns:88px minmax(0,1fr);gap:10px 16px}
+ body.mir-inspiration-page .mir-inspiration-footer .mir-signature-footer-logo{width:88px}
+ body.mir-inspiration-page .mir-inspiration-footer .mir-inspiration-signature{text-align:left;font-size:12px}
+ body.mir-inspiration-page .mir-inspiration-footer .mir-inspiration-disclosure{font-size:12px}
+}
+/* The modal presents the complete source image; the grid's crop is not reused. */
+body.mir-inspiration-page .mir-inspiration-dialog{
+ width:min(1440px,calc(100% - 40px));max-width:none;max-height:calc(100svh - 32px);
+ margin:auto;padding:16px 20px;border:1px solid #706b60;border-radius:0;
+ background:var(--mir-inspiration-ink);color:var(--mir-inspiration-paper);box-shadow:0 20px 70px #0007
+}
+body.mir-inspiration-page .mir-inspiration-dialog::backdrop{background:#11120ff0}
+body.mir-inspiration-page .mir-inspiration-dialog-toolbar{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:12px}
+body.mir-inspiration-page .mir-inspiration-dialog-toolbar h2{margin:0;font:400 20px/1.3 "DM Sans",Arial,sans-serif;color:var(--mir-inspiration-paper)}
+body.mir-inspiration-page .mir-inspiration-dialog button{display:grid;place-items:center;flex:none;width:44px;min-height:44px;padding:9px;border:1px solid #9e9685;border-radius:50%;background:#242522db;color:var(--mir-inspiration-paper);cursor:pointer}
+body.mir-inspiration-page .mir-inspiration-dialog button svg{display:block;width:24px;height:24px}
+body.mir-inspiration-page .mir-inspiration-dialog button:hover{border-color:var(--mir-inspiration-accent);color:var(--mir-inspiration-accent)}
+body.mir-inspiration-page .mir-inspiration-dialog-stage{position:relative;display:flex;align-items:center;justify-content:center;min-height:180px;background:var(--mir-inspiration-ink)}
+body.mir-inspiration-page #mir-inspiration-large{display:block;width:100%;height:auto;max-height:calc(100svh - 190px);object-fit:contain}
+body.mir-inspiration-page .mir-inspiration-previous{position:absolute;left:14px;top:calc(50% - 22px);z-index:2}
+body.mir-inspiration-page .mir-inspiration-next{position:absolute;right:14px;top:calc(50% - 22px);z-index:2}
+body.mir-inspiration-page .mir-inspiration-dialog-footer{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;padding-top:12px}
+body.mir-inspiration-page .mir-inspiration-dialog-footer p{margin:0;font:400 14px/1.45 "DM Sans",Arial,sans-serif;color:var(--mir-inspiration-muted)}
+body.mir-inspiration-page #mir-inspiration-position{flex:none;white-space:nowrap}
+body.mir-inspiration-page .mir-inspiration-dialog .mir-inspiration-error{inset:0}
+body.mir-inspiration-page .mir-inspiration-dialog .mir-inspiration-error button{width:auto;min-width:110px;border-radius:0}
+@media(max-width:600px){
+ body.mir-inspiration-page .mir-inspiration-dialog{width:calc(100% - 16px);max-height:calc(100svh - 16px);padding:10px}
+ body.mir-inspiration-page .mir-inspiration-dialog-toolbar h2{font-size:17px}
+ body.mir-inspiration-page .mir-inspiration-dialog-toolbar{gap:10px}
+ body.mir-inspiration-page #mir-inspiration-large{max-height:calc(100svh - 210px)}
+ body.mir-inspiration-page .mir-inspiration-previous{left:6px}
+ body.mir-inspiration-page .mir-inspiration-next{right:6px}
+ body.mir-inspiration-page .mir-inspiration-dialog-footer p{font-size:12px}
+}
+@media(hover:none){body.mir-inspiration-page .mir-inspiration-enlarge{opacity:1}}
+@media(prefers-reduced-motion:reduce){body.mir-inspiration-page .mir-inspiration-enlarge{transition:none}}

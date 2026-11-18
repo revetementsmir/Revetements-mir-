@@ -1,7 +1,7 @@
 /* MIR public presentation. Existing catalogue, cart, Auth and drawing engines remain owners of data. */
 (()=>{'use strict';function init(){
  const file=location.pathname.split('/').pop()||'index.html',q=new URLSearchParams(location.search);
- const pages=['index.html','boutique.html','produit.html','selection.html','materiaux.html','pliage.html','plan.html','studio.html','studio-public.html','estimation.html','realisations.html','contact.html','maison.html','chantiers.html','aide.html'];
+ const pages=['index.html','boutique.html','produit.html','selection.html','materiaux.html','pliage.html','plan.html','studio.html','studio-public.html','estimation.html','realisations.html','contact.html','maison.html','chantiers.html','aide.html','inspiration.html'];
  let invitation=['invite','invitation','token'].some(key=>q.has(key))||!!document.querySelector('[data-mir-invitation="true"]');try{invitation=invitation||!!sessionStorage.getItem('mir_portal_invitation_v1');}catch{}
  const account=file==='chantier.html'&&q.get('clientLocale')==='1'&&!invitation;
  if(!pages.includes(file)&&!account&&!(file==='production.html'&&q.get('mode')==='client'&&q.get('source')!=='store'))return;

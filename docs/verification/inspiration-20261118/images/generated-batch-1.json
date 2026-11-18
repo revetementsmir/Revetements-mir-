@@ -1,0 +1,42 @@
+[
+  {
+    "id": "farmhouse-03",
+    "prompt": "Create ONE original photorealistic premium architectural photograph, landscape 16:9, of a newly built credible Quebec residence. Refined architecture magazine photography, restrained realistic colours and textures, straight verticals, eye-level camera from street with subtle three-quarter angle. Include the WHOLE building with breathing room on both sides; roof, doorway, foundation and steps all contained in the central 55 percent of image height so a panoramic web crop retains the entire facade. Credible Canadian foundations and connected walkways, steps with correctly supported railings where needed, Quebec deciduous trees and conifers, realistic landscaping. No people, vehicles, text, logo, watermark, collage, schematic drawing, construction site or renovation. A realistic architectural inspiration illustration, not a real MIR project. Contemporary farmhouse with L-shaped footprint: a two-storey grey vertical-clad wing on the RIGHT under a simple steep roof, lower pale fieldstone left wing with three aligned windows, wooden porch inside the L with sturdy railing, warm brown wood entrance. Winter light, broad snow-covered lawn, shoveled concrete stairs, asphalt drive visible on left, spruce grove behind. Distinct asymmetrical architecture, no central front gable.",
+    "caption": {
+      "fr": "Une ferme contemporaine aux volumes en L.",
+      "en": "An L-shaped contemporary farmhouse."
+    },
+    "status": "generated",
+    "original": "/workspace/generated_images/exec-21d624a8-01c9-4c2c-9510-5c880741fd06.png"
+  },
+  {
+    "id": "farmhouse-02",
+    "prompt": "Create ONE original photorealistic premium architectural photograph, landscape 16:9, of a newly built credible Quebec residence. Refined architecture magazine photography, restrained realistic colours and textures, straight verticals, eye-level camera from street with subtle three-quarter angle. Include the WHOLE building with breathing room on both sides; roof, doorway, foundation and steps all contained in the central 55 percent of image height so a panoramic web crop retains the entire facade. Credible Canadian foundations and connected walkways, steps with correctly supported railings where needed, Quebec deciduous trees and conifers, realistic landscaping. No people, vehicles, text, logo, watermark, collage, schematic drawing, construction site or renovation. A realistic architectural inspiration illustration, not a real MIR project. Compact contemporary farmhouse with ONE AND A HALF STOREYS, charcoal vertical siding, a steep side-facing gable roof and ONE small front dormer, warm timber front stoop tucked left, white-trimmed tall windows, detached small cedar garage visible far right behind house. Red and golden Quebec maple autumn, low stone retaining edge, short paved walkway and asphalt drive. Modest approachable scale.",
+    "caption": {
+      "fr": "Une silhouette compacte aux accents boisés.",
+      "en": "A compact silhouette with warm wood accents."
+    },
+    "status": "generated",
+    "original": "/workspace/generated_images/exec-b4a8fae7-5e7b-41fd-a840-89272d88a58b.png"
+  },
+  {
+    "id": "contemporain-04",
+    "prompt": "Create ONE original photorealistic premium architectural photograph, landscape 16:9, of a newly built credible Quebec residence. Refined architecture magazine photography, restrained realistic colours and textures, straight verticals, eye-level camera from street with subtle three-quarter angle. Include the WHOLE building with breathing room on both sides; roof, doorway, foundation and steps all contained in the central 55 percent of image height so a panoramic web crop retains the entire facade. Credible Canadian foundations and connected walkways, steps with correctly supported railings where needed, Quebec deciduous trees and conifers, realistic landscaping. No people, vehicles, text, logo, watermark, collage, schematic drawing, construction site or renovation. A realistic architectural inspiration illustration, not a real MIR project. Contemporary modern home, two rectangular storeys with flat parapet roofs in an L arrangement, tall ochre cedar vertical-clad volume on the left and low dark grey siding garage wing extending right, recessed black front door at the inner corner, large black windows, small pale masonry lower panel. Quiet winter afternoon, modest clean snowbanks alongside a ploughed black asphalt drive and clear concrete front stairs with black railing. White spruce and bare sugar maples. Clearly different from a bungalow or farmhouse.",
+    "caption": {
+      "fr": "Volumes décalés et bois chaleureux sous la neige.",
+      "en": "Offset volumes and warm wood in the snow."
+    },
+    "status": "generated",
+    "original": "/workspace/generated_images/exec-c38fdc84-aa5d-43ce-845f-258a025c72af.png"
+  },
+  {
+    "id": "farmhouse-01",
+    "prompt": "Create ONE original photorealistic premium architectural photograph, landscape 16:9, of a newly built credible Quebec residence. Refined architecture magazine photography, restrained realistic colours and textures, straight verticals, eye-level camera from street with subtle three-quarter angle. Include the WHOLE building with breathing room on both sides; roof, doorway, foundation and steps all contained in the central 55 percent of image height so a panoramic web crop retains the entire facade. Credible Canadian foundations and connected walkways, steps with correctly supported railings where needed, Quebec deciduous trees and conifers, realistic landscaping. No people, vehicles, text, logo, watermark, collage, schematic drawing, construction site or renovation. A realistic architectural inspiration illustration, not a real MIR project. Contemporary farmhouse, two-storey WHITE board-and-batten main volume with one tall central front gable, lower single-storey attached garage on the left, long deep covered front porch with natural timber square columns on a pale masonry base, small black metal porch roof, black rectangular windows. Moderate-sized new family house, not a mansion. Summer daylight, lawn, hydrangeas, mature maple, asphalt driveway connects naturally to garage.",
+    "caption": {
+      "fr": "Pignon clair et grande galerie accueillante.",
+      "en": "A light gable and an inviting front porch."
+    },
+    "status": "generated",
+    "original": "/workspace/generated_images/exec-567aab23-6341-4e97-82dd-988e68a01893.png"
+  }
+]

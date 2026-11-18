@@ -1,0 +1,42 @@
+[
+  {
+    "id": "contemporain-02",
+    "prompt": "Create ONE original photorealistic premium architectural photograph, horizontal landscape 16:9. A credible newly built Quebec home, refined natural architecture-magazine photography, realistic construction and materials, straight verticals, camera at street eye level. CRITICAL PANORAMIC WEB FRAMING: photograph from FAR ENOUGH BACK that the ENTIRE building, from highest roof edge to lowest front step, fits ONLY within the MIDDLE 50 percent of the total image height. Use substantial real sky above and a generous foreground lawn/asphalt below. Whole facade and both sides visible, no cropped roof or foundation. This is a high-end architectural illustration for inspiration, not an actual MIR realization. No people, vehicles, signs, logos, text, watermark or collage. Quebec maple, birch and spruce vegetation, credible foundations, grounded steps with proper railings, realistic landscaping and connected paved paths. A broad contemporary modern Quebec single-storey house with one LOW front-facing asymmetrical GABLED living wing at LEFT, large triangular clerestory glazing above a broad picture window, warm natural timber ceiling visible under eaves; a lower flat-roof pale limestone entry wing at RIGHT, charcoal vertical siding behind the glass, a dark recessed front door close to the right edge, NO GARAGE and no second storey. Gentle early-autumn day, yellow birch and still-green maples, restrained ornamental grasses and low hydrangeas, black asphalt parking strip on right ending before the front path, four wide concrete stairs with a slim dark railing. Broad low horizontal profile and a glazed living gable, visually distinct from a long shed-roof bungalow. CAMERA FRAMING IS ESSENTIAL: pull back so the complete building, from highest roof to lowest front step, occupies ONLY the middle HALF of the total image height. Add generous real sky above and lawn/asphalt foreground below, never crop the facade.",
+    "caption": {
+      "fr": "Un pignon vitré, entre bois et pierre claire.",
+      "en": "A glazed gable between warm wood and light stone."
+    },
+    "status": "generated",
+    "original": "/workspace/generated_images/exec-a8b7232b-1d40-4e12-9f81-15af81fc57b6.png"
+  },
+  {
+    "id": "contemporain-01",
+    "prompt": "Create ONE original photorealistic premium architectural photograph, horizontal landscape 16:9. A credible newly built Quebec home, refined natural architecture-magazine photography, realistic construction and materials, straight verticals, camera at street eye level. CRITICAL PANORAMIC WEB FRAMING: photograph from FAR ENOUGH BACK that the ENTIRE building, from highest roof edge to lowest front step, fits ONLY within the MIDDLE 50 percent of the total image height. Use substantial real sky above and a generous foreground lawn/asphalt below. Whole facade and both sides visible, no cropped roof or foundation. This is a high-end architectural illustration for inspiration, not an actual MIR realization. No people, vehicles, signs, logos, text, watermark or collage. Quebec maple, birch and spruce vegetation, credible foundations, grounded steps with proper railings, realistic landscaping and connected paved paths. A broad contemporary modern home in an L configuration, one long low charcoal horizontal-clad front wing with a pale WHITE upper rectangular volume floating slightly behind the right half, low flat parapet roofs, deep front entry courtyard at the elbow, a recessed single-car garage at far LEFT, large narrow black-framed windows in the white upper box and horizontal glazing below. Warm tan wood only around the central entry recess, no tall gables. Moderate-sized new Quebec family home. Summer maples, planted grasses and hydrangeas, asphalt driveway left, clear broad concrete walkway into entry court. Architectural emphasis on horizontal offset white and charcoal volumes, a unique house rather than another colour variation. CAMERA FRAMING IS ESSENTIAL: pull back so the complete building, from highest roof to lowest front step, occupies ONLY the middle HALF of the total image height. Add generous real sky above and lawn/asphalt foreground below, never crop the facade.",
+    "caption": {
+      "fr": "Des volumes horizontaux autour d’une entrée en retrait.",
+      "en": "Horizontal volumes around a recessed entrance."
+    },
+    "status": "generated",
+    "original": "/workspace/generated_images/exec-f56188fe-35a0-4489-af4d-7c20b44402a0.png"
+  },
+  {
+    "id": "nordique-04",
+    "prompt": "Create ONE original photorealistic premium architectural photograph, landscape 16:9, of a newly built credible Quebec residence. Refined architecture magazine photography, restrained realistic colours and textures, straight verticals, eye-level camera from street with subtle three-quarter angle. Include the WHOLE building with breathing room on both sides; roof, doorway, foundation and steps all contained in the central 55 percent of image height so a panoramic web crop retains the entire facade. Credible Canadian foundations and connected walkways, steps with correctly supported railings where needed, Quebec deciduous trees and conifers, realistic landscaping. No people, vehicles, text, logo, watermark, collage, schematic drawing, construction site or renovation. A realistic architectural inspiration illustration, not a real MIR project. Single-storey Nordic home shaped as a broad low courtyard rectangle beneath one shallow pitched gable roof, silvery grey vertical cladding, warm timber recess running across the centre, three large square windows on the right wing and smaller kitchen windows on left. No tall front gable, no second storey. Late summer Quebec setting with mixed spruce and maple trees, stone path, low perennial planting, black asphalt drive leading from bottom left. CAMERA FRAMING IS ESSENTIAL: pull back so the complete building, from highest roof to lowest front step, occupies ONLY the middle HALF of the total image height. Add generous real sky above and lawn/asphalt foreground below, never crop the facade.",
+    "caption": {
+      "fr": "Un refuge bas et ouvert sur le paysage.",
+      "en": "A low, open home facing the landscape."
+    },
+    "status": "generated",
+    "original": "/workspace/generated_images/exec-2339896c-5c87-46dc-8001-2619464aba37.png"
+  },
+  {
+    "id": "chalet-01",
+    "prompt": "Create ONE original photorealistic premium architectural photograph, landscape 16:9, of a newly built credible Quebec residence. Refined architecture magazine photography, restrained realistic colours and textures, straight verticals, eye-level camera from street with subtle three-quarter angle. Include the WHOLE building with breathing room on both sides; roof, doorway, foundation and steps all contained in the central 55 percent of image height so a panoramic web crop retains the entire facade. Credible Canadian foundations and connected walkways, steps with correctly supported railings where needed, Quebec deciduous trees and conifers, realistic landscaping. No people, vehicles, text, logo, watermark, collage, schematic drawing, construction site or renovation. A realistic architectural inspiration illustration, not a real MIR project. Modern rustic chic Quebec chalet, tall TWO-STOREY A-FRAME main volume with full-height triangular glazing, substantial natural wood structural beams, low grey stone base, a small single-storey side utility wing in dark siding. Warm summer woodland near a lake glimpsed behind at right, white pine and maples, grounded timber stairs and proper black railings, asphalt approach ending well before the front garden. Not a ski resort mansion. CAMERA FRAMING IS ESSENTIAL: pull back so the complete building, from highest roof to lowest front step, occupies ONLY the middle HALF of the total image height. Add generous real sky above and lawn/asphalt foreground below, never crop the facade.",
+    "caption": {
+      "fr": "Un chalet vitré entre bois et pierre.",
+      "en": "A glazed chalet framed by wood and stone."
+    },
+    "status": "generated",
+    "original": "/workspace/generated_images/exec-acaf8c71-480c-4225-a89c-47e4ec6485ff.png"
+  }
+]

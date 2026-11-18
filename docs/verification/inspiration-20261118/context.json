@@ -1,0 +1,32 @@
+{
+  "date": "2026-11-18",
+  "moon": {
+    "coordinator": "moon",
+    "version": "1.3.11",
+    "freshness": {
+      "protocol": 1,
+      "source": "atelier",
+      "methodVersion": "1.3.11",
+      "checkedAt": "2026-11-18T10:47:30.250Z",
+      "refresh": "each-request",
+      "failureMode": "stop-moon-coordination"
+    }
+  },
+  "boss": {
+    "level": "god",
+    "instructionsLoaded": true
+  },
+  "experts": [
+    "interface-designer",
+    "ux-accessibility",
+    "visual-harmonization",
+    "seo-geo"
+  ],
+  "task": "3bc59032-9d23-463d-8ba1-f5e91fcac3a4",
+  "taskVersion": 1,
+  "base": "a045c7cfa365581f4db1624897764d696fb3e92e",
+  "homeReference": "16cf0f8bf197011cade4d5b5fdb7b6b3d2fc0e9e",
+  "branch": "codex/inspiration-anthracite-20261118",
+  "scope": "Real inspiration gallery; TEST only; home unchanged; Maison inspiration link only.",
+  "seo": "Review page remains noindex under existing protected MIR TEST; no indexing or public publication claim."
+}

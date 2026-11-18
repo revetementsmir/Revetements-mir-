@@ -1,0 +1,47 @@
+{
+  "contemporain-01": {
+    "caption": {
+      "fr": "Des volumes horizontaux autour d’une entrée en retrait.",
+      "en": "Horizontal volumes around a recessed entrance."
+    },
+    "alt": {
+      "fr": "Maison contemporaine à volumes horizontaux blancs et charbon, avec entrée en bois en retrait et toits plats.",
+      "en": "Contemporary house with horizontal white and charcoal volumes, a recessed wood entrance and flat roofs."
+    },
+    "reviewStatus": "visually-reviewed"
+  },
+  "contemporain-02": {
+    "caption": {
+      "fr": "Un pignon vitré, entre bois et pierre claire.",
+      "en": "A glazed gable between warm wood and light stone."
+    },
+    "alt": {
+      "fr": "Maison de plain-pied à grand pignon vitré, avec accents de bois, parement charbon et aile basse en pierre claire.",
+      "en": "Single-storey house with a large glazed gable, wood accents, charcoal siding and a low light-stone wing."
+    },
+    "reviewStatus": "visually-reviewed"
+  },
+  "contemporain-03": {
+    "caption": {
+      "fr": "Un plain-pied contemporain sous les couleurs d’automne.",
+      "en": "A contemporary bungalow framed by autumn colours."
+    },
+    "alt": {
+      "fr": "Bungalow allongé à deux toits monopentes asymétriques, avec clin charbon, pierre pâle et entrée en bois en retrait.",
+      "en": "Long bungalow with two asymmetrical shed roofs, charcoal lap siding, pale stone and a recessed wood entrance."
+    },
+    "reviewStatus": "visually-reviewed"
+  },
+  "contemporain-04": {
+    "caption": {
+      "fr": "Volumes décalés et bois chaleureux sous la neige.",
+      "en": "Offset volumes and warm wood in the snow."
+    },
+    "alt": {
+      "fr": "Maison contemporaine à volumes rectangulaires décalés, parement de bois vertical et garage bas gris foncé, dans un paysage enneigé.",
+      "en": "Contemporary house with offset rectangular volumes, vertical wood siding and a low dark grey garage in a snowy landscape."
+    },
+    "reviewStatus": "visually-reviewed",
+    "position": "50% 70%"
+  }
+}

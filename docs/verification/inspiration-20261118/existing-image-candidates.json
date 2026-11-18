@@ -1,0 +1,44 @@
+[
+  {
+    "id": "contemporain-01",
+    "source": "dist/assets/mir-home-hero-20261105.webp",
+    "sourceSha256": "53ee16ea323d72363a867e8218e66e569ff4603835612fee253041028cf40e1a",
+    "provenance": "Existing approved MIR inspiration illustration; not a claimed MIR construction. Original unchanged.",
+    "variants": {
+      "contemporain-01.webp": {
+        "width": 960,
+        "height": 540,
+        "bytes": 155568,
+        "sha256": "3c665064fa99c247c73e596a3ac5fef0c1e029a7938c8d374b45f61a1cee818e"
+      },
+      "contemporain-01-large.webp": {
+        "width": 1600,
+        "height": 900,
+        "bytes": 337588,
+        "sha256": "a7e28991a408b2e0c2c84f24dcfb00709d01543204042c5517dff2ac9a1f94a6"
+      }
+    },
+    "decision": "Not used in final gallery: panoramic grid crop cuts rooflines or foundations; original approved files remain unchanged. Dedicated generation requested instead."
+  },
+  {
+    "id": "contemporain-02",
+    "source": "dist/assets/mir-particuliers-maison-approuvee.webp",
+    "sourceSha256": "89f112fbbbd43a3cf16bf113a37b80b3af9646929d5759e86dce321bf669da5b",
+    "provenance": "Existing approved MIR inspiration illustration; not a claimed MIR construction. Original unchanged.",
+    "variants": {
+      "contemporain-02.webp": {
+        "width": 960,
+        "height": 540,
+        "bytes": 180858,
+        "sha256": "57d37df8422f7f4d2b2b14bd1d69953053b5390d9f039e4d9d40f14c5840af12"
+      },
+      "contemporain-02-large.webp": {
+        "width": 1600,
+        "height": 900,
+        "bytes": 419926,
+        "sha256": "f1f828f46b7cd025245b64b54ec0810a9433608025a661267ddd015621d8d311"
+      }
+    },
+    "decision": "Not used in final gallery: panoramic grid crop cuts rooflines or foundations; original approved files remain unchanged. Dedicated generation requested instead."
+  }
+]

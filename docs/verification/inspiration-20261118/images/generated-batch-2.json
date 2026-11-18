@@ -1,0 +1,42 @@
+[
+  {
+    "id": "nordique-03",
+    "prompt": "Create ONE original photorealistic premium architectural photograph, landscape 16:9, of a newly built credible Quebec residence. Refined architecture magazine photography, restrained realistic colours and textures, straight verticals, eye-level camera from street with subtle three-quarter angle. Include the WHOLE building with breathing room on both sides; roof, doorway, foundation and steps all contained in the central 55 percent of image height so a panoramic web crop retains the entire facade. Credible Canadian foundations and connected walkways, steps with correctly supported railings where needed, Quebec deciduous trees and conifers, realistic landscaping. No people, vehicles, text, logo, watermark, collage, schematic drawing, construction site or renovation. A realistic architectural inspiration illustration, not a real MIR project. Scandinavian inspired Quebec two-storey narrow house, steep side-gable pale grey roof, pale whitewashed horizontal timber cladding, an elongated one-storey dark cedar wing perpendicular at left, central recess with natural wood front door, a few carefully placed vertical windows. Autumn early morning, yellow birch leaves and white spruce, understated low shrubs, sloped asphalt driveway, three grounded steps with black railing. Clear compact asymmetry. CAMERA FRAMING IS ESSENTIAL: pull back so the complete building, from highest roof to lowest front step, occupies ONLY the middle HALF of the total image height. Add generous real sky above and lawn/asphalt foreground below, never crop the facade. The house remains a clear architectural subject in a wide landscape.",
+    "caption": {
+      "fr": "Des lignes nordiques et des contrastes doux.",
+      "en": "Nordic lines and gentle contrasts."
+    },
+    "status": "generated",
+    "original": "/workspace/generated_images/exec-4604315a-5c49-44ac-ba1f-67bcfd04dd53.png"
+  },
+  {
+    "id": "nordique-01",
+    "prompt": "Create ONE original photorealistic premium architectural photograph, landscape 16:9, of a newly built credible Quebec residence. Refined architecture magazine photography, restrained realistic colours and textures, straight verticals, eye-level camera from street with subtle three-quarter angle. Include the WHOLE building with breathing room on both sides; roof, doorway, foundation and steps all contained in the central 55 percent of image height so a panoramic web crop retains the entire facade. Credible Canadian foundations and connected walkways, steps with correctly supported railings where needed, Quebec deciduous trees and conifers, realistic landscaping. No people, vehicles, text, logo, watermark, collage, schematic drawing, construction site or renovation. A realistic architectural inspiration illustration, not a real MIR project. Scandinavian Nordic Quebec small cabin-house, ONE narrow tall front-facing gable volume in black vertical wood siding, minimal roof overhang, tall glazed gable above a warm timber door on left edge of glazing, low deck with slender black railing. No garage, no second wing. Snowy Quebec birch and spruce woodland, packed cleared short walkway and modest ploughed asphalt parking area left. Crisp diffuse winter morning. CAMERA FRAMING IS ESSENTIAL: pull back so the complete building, from highest roof to lowest front step, occupies ONLY the middle HALF of the total image height. Add generous real sky above and lawn/asphalt foreground below, never crop the facade. The house remains a clear architectural subject in a wide landscape.",
+    "caption": {
+      "fr": "Un pignon épuré au cœur de l’hiver.",
+      "en": "A simple gable in a winter landscape."
+    },
+    "status": "generated",
+    "original": "/workspace/generated_images/exec-8579aaa0-b046-4c60-8c4d-838f03b8fef0.png"
+  },
+  {
+    "id": "nordique-02",
+    "prompt": "Create ONE original photorealistic premium architectural photograph, landscape 16:9, of a newly built credible Quebec residence. Refined architecture magazine photography, restrained realistic colours and textures, straight verticals, eye-level camera from street with subtle three-quarter angle. Include the WHOLE building with breathing room on both sides; roof, doorway, foundation and steps all contained in the central 55 percent of image height so a panoramic web crop retains the entire facade. Credible Canadian foundations and connected walkways, steps with correctly supported railings where needed, Quebec deciduous trees and conifers, realistic landscaping. No people, vehicles, text, logo, watermark, collage, schematic drawing, construction site or renovation. A realistic architectural inspiration illustration, not a real MIR project. Scandinavian Nordic house with TWO parallel staggered gabled volumes: left volume natural light cedar and right white vertical siding; both are single-storey with low elongated side walls, joined by a glazed recessed entrance. Slender black-frame windows, no ornament, black metal roofs. Summer Quebec countryside edge, soft green lawn, young birches, ferns, rectangular concrete pavers and restrained black asphalt driveway on right. CAMERA FRAMING IS ESSENTIAL: pull back so the complete building, from highest roof to lowest front step, occupies ONLY the middle HALF of the total image height. Add generous real sky above and lawn/asphalt foreground below, never crop the facade. The house remains a clear architectural subject in a wide landscape.",
+    "caption": {
+      "fr": "Deux volumes simples, reliés par la lumière.",
+      "en": "Two simple volumes connected by light."
+    },
+    "status": "generated",
+    "original": "/workspace/generated_images/exec-9c106add-2ea8-4f70-8eac-f29a7591d74c.png"
+  },
+  {
+    "id": "farmhouse-04",
+    "prompt": "Create ONE original photorealistic premium architectural photograph, landscape 16:9, of a newly built credible Quebec residence. Refined architecture magazine photography, restrained realistic colours and textures, straight verticals, eye-level camera from street with subtle three-quarter angle. Include the WHOLE building with breathing room on both sides; roof, doorway, foundation and steps all contained in the central 55 percent of image height so a panoramic web crop retains the entire facade. Credible Canadian foundations and connected walkways, steps with correctly supported railings where needed, Quebec deciduous trees and conifers, realistic landscaping. No people, vehicles, text, logo, watermark, collage, schematic drawing, construction site or renovation. A realistic architectural inspiration illustration, not a real MIR project. Single-storey contemporary farmhouse: long low white horizontal siding house with THREE clearly separated small front gables, central double glazed entrance under a small dark standing seam canopy, narrow black windows, dark low roof. No garage attached. Summer perennial gardens with grasses, neat lawn and maple trees, modest Quebec suburban lot, gently curving concrete path to two low front steps, asphalt parking area right. CAMERA FRAMING IS ESSENTIAL: pull back so the complete building, from highest roof to lowest front step, occupies ONLY the middle HALF of the total image height. Add generous real sky above and lawn/asphalt foreground below, never crop the facade. The house remains a clear architectural subject in a wide landscape.",
+    "caption": {
+      "fr": "Trois pignons pour un plain-pied lumineux.",
+      "en": "Three gables for a bright single-storey home."
+    },
+    "status": "generated",
+    "original": "/workspace/generated_images/exec-10bb70cb-df1d-43a6-8ce5-56608dc2f163.png"
+  }
+]

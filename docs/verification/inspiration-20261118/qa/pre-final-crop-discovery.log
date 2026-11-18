@@ -1,0 +1,53 @@
+PASS 28-real-images-and-data
+PASS style-farmhouse-1440
+FAIL style-contemporain-1440: image centre not hidden
+FAIL style-nordique-1440: image centre not hidden
+PASS style-chalet-1440
+FAIL style-craftsman-1440: image centre not hidden
+PASS style-mid-century-1440
+FAIL style-quebecois-1440: image centre not hidden
+FAIL dialog-keyboard-buttons-focus: native modal focus stays inside
+
+false !== true
+
+FAIL tablist-and-language: Expected values to be strictly equal:
+
+'false' !== 'true'
+
+FAIL image-error-and-retry: locator.click: Timeout 15000ms exceeded.
+Call log:
+[2m  - waiting for locator('[data-inspiration-tab="contemporain"]')[22m
+[2m    - locator resolved to <button role="tab" tabindex="0" type="button" aria-selected="true" data-en="Modern contemporary" data-fr="Contemporain moderne" data-inspiration-tab="contemporain" id="mir-inspiration-tab-contemporain" aria-controls="mir-inspiration-panel">Contemporain moderne</button>[22m
+[2m  - attempting click action[22m
+[2m    2 × waiting for element to be visible, enabled and stable[22m
+[2m      - element is visible, enabled and stable[22m
+[2m      - scrolling into view if needed[22m
+[2m      - done scrolling[22m
+[2m      - <img id="mir-inspiration-large" data-inspiration-state="ready" src="assets/inspirations/contemporain-01-large.webp" data-inspiration-source="assets/inspirations/contemporain-01-large.webp" alt="Maison contemporaine à volumes horizontaux blancs et charbon, avec entrée en bois en retrait et toits plats." data-en-alt="Contemporary house with horizontal white and charcoal volumes, a recessed wood entrance and flat roofs." data-fr-alt="Maison contemporaine à volumes horizontaux blancs et charbon, avec e…/> from <dialog open="" id="mir-inspiration-dialog" class="mir-inspiration-dialog" aria-describedby="mir-inspiration-caption" aria-labelledby="mir-inspiration-dialog-title">…</dialog> subtree intercepts pointer events[22m
+[2m    - retrying click action[22m
+[2m    - waiting 20ms[22m
+[2m    2 × waiting for element to be visible, enabled and stable[22m
+[2m      - element is visible, enabled and stable[22m
+[2m      - scrolling into view if needed[22m
+[2m      - done scrolling[22m
+[2m      - <img id="mir-inspiration-large" data-inspiration-state="ready" src="assets/inspirations/contemporain-01-large.webp" data-inspiration-source="assets/inspirations/contemporain-01-large.webp" alt="Maison contemporaine à volumes horizontaux blancs et charbon, avec entrée en bois en retrait et toits plats." data-en-alt="Contemporary house with horizontal white and charcoal volumes, a recessed wood entrance and flat roofs." data-fr-alt="Maison contemporaine à volumes horizontaux blancs et charbon, avec e…/> from <dialog open="" id="mir-inspiration-dialog" class="mir-inspiration-dialog" aria-describedby="mir-inspiration-caption" aria-labelledby="mir-inspiration-dialog-title">…</dialog> subtree intercepts pointer events[22m
+[2m    - retrying click action[22m
+[2m      - waiting 100ms[22m
+[2m    29 × waiting for element to be visible, enabled and stable[22m
+[2m       - element is visible, enabled and stable[22m
+[2m       - scrolling into view if needed[22m
+[2m       - done scrolling[22m
+[2m       - <img id="mir-inspiration-large" data-inspiration-state="ready" src="assets/inspirations/contemporain-01-large.webp" data-inspiration-source="assets/inspirations/contemporain-01-large.webp" alt="Maison contemporaine à volumes horizontaux blancs et charbon, avec entrée en bois en retrait et toits plats." data-en-alt="Contemporary house with horizontal white and charcoal volumes, a recessed wood entrance and flat roofs." data-fr-alt="Maison contemporaine à volumes horizontaux blancs et charbon, avec e…/> from <dialog open="" id="mir-inspiration-dialog" class="mir-inspiration-dialog" aria-describedby="mir-inspiration-caption" aria-labelledby="mir-inspiration-dialog-title">…</dialog> subtree intercepts pointer events[22m
+[2m     - retrying click action[22m
+[2m       - waiting 500ms[22m
+
+PASS desktop-1280-fr-CA
+PASS desktop-1280-en-CA
+PASS desktop-1440-fr-CA
+PASS desktop-1440-en-CA
+PASS desktop-1920-fr-CA
+PASS desktop-1920-en-CA
+PASS chrome-desktop-layout-980
+PASS all-images-reachable-390-fr-CA
+PASS all-images-reachable-390-en-CA
+PASS all-images-reachable-768-fr-CA

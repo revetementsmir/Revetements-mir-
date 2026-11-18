@@ -1,0 +1,26 @@
+PASS 28-real-images-and-data
+PASS style-farmhouse-1440
+PASS style-contemporain-1440
+PASS style-nordique-1440
+PASS style-chalet-1440
+PASS style-craftsman-1440
+PASS style-mid-century-1440
+PASS style-quebecois-1440
+PASS dialog-keyboard-buttons-focus
+PASS tablist-and-language
+PASS image-error-and-retry
+PASS desktop-1280-fr-CA
+PASS desktop-1280-en-CA
+PASS desktop-1440-fr-CA
+PASS desktop-1440-en-CA
+PASS desktop-1920-fr-CA
+PASS desktop-1920-en-CA
+PASS chrome-desktop-layout-980
+PASS all-images-reachable-390-fr-CA
+PASS all-images-reachable-390-en-CA
+PASS all-images-reachable-768-fr-CA
+PASS all-images-reachable-768-en-CA
+PASS zoom200-fr-CA
+PASS zoom200-en-CA
+PASS home-identical-and-maison-link-only
+PASS after: 37 captures, 25 checks; local GET only.

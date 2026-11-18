@@ -1,0 +1,35 @@
+{
+  "result": "PASS",
+  "styles": 7,
+  "photos": 28,
+  "localWebPFiles": 56,
+  "visuallyReviewed": 28,
+  "completeCaptionAndAltLanguages": [
+    "fr",
+    "en"
+  ],
+  "initialStyle": "contemporain",
+  "positionExceptions": [
+    {
+      "id": "contemporain-04",
+      "position": "50% 70%"
+    },
+    {
+      "id": "nordique-01",
+      "position": "50% 65%"
+    },
+    {
+      "id": "chalet-01",
+      "position": "50% 65%"
+    },
+    {
+      "id": "chalet-04",
+      "position": "50% 65%"
+    },
+    {
+      "id": "quebecois-01",
+      "position": "50% 65%"
+    }
+  ],
+  "scope": "Données, présence des fichiers et concordance visuelle des descriptions. La recette navigateur responsive indépendante est distincte."
+}

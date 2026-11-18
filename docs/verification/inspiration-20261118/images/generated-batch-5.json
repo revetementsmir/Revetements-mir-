@@ -1,0 +1,42 @@
+[
+  {
+    "id": "craftsman-02",
+    "prompt": "Create ONE original photorealistic premium architectural photograph, landscape 16:9, of a newly built credible Quebec residence. Refined architecture magazine photography, restrained realistic colours and textures, straight verticals, eye-level camera from street with subtle three-quarter angle. Include the WHOLE building with breathing room on both sides; roof, doorway, foundation and steps all contained in the central 55 percent of image height so a panoramic web crop retains the entire facade. Credible Canadian foundations and connected walkways, steps with correctly supported railings where needed, Quebec deciduous trees and conifers, realistic landscaping. No people, vehicles, text, logo, watermark, collage, schematic drawing, construction site or renovation. A realistic architectural inspiration illustration, not a real MIR project. Contemporary Craftsman bungalow, low single-storey house with broad hipped roof and small triangular porch gable at left, deep eaves, cream horizontal siding, dark forest-grey gable shingles, two tapered dark timber porch posts on buff brick bases, grouped three-part windows, no attached garage. Autumn red maples, tidy perennials, asphalt driveway right and three connected brick-edged steps. Compact ordinary Quebec neighbourhood scale. CAMERA FRAMING IS ESSENTIAL: pull back so the complete building, from highest roof to lowest front step, occupies ONLY the middle HALF of the total image height. Add generous real sky above and lawn/asphalt foreground below, never crop the facade.",
+    "caption": {
+      "fr": "Un bungalow Craftsman à l’échelle du quartier.",
+      "en": "A Craftsman bungalow scaled for the neighbourhood."
+    },
+    "status": "generated",
+    "original": "/workspace/generated_images/exec-0a5e2825-f30b-4d17-9afb-5d4f787cb035.png"
+  },
+  {
+    "id": "mid-century-01",
+    "prompt": "Create ONE original photorealistic premium architectural photograph, landscape 16:9, of a newly built credible Quebec residence. Refined architecture magazine photography, restrained realistic colours and textures, straight verticals, eye-level camera from street with subtle three-quarter angle. Include the WHOLE building with breathing room on both sides; roof, doorway, foundation and steps all contained in the central 55 percent of image height so a panoramic web crop retains the entire facade. Credible Canadian foundations and connected walkways, steps with correctly supported railings where needed, Quebec deciduous trees and conifers, realistic landscaping. No people, vehicles, text, logo, watermark, collage, schematic drawing, construction site or renovation. A realistic architectural inspiration illustration, not a real MIR project. Mid-Century Modern inspired new Quebec bungalow, very long LOW single-storey horizontal composition under a shallow butterfly roof, central recessed amber wood front door, beige brick wall left, black vertical siding panel right, broad ribbon windows, a simple open carport on the far right with two structurally plausible slim columns. Summer maples and white birches, linear garden, long asphalt driveway. Clearly 1950s-inspired modern geometry, not farmhouse. CAMERA FRAMING IS ESSENTIAL: pull back so the complete building, from highest roof to lowest front step, occupies ONLY the middle HALF of the total image height. Add generous real sky above and lawn/asphalt foreground below, never crop the facade.",
+    "caption": {
+      "fr": "Une toiture papillon et une façade horizontale.",
+      "en": "A butterfly roof and a horizontal facade."
+    },
+    "status": "generated",
+    "original": "/workspace/generated_images/exec-f52231f2-e99b-4a93-8932-fa412137389f.png"
+  },
+  {
+    "id": "craftsman-04",
+    "prompt": "Create ONE original photorealistic premium architectural photograph, landscape 16:9, of a newly built credible Quebec residence. Refined architecture magazine photography, restrained realistic colours and textures, straight verticals, eye-level camera from street with subtle three-quarter angle. Include the WHOLE building with breathing room on both sides; roof, doorway, foundation and steps all contained in the central 55 percent of image height so a panoramic web crop retains the entire facade. Credible Canadian foundations and connected walkways, steps with correctly supported railings where needed, Quebec deciduous trees and conifers, realistic landscaping. No people, vehicles, text, logo, watermark, collage, schematic drawing, construction site or renovation. A realistic architectural inspiration illustration, not a real MIR project. Contemporary Craftsman one-and-a-half storey family home with long low side-facing roof and TWO broad shed dormers, charcoal blue lap siding, warm cedar shakes on porch gable, a wraparound porch at right with chunky tapered columns on fieldstone piers, modest landscaped Quebec corner lot. Summer, maples and hydrangeas, curved paved walkway, low entry stairs with continuous rail, asphalt drive on left. Distinct from a symmetrical front gable house. CAMERA FRAMING IS ESSENTIAL: pull back so the complete building, from highest roof to lowest front step, occupies ONLY the middle HALF of the total image height. Add generous real sky above and lawn/asphalt foreground below, never crop the facade.",
+    "caption": {
+      "fr": "Une galerie d’angle et un toit à lucarnes.",
+      "en": "A corner porch beneath a dormered roof."
+    },
+    "status": "generated",
+    "original": "/workspace/generated_images/exec-de24310f-59c5-4fee-964b-88cda581c525.png"
+  },
+  {
+    "id": "craftsman-03",
+    "prompt": "Create ONE original photorealistic premium architectural photograph, landscape 16:9, of a newly built credible Quebec residence. Refined architecture magazine photography, restrained realistic colours and textures, straight verticals, eye-level camera from street with subtle three-quarter angle. Include the WHOLE building with breathing room on both sides; roof, doorway, foundation and steps all contained in the central 55 percent of image height so a panoramic web crop retains the entire facade. Credible Canadian foundations and connected walkways, steps with correctly supported railings where needed, Quebec deciduous trees and conifers, realistic landscaping. No people, vehicles, text, logo, watermark, collage, schematic drawing, construction site or renovation. A realistic architectural inspiration illustration, not a real MIR project. Contemporary Craftsman two-storey asymmetrical Quebec home: tall narrow right front gable, lower left garage wing with wide eaves, reddish brown horizontal siding, light stone lower facade, exposed dark timber brackets, recessed porch with tapered square columns and a warm front door. Winter snow, shoveled stairs with black metal handrails, ploughed black asphalt driveway, mature spruce and bare maples. Subtle well-built detailing, not ornate. CAMERA FRAMING IS ESSENTIAL: pull back so the complete building, from highest roof to lowest front step, occupies ONLY the middle HALF of the total image height. Add generous real sky above and lawn/asphalt foreground below, never crop the facade.",
+    "caption": {
+      "fr": "Pierre claire et charpente expressive en hiver.",
+      "en": "Light stone and expressive timber in winter."
+    },
+    "status": "generated",
+    "original": "/workspace/generated_images/exec-0bafccf2-be66-4e77-bf85-a884c356e645.png"
+  }
+]

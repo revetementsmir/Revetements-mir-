@@ -1,0 +1,21 @@
+{
+  "reference": "Maquette 10 anthracite attached to the user's current Inspiration request; visual composition reference, not a production image source.",
+  "comparison": "Qualitative visual inspection of real Chromium captures; no claim of pixel identity with the mockup.",
+  "reviewed": [
+    "All seven final style captures at 1280x800, plus contemporary at 1440x900",
+    "Phone 390x844 and tablet 768x1024, French and Canadian-English functional coverage",
+    "Full image contact sheet and panoramic crop diagnostic for all 28 distinct houses"
+  ],
+  "composition": {
+    "background": "Uniform anthracite #242522 without an ivory central panel",
+    "heading": "Votre prochaine inspiration. / italic sand emphasis, actual MIR editorial fonts",
+    "navigation": "Seven styles in approved order; contemporary initially selected; sand underline",
+    "gallery": "Four horizontal images in a 2 by 2 desktop grid, captions below, thin separators",
+    "shell": "Existing official MIR logo and public search/cart/language/account shell",
+    "footer": "Compact MIR signature and explicit illustration disclosure",
+    "removed": "No proposal number, generated identifiers or real-MIR-construction claim"
+  },
+  "cropAdjustments": "Five object-position adjustments preserve roofs and entry steps in the narrowest desktop crop. Three Farmhouse illustrations were regenerated with wider framing. Approved home images were not edited.",
+  "responsiveReview": "One photo column on phone, two on tablet, scrollable local style selector. Footer text is at least 12 CSS px below 960px. Desktop-mode viewport 980px uses the desktop composition.",
+  "limitations": "No physical-device, Safari or Firefox verification. Architectural scenes are generated inspiration illustrations, not product or construction certifications. Final aesthetic approval remains with Frederick."
+}

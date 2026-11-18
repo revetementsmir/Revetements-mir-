@@ -1,0 +1,13 @@
+{
+  "dist/inspiration.html": "7721d1721cf86f4940dab2470004d76d474dd95b5bd64bdae30772cd564eaf44",
+  "dist/mir-inspiration.css": "ca836d4f8b7b20211f15ed3b3da11195be05a4d765edff9633ec360ab13cdce4",
+  "dist/mir-inspiration.js": "921327ca165389a66bf6d0ffe85a54ef8f11ccc75a8c3f10a3e2d9e423fadfdf",
+  "dist/mir-inspiration-data.js": "0bc87fd4abf5a66f321ed58f89ea6b82768e2748a5c94554b6eb18aee6b5ac33",
+  "dist/maison.html": "732c02bb0bb179bd8a2400778c6a25f33b564809ec437ab867736ce4023eb395",
+  "dist/mir-prestige.js": "d9c99fe3df0d70e918369492e69b13558517ca8c98b300a923f3ccf6fd72d82f",
+  "dist/mir-client-i18n.js": "5ba9620f0215fd93cadadc588b9104def54878a05f31a84adc39a51510538536",
+  "dist/assets/mir-particuliers-maison-approuvee.webp": "89f112fbbbd43a3cf16bf113a37b80b3af9646929d5759e86dce321bf669da5b",
+  "dist/assets/mir-home-hero-20261105.avif": "40bc16dc6afe44a009a90597f6ae325f4ca002e60788eda73df3e4d141b6bd15",
+  "dist/assets/mir-home-hero-20261105.webp": "53ee16ea323d72363a867e8218e66e569ff4603835612fee253041028cf40e1a",
+  "tests/mir-inspiration-browser.cjs": "a0e441fd777f4d82b5ba013f1b13e6e1de7d48a7710ce2ee474a15c30670a78d"
+}

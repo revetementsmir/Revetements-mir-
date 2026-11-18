@@ -1,0 +1,9 @@
+# MIR Inspiration — provenance et revue des images
+
+28 illustrations architecturales originales générées avec `image_gen` le 18 novembre 2026, soit quatre maisons distinctes pour chacun des sept styles. Les 28 images finales sont générées ; aucune capture de maquette ni photographie approuvée de l’accueil ou de Particuliers n’a été découpée ou modifiée. 31 générations au total, dont trois reprises Farmhouse pour éloigner le point de vue et préserver les façades dans la grille panoramique.
+
+Les PNG originaux sont conservés hors dépôt dans `/workspace/mir-inspiration-originals`. Le manifeste indique pour chaque image son prompt réel, son origine, son SHA-256, ses dimensions, ses légendes proposées et les deux variantes WebP. Les variantes 960 et 1600 pixels sont optimisées en qualité 86, avec redimensionnement proportionnel seulement. Les 56 fichiers ont été décodés et leurs empreintes vérifiées.
+
+Les planches `contact-sheet.jpg`, `final-six-review.jpg`, `positions-review.jpg` et `contact-sheet-panoramic.jpg` documentent les inspections visuelles réellement effectuées. Le cadrage panoramique final conserve les toits et les entrées avec les positions spécifiques listées dans `image-review.json`. Les maisons sont distinctes par leurs volumes et façades, avec des saisons variées, des maisons modestes et de plus grandes demeures. Les détails de matériaux visibles restent illustratifs et ne constituent aucune attribution de produit, fournisseur ou certification.
+
+Les légendes et textes alternatifs définitifs appartiennent à `dist/mir-inspiration-data.js`, revus séparément par l’agent chargé du parcours. Les légendes du manifeste restent les propositions associées à la génération. La revue des images confirme leur adéquation visuelle à une galerie d’inspiration ; elle ne constitue ni une validation technique de construction, ni une approbation finale de Frederick, ni la preuve de réalisations MIR.

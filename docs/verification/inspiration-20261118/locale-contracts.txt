@@ -1,0 +1,10 @@
+Command: node tests/mir-client-i18n.cjs
+Exit: 0
+PASS Canadian-English dictionary and source preservation
+PASS French default and CAD localization
+PASS Staff, warehouse, studio Admin and supplier interfaces are excluded
+PASS PDF exports preserve product, manufacturer names, SKU, colour and geometry
+PASS English PDF heading, filename and warnings without fake checkout
+PASS Identical validations fail safely in both locales
+PASS English mixed PDF warning remains fully translated across SVG line fragments
+MIR client locale: 7 contract groups passed

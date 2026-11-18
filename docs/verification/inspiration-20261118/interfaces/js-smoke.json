@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "initialImageRequests": 4,
+  "initialLargeImageRequests": 0,
+  "large503RetryPassed": true,
+  "keyboard": true,
+  "stableCards": true,
+  "localePreserved": true,
+  "errors": []
+}
