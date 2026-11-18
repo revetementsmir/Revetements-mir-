@@ -10,12 +10,51 @@ const publicDraft=JSON.stringify({version:1,journeyVersion:2,draft:{kind:'profil
 const publicOrder=JSON.stringify({version:1,order:{id:'QA-CLIENT-UNTOUCHED',items:[],nextNumber:1}});
 const report={fixture:'same-origin parent contract + real production.html UI',customerData:false,backendWrites:false,checks:[],captures:[],blocked:[],pageErrors:[]};
 const contextData=(owner='worker-a',job='job-a',extra={})=>({personal:true,ownerId:owner,jobId:job,presentation:'pliage03',...extra});
-function fixture(data){return `<!doctype html><html lang="fr-CA"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;height:100%;background:#242522}iframe{display:block;width:100%;height:100dvh;border:0}</style><script>window.MIRFieldDrawingContext=()=>(${JSON.stringify(data).replaceAll('<','\\u003c')});window.__openedCart=0;</script><iframe id="drawing" title="QA fictif du parcours équipe" src="production.html?mode=client&source=store&kind=profile"></iframe><script>document.querySelector('iframe').addEventListener('load',event=>{event.target.contentDocument.addEventListener('click',event=>{const a=event.target.closest('a[href]');if(!a)return;const u=new URL(a.href);if(u.origin===location.origin&&u.pathname.endsWith('/chantier.html')&&u.searchParams.get('view')==='orders'){event.preventDefault();window.__openedCart++;}},true);});</script></html>`;}
+function fixture(data,{height=null}={}){const bounded=Number.isFinite(height)&&height>0;return `<!doctype html><html lang="fr-CA"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;height:100%;background:#242522}.qa-chrome{box-sizing:border-box;height:160px;padding:28px 16px;color:#c6c3ba;font:14px Arial,sans-serif}iframe{display:block;width:100%;height:${bounded?height+'px':'100dvh'};border:0}</style><script>window.MIRFieldDrawingContext=()=>(${JSON.stringify(data).replaceAll('<','\\u003c')});window.__openedCart=0;</script>${bounded?'<header class="qa-chrome">Fixture locale équipe · iframe courte '+height+' px</header>':''}<iframe id="drawing" title="QA fictif du parcours équipe" src="production.html?mode=client&source=store&kind=profile"></iframe><script>document.querySelector('iframe').addEventListener('load',event=>{event.target.contentDocument.addEventListener('click',event=>{const a=event.target.closest('a[href]');if(!a)return;const u=new URL(a.href);if(u.origin===location.origin&&u.pathname.endsWith('/chantier.html')&&u.searchParams.get('view')==='orders'){event.preventDefault();window.__openedCart++;}},true);});</script></html>`;}
 async function ready(frame){await frame.waitForFunction(()=>!!window.MIRProductionWorkspace);}
 async function state(frame){return frame.evaluate(()=>MIRProductionWorkspace.getLivePreviewState());}
 async function stage(frame,n){await frame.waitForFunction(n=>document.body.dataset.clientStage===String(n),n);}
 async function layout(frame){const info=await frame.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth,body:document.body.scrollWidth}));assert.ok(info.scroll<=info.width+1&&info.body<=info.width+1,'no horizontal overflow '+JSON.stringify(info));return info;}
 async function shot(page,name){await page.screenshot({path:path.join(out,name+'.png'),animations:'disabled',caret:'hide'});report.captures.push(name+'.png');}
+async function settled(frame){await frame.evaluate(async()=>{await document.fonts.ready;await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));});}
+async function seedPersonalProfile(frame,spec){
+ // Only this synthetic worker/chantier draft is seeded. Rendering, pagination,
+ // keyboard edits and navigation below execute the production controllers.
+ await frame.evaluate(spec=>{const model=MIRProduction.buildProfile(spec);if(!model.valid)throw Error('Invalid compact QA profile');localStorage.setItem(MIRProductionWorkspace.storageKeys.activeProfile,JSON.stringify({version:1,journeyVersion:2,draft:spec,drawPoints:model.pointsMM,clientStep:2,clientUnlocked:2,clientProfileSelected:true,clientEntry:'draw',tool:'select',clientModelAngles:spec.bends,colorSystem:'manufacturer',colorId:'',materialId:'',selectedTemplate:null}));},spec);
+ await frame.goto(frame.url(),{waitUntil:'networkidle'});await ready(frame);await stage(frame,2);await settled(frame);
+}
+async function compactLayout(frame,{expectHem=false,width=393}={}){
+ await settled(frame);
+ const proof=await frame.evaluate(()=>{
+  const rect=node=>{const r=node.getBoundingClientRect();return{x:r.x,y:r.y,width:r.width,height:r.height,top:r.top,right:r.right,bottom:r.bottom,left:r.left};};
+  const visible=node=>node.getClientRects().length&&getComputedStyle(node).visibility!=='hidden';
+  const required=[...document.querySelectorAll('#production-dimensions input,#client-step-back,#client-step-next,#client-reset-model-angles,#client-hem-options,.client-measure-pages button')].filter(visible);
+  const controls=required.map(node=>{const r=rect(node),clipped=[];for(let p=node.parentElement;p;p=p.parentElement){const s=getComputedStyle(p),b=rect(p);if(/hidden|clip|auto|scroll/.test(s.overflowY)&&(r.top<b.top-1||r.bottom>b.bottom+1))clipped.push(p.id||p.className||p.tagName);}return{id:node.id||node.getAttribute('aria-label')||node.dataset.segmentLength||node.dataset.clientBendAngle||node.textContent.trim(),rect:r,clipped};});
+  const preview=document.querySelector('#production-drawing'),svg=preview.querySelector('svg'),form=document.querySelector('#client-step-scroll'),first=document.querySelector('.client-measure-field:not([hidden])');
+  const markers=[...preview.querySelectorAll('.profile-side-marker')].map(group=>{const text=group.querySelector('text'),matrix=text.getScreenCTM(),font=parseFloat(getComputedStyle(text).fontSize);return{label:group.dataset.markerLabel,text:text.textContent.replace(/\s+/g,' ').trim(),rect:rect(text),fontCSS:font*Math.hypot(matrix.c,matrix.d)};});
+  const base=preview.querySelector('path[stroke-width="9"]'),segments=[];let point;
+  if(base){const matrix=base.getScreenCTM(),screen=pair=>{const p=new DOMPoint(...pair).matrixTransform(matrix);return{x:p.x,y:p.y};};for(const command of base.getAttribute('d').match(/[MLA][^MLA]*/g)||[]){const type=command[0],values=command.slice(1).trim().split(/[ ,]+/).map(Number),next=values.slice(-2);if(type==='L')segments.push({a:screen(point),b:screen(next)});point=next;}}
+  const model=MIRProductionWorkspace.getLivePreviewState().model;
+  return{width:innerWidth,height:innerHeight,body:{height:document.body.clientHeight,scroll:document.body.scrollHeight,top:document.body.scrollTop},document:{height:document.documentElement.clientHeight,scroll:document.documentElement.scrollHeight,top:scrollY},form:{height:form.clientHeight,scroll:form.scrollHeight,top:form.scrollTop},preview:rect(preview),first:rect(first),controls,markers,segments,presentation:svg?.dataset.measurementPresentation,visibleSides:[...document.querySelectorAll('.client-measure-field:not([hidden])')].map(n=>Number(n.dataset.fieldMeasureIndex)),visibleAngles:[...document.querySelectorAll('.client-angle-field:not([hidden])')].map(n=>Number(n.dataset.angleIndex)),expected:model.segments.map(s=>({label:s.label,value:MIRProduction.formatMeasurement(s.lengthMM,model.unit).replace(/\s+/g,' ').trim()}))};
+ });
+ assert.equal(proof.width,width);assert.equal(proof.height,500,'the actual child viewport is 500px, not the full device viewport');
+ for(const [name,value]of Object.entries({body:proof.body,document:proof.document,form:proof.form})){assert.ok(value.scroll<=value.height+1,name+' has no hidden or scrollable vertical overflow: '+JSON.stringify(value));assert.equal(value.top,0,name+' does not require scrolling');}
+ assert.ok(proof.preview.bottom<=proof.first.top+1,'the entire drawing is above the measure fields');
+ assert.ok(proof.preview.height>=140,'a usable preview remains above the fixed fields');
+ assert.ok(proof.controls.length>=7,'measures, angles and navigation are actually rendered');
+ for(const control of proof.controls){assert.ok(control.rect.width>0&&control.rect.height>0,control.id+' has a hit target');assert.ok(control.rect.left>=-1&&control.rect.right<=proof.width+1&&control.rect.top>=-1&&control.rect.bottom<=proof.height+1,control.id+' stays inside the real iframe: '+JSON.stringify(control.rect));assert.deepEqual(control.clipped,[],control.id+' is not hidden by a clipped ancestor');}
+ assert.equal(await frame.locator('[data-client-angle-nudge]').count(),0,'no angle +/- remains in the field DOM');
+ for(const input of await frame.locator('[data-client-bend-angle]:visible').all()){assert.equal(await input.getAttribute('inputmode'),'decimal');assert.equal(await input.getAttribute('step'),'any');}
+ if(expectHem){
+  assert.equal(proof.presentation,'dimensions','the three requested measurements are shown directly on the drawing');
+  assert.deepEqual(proof.visibleSides,[0,1,2]);assert.deepEqual(proof.visibleAngles,[0,1]);
+  for(const expected of proof.expected){const marker=proof.markers.find(m=>m.label===expected.label);assert.ok(marker,'side marker '+expected.label);assert.ok(marker.text.includes(expected.value),expected.label+' includes its real measured value');assert.ok(marker.fontCSS>=11,expected.label+' text is readable in CSS pixels: '+marker.fontCSS);assert.ok(marker.rect.left>=proof.preview.left-1&&marker.rect.right<=proof.preview.right+1&&marker.rect.top>=proof.preview.top-1&&marker.rect.bottom<=proof.preview.bottom+1,expected.label+' is not clipped');}
+  assert.equal(proof.segments.length,3);
+  const b=proof.segments[1],c=proof.segments[2],bY=(b.a.y+b.b.y)/2,cY=(c.a.y+c.b.y)/2,cLabel=proof.markers.find(m=>m.label==='C'),bLabel=proof.markers.find(m=>m.label==='B');
+  assert.ok(cY<bY-2,'the actual C return is drawn above B');assert.ok(cLabel.rect.bottom<cY,'C stays outside and above its return');assert.ok(bLabel.rect.top>bY,'B stays outside and below its own flange');
+ }
+ return proof;
+}
 function contrast(a,b){
  const luminance=colour=>{const rgb=colour.match(/[\d.]+/g);assert.ok(rgb&&rgb.length>=3,'computed RGB colour: '+colour);return rgb.slice(0,3).map(Number).map(v=>{const c=v/255;return c<=.04045?c/12.92:((c+.055)/1.055)**2.4;}).reduce((sum,v,i)=>sum+v*[.2126,.7152,.0722][i],0);};
  const x=luminance(a),y=luminance(b);return(Math.max(x,y)+.05)/(Math.min(x,y)+.05);
@@ -58,7 +97,7 @@ async function main(){
   await srv.close();throw error;
  });
  const context=await browser.newContext({viewport:{width:390,height:796},hasTouch:true,locale:'fr-CA',serviceWorkers:'block',reducedMotion:'reduce'});
- let current=contextData();
+ let current=contextData(),fixtureOptions={};
  await context.addInitScript(({publicKey,publicDraft,publicOrder})=>{
   if(window===window.top&&!localStorage.getItem('__qa_field_seeded')){localStorage.setItem(publicKey,publicDraft);localStorage.setItem('mir_production_client_dossier_v1',publicOrder);localStorage.setItem('__qa_field_seeded','1');}
   const get=Storage.prototype.getItem;window.__qaStorageReads=[];window.__qaRead=key=>get.call(localStorage,key);
@@ -67,13 +106,13 @@ async function main(){
  await context.route('**/*',route=>{
   const req=route.request(),url=new URL(req.url());
   if(url.origin===srv.base&&req.method()==='GET'){
-   if(url.pathname==='/__field-fixture.html')return route.fulfill({contentType:'text/html; charset=utf-8',body:fixture(current)});
+   if(url.pathname==='/__field-fixture.html')return route.fulfill({contentType:'text/html; charset=utf-8',body:fixture(current,fixtureOptions)});
    return route.continue();
   }
   report.blocked.push({url:req.url(),method:req.method()});return route.abort();
  });
  const page=await context.newPage();page.setDefaultTimeout(15000);page.on('pageerror',e=>report.pageErrors.push(e.message));
- async function open(data){current=data;await page.goto(srv.base+'/__field-fixture.html',{waitUntil:'networkidle'});assert.deepEqual(await page.evaluate(()=>window.MIRFieldDrawingContext?.()),data,'fixture publishes the exact parent context');const frame=page.frames().find(f=>f.url().includes('production.html'));assert.ok(frame);await ready(frame);return frame;}
+ async function open(data,options={}){current=data;fixtureOptions=options;await page.goto(srv.base+'/__field-fixture.html',{waitUntil:'networkidle'});assert.deepEqual(await page.evaluate(()=>window.MIRFieldDrawingContext?.()),data,'fixture publishes the exact parent context');const frame=page.frames().find(f=>f.url().includes('production.html'));assert.ok(frame);await ready(frame);return frame;}
  async function untouched(frame){
   const data=await frame.evaluate(publicKey=>({reads:window.__qaStorageReads.slice(),publicDraft:window.__qaRead(publicKey),publicOrder:window.__qaRead('mir_production_client_dossier_v1')}),publicKey);
   assert.equal(data.publicDraft,publicDraft,'public active draft byte-identical');assert.equal(data.publicOrder,publicOrder,'public dossier byte-identical');assert.ok(!data.reads.includes(publicKey),'field app never reads public active draft');
@@ -129,6 +168,53 @@ async function main(){
   await frame.goto(frame.url(),{waitUntil:'networkidle'});await ready(frame);await stage(frame,2);assert.equal(await frame.locator('[data-measure="A"]').inputValue(),'5','entry request consumed only once');
   frame=await open(contextData('worker-a','job-a',{entry:'draw',entryRequestId:'click-draw-2'}));await stage(frame,1);assert.equal(await frame.locator('body').getAttribute('data-client-entry'),'draw');assert.equal((await state(frame)).tool,'draw');await layout(frame);await shot(page,'field-draw-390');
   report.checks.push({name:'parent-model-and-drawing-entries-consumed-once',passed:true});
+  await page.setViewportSize({width:393,height:851});
+  frame=await open(contextData('worker-compact-qa','job-compact-qa'),{height:500});
+  const compactSpec={kind:'profile',template:'custom',name:'QA compact A B C',unit:'in',length:120,quantity:1,startAngle:-90,segments:[{label:'A',length:'5.5'},{label:'B',length:'3'},{label:'C',length:'1.5'}],bends:[{mode:'interior',angle:90,direction:'left'},{mode:'hem',angle:180,direction:'left'}],material:{type:'aluminium'},finish:{},coloredFace:{side:'',segmentId:'A'}};
+  await seedPersonalProfile(frame,compactSpec);
+  const compactBefore=await compactLayout(frame,{expectHem:true});await shot(page,'field-compact-hem-393x500');
+  assert.equal(await frame.locator('[data-client-bend-angle="1"]').getAttribute('readonly'),'');
+  await frame.locator('[data-client-bend-angle="0"]').fill('91.25');assert.equal((await state(frame)).model.bends[0].angle,91.25,'decimal angle is entered directly at the keyboard');
+  await frame.locator('[data-client-bend-angle="0"]').fill('90');await frame.locator('[data-segment-length="2"]').fill('0.75');
+  assert.ok(Math.abs((await state(frame)).model.segments[2].lengthMM-19.05)<1e-7);const compactQuarter=await compactLayout(frame,{expectHem:true});await shot(page,'field-compact-hem-three-quarter-393x500');
+  const archiveBefore=await frame.evaluate(()=>({order:MIRProductionWorkspace.getEstimationDossier(),cart:MIRUnifiedOrderCart.list()}));
+  assert.equal(await frame.locator('#client-step-back').innerText(),'Retour au tracé');await frame.locator('#client-step-back').click();await stage(frame,1);await settled(frame);
+  const beforeUndo=await state(frame);assert.equal(beforeUndo.tool,'draw');assert.equal(beforeUndo.drawPointsMM.length,4);
+  for(const selector of ['[data-drawing-undo]','#client-new-trace','[data-draw-tool="draw"]']){
+   const rect=await frame.locator('.client-trace-actions '+selector).evaluate(el=>{const r=el.getBoundingClientRect();return{top:r.top,bottom:r.bottom,left:r.left,right:r.right,height:r.height};});assert.ok(rect.top>=0&&rect.bottom<=500&&rect.left>=0&&rect.right<=393&&rect.height>=44,'drawing action is fully visible without scrolling: '+selector+' '+JSON.stringify(rect));
+  }
+  await frame.locator('[data-drawing-undo]').click();const afterUndo=await state(frame);assert.deepEqual(afterUndo.drawPointsMM,beforeUndo.drawPointsMM.slice(0,-1),'undo removes only the last point');
+  await frame.locator('#client-new-trace').click();await frame.locator('#production-dialog[open]').waitFor();assert.deepEqual((await state(frame)).drawPointsMM,afterUndo.drawPointsMM,'restart opens a confirmation without clearing the draft');
+  await frame.locator('#production-dialog [data-close-production-dialog]').click();assert.deepEqual((await state(frame)).drawPointsMM,afterUndo.drawPointsMM,'cancelling restart preserves the drawing');
+  await frame.locator('#client-new-trace').click();await frame.locator('#confirm-client-new-trace').click();assert.equal((await state(frame)).drawPointsMM.length,0,'confirmed restart clears this drawing');
+  assert.deepEqual(await frame.evaluate(()=>({order:MIRProductionWorkspace.getEstimationDossier(),cart:MIRUnifiedOrderCart.list()})),archiveBefore,'undo and restart never change the saved order or cart');await untouched(frame);await shot(page,'field-compact-restarted-393x500');
+  report.checks.push({name:'samsung-height-500-real-hem-measures-keyboard-back-undo-restart',passed:true,viewport:{width:393,height:851},iframeHeight:500,measurements:compactBefore,threeQuarterReturn:compactQuarter});
+  const longSpec={...compactSpec,name:'QA compact sept côtés',segments:[5.5,3,1.5,2,1.25,2,.75].map((length,index)=>({label:String.fromCharCode(65+index),length:String(length)})),bends:Array.from({length:6},(_,index)=>({mode:'interior',angle:90,direction:index%2?'right':'left'}))};
+  await seedPersonalProfile(frame,longSpec);
+  const sideValues=new Map(),angleValues=new Map(),pageProof=[];
+  for(let pageIndex=0;pageIndex<4;pageIndex++){
+   await settled(frame);const visible=await frame.evaluate(()=>({sides:[...document.querySelectorAll('.client-measure-field:not([hidden])')].map(n=>Number(n.dataset.fieldMeasureIndex)),angles:[...document.querySelectorAll('.client-angle-field:not([hidden])')].map(n=>Number(n.dataset.angleIndex))}));
+   assert.ok(visible.sides.length<=3&&visible.angles.length<=2,'pagination bounds the number of simultaneous controls');
+   for(const index of visible.sides){const input=frame.locator('[data-segment-length="'+index+'"]');if(sideValues.has(index))assert.equal(await input.inputValue(),sideValues.get(index),'shared page-boundary dimension stays unchanged');else{const value=String(Number(longSpec.segments[index].length)+.125);await input.fill(value);sideValues.set(index,value);}}
+   for(const index of visible.angles){const input=frame.locator('[data-client-bend-angle="'+index+'"]');if(angleValues.has(index))assert.equal(await input.inputValue(),angleValues.get(index));else{const value=String(90+index/10);await input.fill(value);angleValues.set(index,value);}}
+   pageProof.push(await compactLayout(frame));await shot(page,'field-compact-seven-sides-page-'+(pageIndex+1));
+   const next=frame.locator('[data-field-measure-page-step="1"]');if(await next.isDisabled())break;await next.click();
+  }
+  assert.equal(sideValues.size,7,'every side remains keyboard-editable');assert.equal(angleValues.size,6,'every adjacent angle remains keyboard-editable');
+  assert.ok(pageProof.length>1,'the seven-side profile really paginates');
+  for(let pageIndex=pageProof.length-1;pageIndex>=0;pageIndex--){
+   for(const input of await frame.locator('.client-measure-field:not([hidden]) input').all())assert.equal(await input.inputValue(),sideValues.get(Number(await input.getAttribute('data-segment-length'))));
+   for(const input of await frame.locator('.client-angle-field:not([hidden]) input').all())assert.equal(await input.inputValue(),angleValues.get(Number(await input.getAttribute('data-client-bend-angle'))));
+   if(pageIndex>0)await frame.locator('[data-field-measure-page-step="-1"]').click();
+  }
+  const pagedModel=(await state(frame)).model;assert.equal(pagedModel.valid,true);pagedModel.spec.segments.forEach((segment,index)=>assert.equal(Number(segment.length),Number(sideValues.get(index))));await untouched(frame);
+  report.checks.push({name:'samsung-height-500-seven-side-pagination-preserves-all-measures-and-angles',passed:true,pages:pageProof});
+  await page.setViewportSize({width:834,height:851});frame=await open(contextData('worker-tablet-compact-qa','job-tablet-compact-qa'),{height:500});
+  await seedPersonalProfile(frame,compactSpec);const tabletCompact=await compactLayout(frame,{width:834,expectHem:true});
+  await seedPersonalProfile(frame,longSpec);const tabletFirstPage=await compactLayout(frame,{width:834});assert.equal(tabletFirstPage.visibleSides.length,3,'834px field layout uses the same bounded measurement pages');
+  assert.ok(Number(await frame.locator('#production-dimensions').getAttribute('data-field-measure-page-count'))>1,'834px field layout really paginates long profiles');await frame.locator('[data-field-measure-page-step="1"]').click();await settled(frame);
+  const tabletSecondPage=await compactLayout(frame,{width:834});assert.deepEqual(tabletSecondPage.visibleSides,[2,3,4]);await untouched(frame);await shot(page,'field-compact-tablet-834x500');
+  report.checks.push({name:'field-breakpoint-834-height-500-keeps-readable-cotes-and-bounded-pages',passed:true,measures:tabletCompact,firstPage:tabletFirstPage,secondPage:tabletSecondPage});
   for(const candidate of [contextData('worker-c','job-c',{presentation:'legacy'}),contextData('','job-c'),contextData('   ','job-c'),{personal:false,ownerId:'worker-c',jobId:'job-c',presentation:'pliage03'}]){
    frame=await open(candidate);assert.equal(await frame.locator('body.mir-pliage03').count(),0);assert.equal(await frame.locator('.mir-pliage03-heading').count(),0);assert.equal(await frame.evaluate(()=>MIRProductionWorkspace.editFieldOrderItem('M001')),false);
   }

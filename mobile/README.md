@@ -1,6 +1,6 @@
 # MIR TEST Aperçu — connexion mobile 08
 
-Version candidate **0.13.3-test**, codes **130005 → 130006** pour la recette de mise à jour. Logo MIR de 245 px (+75 % par rapport à la proposition de 140 px), titre « Connexion équipe MIR » retiré de la connexion normale, formulaire courriel/mot de passe directement visible, bouton Google et palette anthracite/champagne approuvés. Google respecte la capacité réellement configurée ; l’affichage du bouton ne prouve pas une authentification réussie. La récupération conserve son titre et explique son indisponibilité lorsque le transport TEST est désactivé.
+Version candidate **0.13.4-test**, codes **130007 → 130008** pour la recette de mise à jour. Elle corrige le Pliage dans l’iframe courte de l’application et libère le catalogue des champs de chantier et du gros pied de panier. Logo MIR de 245 px (+75 % par rapport à la proposition de 140 px), titre « Connexion équipe MIR » retiré de la connexion normale, formulaire courriel/mot de passe directement visible, bouton Google et palette anthracite/champagne approuvés. Google reste activé comme dans l’APK livré 130006 ; l’affichage du bouton ne prouve pas une authentification réussie. La récupération conserve sa limite TEST existante.
 
 ## Installation séparée autorisée
 
@@ -19,7 +19,7 @@ Frederick a autorisé une application TEST installée **à côté de l’ancienn
 
 L’ancien paquet `ca.revetementsmir.equipe.test` conserve son stockage et son callback `mirtest`. Aperçu possède son propre stockage Android, coffre de session et FileProvider ; aucune migration de données ni reprise automatique de session n’est effectuée. Les assertions natives vérifient l’identité réellement installée et que l’ancien callback ne résout pas dans Aperçu. Cette recette sur émulateur ne constitue pas une observation du téléphone de Frederick.
 
-Les ressources `dist/` restent embarquées. Le menu **Accueil · Commande · Punch · Messages · Plus**, les accueils, le Punch et le parcours Pliage restent ceux de la version approuvée.
+Les ressources `dist/` restent embarquées. Le menu **Accueil · Commande · Punch · Messages · Plus**, les accueils et le Punch conservent leur fonctionnement. Le Pliage conserve ses quatre étapes et son modèle métier ; ses mesures, angles et actions sont adaptés à l’espace réel du téléphone. Le choix de chantier est présenté au panier ; le filtre de catégories se trouve dans le bouton à trois barres près de la recherche.
 
 ## Signature durable et garde de livraison
 
@@ -44,9 +44,9 @@ Le job Android ne démarre que pour une PR provenant du même dépôt et dont le
 
 `tools/preview-signing.cjs import` place uniquement le keystore dans un sous-répertoire privé du `RUNNER_TEMP`, permissions `0700/0600`. `GITHUB_ENV` reçoit seulement les chemins ; les mots de passe restent limités aux étapes d’import et de compilation. Les caches de configuration Gradle sont désactivés. Une étape `always()` supprime ce fichier avant les tests natifs et les archives.
 
-`tools/verify-preview-signing.cjs` exécute **apksigner verify** sur les APK 130005, 130006 et l’APK d’instrumentation. Il exige une signature v2 valide, un seul signataire, l’empreinte publique attendue et les identités Android prévues. L’APK final n’est copié vers les artefacts qu’après cette vérification. `preview-signing.json` ne contient que des métadonnées publiques, empreintes et résultats. Le rapport natif final recoupe cette preuve avec le SHA du fichier effectivement remis.
+`tools/verify-preview-signing.cjs` exécute **apksigner verify** sur les APK 130007, 130008 et l’APK d’instrumentation. Il exige une signature v2 valide, un seul signataire, l’empreinte publique attendue et les identités Android prévues. L’APK final n’est copié vers les artefacts qu’après cette vérification. `preview-signing.json` ne contient que des métadonnées publiques, empreintes et résultats. Le rapport natif final recoupe cette preuve avec le SHA du fichier effectivement remis.
 
-La recette **130005 → 130006** vérifie le maintien du stockage de la nouvelle application Aperçu. Elle reste exécutée dans un seul runner et ne prouve pas une mise à jour de l’ancien APK **130004**, dont l’identifiant est différent. Le certificat historique est `d62841b88fd0b0194ef871c5fcc03a2b1e0bc43fc5895308fddf35e9d0a94842` ; aucune clé privée correspondante n’a été trouvée lors de l’audit. Aucun remplacement, effacement ou désinstallation de cet ancien paquet n’est prévu.
+La recette **130007 → 130008** vérifie le maintien du stockage d’Aperçu dans un seul runner. L’APK précédemment livré **130006** possède le même identifiant et le même certificat durable ; cette paire de recette ne constitue pas un essai direct de son fichier exact vers 130008. L’ancien APK **130004** utilise un autre identifiant et le certificat historique `d62841b88fd0b0194ef871c5fcc03a2b1e0bc43fc5895308fddf35e9d0a94842`. Aucun remplacement, effacement ou désinstallation de cet ancien paquet n’est prévu.
 
 Pour compiler localement avec une clé déjà provisionnée de façon privée, fournir `MIR_PREVIEW_KEYSTORE_PATH`, `MIR_PREVIEW_KEYSTORE_PASSWORD`, `MIR_PREVIEW_KEY_ALIAS`, `MIR_PREVIEW_KEY_PASSWORD` et `MIR_PREVIEW_CERT_SHA256` dans l’environnement. Ne pas inscrire leurs valeurs dans une commande conservée, le dépôt ou un fichier de preuve. Exécuter la vérification cryptographique avant toute remise. Le pipeline CI constitue la voie de livraison contrôlée.
 
@@ -67,11 +67,21 @@ La recette native capture et mesure la vraie barre Android au lancement, en pays
 
 ## Configuration Google — état du 18 novembre 2026
 
-Les deux callbacks exacts du tableau Aperçu ont été enregistrés dans les Redirect URLs de Supabase MIR TEST. Le fournisseur Google reste désactivé : Client IDs et Client Secret sont vides. Google Cloud affiche « Site indisponible » dans le navigateur de configuration, y compris après une recharge. Aucun client OAuth créé ni login Google réussi n’est revendiqué. Le bouton reste honnête sur cette capacité et l’accès par courriel demeure disponible. La récupération par courriel conserve sa limite TEST existante.
+Les deux callbacks exacts du tableau Aperçu ont été enregistrés dans les Redirect URLs de Supabase MIR TEST. Le fournisseur Google et la variable de compilation ont ensuite été activés pour l’APK livré 130006. La preuve native de ce lot confirme le bouton Google actif ; aucune connexion OAuth personnelle complète ni essai physique n’est revendiqué. L’accès par courriel demeure disponible et la récupération conserve sa limite TEST existante.
 
 Le workflow `.github/workflows/mir-phase11-android-pr.yml` transmet la variable de dépôt `MIR_TEST_GOOGLE_ENABLED` aux deux compilations, Chromium et Android ; sa valeur par défaut est la chaîne `false`. Dans chaque job, `npm run sync` appelle `npm run web`, puis `tools/build-web.cjs`, qui inscrit cette capacité dans les ressources embarquées et n’accepte que les chaînes `true` ou `false`.
 
-Passer cette variable à `true` uniquement après configuration du fournisseur Google dans Supabase MIR TEST et vérification du retour `mirtestpreview://auth/callback?flow=google`. Ce réglage de compilation n’active aucun fournisseur. Un nouvel APK doit ensuite être construit avec cette valeur et le parcours Google complet doit être vérifié avec un compte équipe autorisé ; modifier la variable ou réussir les recettes simulées ne prouve pas une connexion réelle. La récupération et les invitations gardent leurs réglages existants.
+Conserver cette variable à `true` pour la présente mise à jour. Ce réglage de compilation n’active aucun fournisseur ; le rapport final exige que la preuve native montre encore Google activé et son bouton accessible. Le parcours OAuth personnel complet reste à vérifier avec un compte équipe autorisé. La récupération et les invitations gardent leurs réglages existants.
+
+## Recette native Pliage et catalogue compacts
+
+Les huit contrôles Android et les deux contrôles de mise à jour sont conservés. Avant le test des cinq rôles, le runner règle l’émulateur sur **1080 × 2340 à 440 dpi**, soit environ **393 × 851 points** d’écran avant les barres natives. Les vérifications utilisent le vrai portail, son en-tête, ses onglets, son menu bas et `#field-drawing-frame`, sans imposer de CSS au produit.
+
+Le parcours employé contrôle Annuler, la confirmation de Recommencer et la conservation du panier, puis construit trois côtés avec le clavier Android et choisit un repli. Il vérifie les cotes **5½ / 3 / 1½ po**, les angles **90° / 180°**, la saisie native des cotes et angles, le clavier visible, les repères numériques d’au moins 11 px, C au-dessus du retour et B au-dessous de sa branche, ainsi que le dessin et les cinq champs sans défilement. À une taille de texte Android de 1,5, chaque mesure et chaque angle doit rester accessible par la pagination. Les captures et mesures sont conservées dans les preuves de chaque rôle et revérifiées par `native-screen-proofs.cjs`.
+
+Les catalogues Employé et Chef doivent montrer les onglets, la recherche, le bouton de catégories et le panier d’en-tête ; les anciens champs de chantier et le gros pied de panier ne doivent pas occuper la liste. Cinq articles doivent tenir lorsqu’au moins cinq articles réels sont présents. Au panier, le choix du second chantier QA doit conserver les mêmes lignes de matériel et de pliage, avec leurs quantités et leur contexte source. Aucune commande n’est soumise par cette recette. Aucun article, compte ou chantier fictif supplémentaire n’est ajouté pour remplir ces écrans.
+
+L’iframe personnelle n’ajoute plus un deuxième bandeau natif TEST ni 30 px d’espace au-dessus du dessin. Le parent conserve son retour d’état réseau, et l’iframe conserve une zone d’erreur locale accessible. Les nouvelles preuves doivent être obtenues sur la CI de la révision livrée avant d’annoncer cette recette réussie.
 
 ## Historique — identités et preuves antérieures
 

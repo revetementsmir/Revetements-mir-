@@ -237,7 +237,7 @@ function renderClientMeasurements(){
  const sides=segments.map((segment,index)=>`<label class="client-measure-field"><span class="letter-label"><b>${esc(segment.label)}</b><span>${esc(segment.name||'Côté '+segment.label)}</span><small>${unit}</small></span><input ${draft.template==='custom'?`data-segment-length="${index}"`:`data-measure="${esc(segment.label)}"`} type="text" inputmode="text" value="${esc(segment.length??'')}" placeholder="ex. ${unit==='po'?'2¼':'57,15'}" aria-label="Côté ${esc(segment.label)} — ${esc(segment.name||'mesure')} (${unit})"></label>`).join('');
  const angles=bends.map((bend,index)=>{
   const label=segments[index].label+'–'+segments[index+1].label,hem=bend.mode==='hem',value=clientInteriorAngle(bend);
-  return `<div class="client-angle-field${hem?' client-hem-angle':''}" data-angle-index="${index}"><label><span>${publicPliage03()?'Angle ':''}${esc(label)} <small>${hem?'Repli':'°'}</small></span><input data-client-bend-angle="${index}" type="number" min="0.001" max="180" step="any" value="${esc(value)}" aria-label="${hem?'Retour écrasé':'Angle intérieur'} ${esc(label)} en degrés"${hem?' readonly aria-readonly="true" title="Repli 180° conservé du modèle"':''}></label>${publicPliage03()&&!hem?`<div class="client-angle-nudges"><button type="button" data-client-angle-nudge="${index}" data-delta="-1" aria-label="Diminuer l’angle ${esc(label)}">−</button><button type="button" data-client-angle-nudge="${index}" data-delta="1" aria-label="Augmenter l’angle ${esc(label)}">+</button></div>`:''}</div>`;
+  return `<div class="client-angle-field${hem?' client-hem-angle':''}" data-angle-index="${index}"><label><span>${publicPliage03()?'Angle ':''}${esc(label)} <small>${hem?'Repli':'°'}</small></span><input data-client-bend-angle="${index}" type="number"${fieldPliage03?' inputmode="decimal"':''} min="0.001" max="180" step="any" value="${esc(value)}" aria-label="${hem?'Retour écrasé':'Angle intérieur'} ${esc(label)} en degrés"${hem?' readonly aria-readonly="true" title="Repli 180° conservé du modèle"':''}></label>${publicPliage03()&&!fieldPliage03&&!hem?`<div class="client-angle-nudges"><button type="button" data-client-angle-nudge="${index}" data-delta="-1" aria-label="Diminuer l’angle ${esc(label)}">−</button><button type="button" data-client-angle-nudge="${index}" data-delta="1" aria-label="Augmenter l’angle ${esc(label)}">+</button></div>`:''}</div>`;
  }).join('');
  return `<div class="client-measures-grid" data-client-side-count="${segments.length}">${sides}</div><section class="client-angle-controls" aria-label="Angles de votre modèle"><div class="client-angle-heading"><h3>Angles du modèle</h3><button type="button" id="client-reset-model-angles" class="plain-button">Rétablir les angles</button>${bends.some(bend=>bend.mode==='hem')?'<button type="button" id="client-hem-options" class="plain-button">Options des replis</button>':''}</div><div class="client-angles-grid" data-client-angle-count="${bends.length}">${angles}</div></section>`;
 }
@@ -534,7 +534,7 @@ function bendAngleLabel(bend){
  const angle=Number(bend?.angle);
  return Number.isFinite(angle)?fmt(angle)+'°':'À préciser';
 }
-function profileAnglesOverlay(model,{segments,folds},labels,handles,[leftEdge,rightEdge]){
+function profileAnglesOverlay(model,{segments,folds},labels,handles,[leftEdge,rightEdge],[topEdge,bottomEdge]=[0,520]){
  const pointBounds=[...folds,...handles].map(([x,y])=>[x,y,9,9]);
  return (model.bends||[]).map((bend,i)=>{
   if(!bend||bend.mode==='hem'||!segments[i]||!segments[i+1])return '';
@@ -553,7 +553,7 @@ function profileAnglesOverlay(model,{segments,folds},labels,handles,[leftEdge,ri
   const visualLabel=fmt(Math.round(Number.parseFloat(label)*100)/100)+'°';
   const halfWidth=visualLabel.length*4.6+3,halfHeight=11;
   const clear=([x,y])=>{
-   if(x<leftEdge+halfWidth+4||x>rightEdge-halfWidth-4||y<halfHeight+4||y>516-halfHeight)return false;
+   if(x<leftEdge+halfWidth+4||x>rightEdge-halfWidth-4||y<topEdge+halfHeight+4||y>bottomEdge-4-halfHeight)return false;
    if(labels.some(([px,py,w,h])=>Math.abs(x-px)<halfWidth+w+4&&Math.abs(y-py)<halfHeight+h+4))return false;
    if(pointBounds.some(([px,py,w,h])=>Math.abs(x-px)<halfWidth+w&&Math.abs(y-py)<halfHeight+h))return false;
    // A scaled distance leaves clearance around the text and the thick profile stroke.
@@ -588,7 +588,9 @@ function profileAnglesOverlay(model,{segments,folds},labels,handles,[leftEdge,ri
 function publicProfileDiagramContent(model,mapped,options={}){
  if(!publicPliage03()||!window.MIRPliageSurfaces)return M.profileDiagramContent(model,mapped,options);
  const section=M.profileSectionPath(mapped,options.bends||model.bends||[]);
- let base=M.profileDiagramContent(model,mapped,{...options,section,illustrative:true});
+ // Public illustrations retain their original presentation. The chantier
+ // preview also shows the entered dimensions without duplicating painted marks.
+ let base=M.profileDiagramContent(model,mapped,{...options,section,illustrative:true,showMeasurements:fieldPliage03&&!options.illustrative&&options.showMeasurements!==false&&tool==='select',hemSideMarkers:fieldPliage03});
  // This blue offset identifies the physical left/right surface; it is not a
  // product colour, a new profile, nor a fabricated bending radius.
  if(model.coloredFace?.side&&tool!=='draw'){
@@ -622,7 +624,39 @@ function compactClientProfileSVG(model,{illustrative=false,painted=false,width:g
   .replace(/(<path[^>]*stroke="#dfe8e3"[^>]*stroke-width=")4"/,(_,prefix)=>prefix+'1.5"');
  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+width+' '+height+'" role="img" aria-label="'+esc(model.name)+'"><title>'+esc(model.name)+(illustrative?' — proportions du modèle, cotes à saisir':' — cotes de la pièce')+'</title>'+profile+(publicPliage03()&&painted?'':labels.join(''))+'</svg>';
 }
+function fieldProfileDiagramSVG(model,{illustrative=false}={}){
+ const host=$('#production-drawing'),width=Math.max(240,Math.round(host.clientWidth||innerWidth-32)),height=Math.max(140,Math.round(host.clientHeight||220));
+ const points=model.pointsMM||[];if(points.length<2)return '';
+ const xs=points.map(point=>point[0]),ys=points.map(point=>point[1]),minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);
+ // SVG units are CSS pixels here. The two annotation lanes and the physical
+ // hem gap stay readable even when the app gives the preview little height.
+ const scale=Math.min(Math.max(24,width-144)/Math.max(1,maxX-minX),Math.max(24,height-120)/Math.max(1,maxY-minY));
+ const tr={scale,ox:width/2-(minX+maxX)*scale/2,oy:(height-10)/2+(minY+maxY)*scale/2};
+ drawTransform=tr;
+ const mapped=points.map(point=>pointOnView(point,tr));
+ const markerIndices=window.MIRPliage03?.measurementIndices?.(model.segments.length)||model.segments.map((_,index)=>index).slice(0,3);
+ const shownAngles={...model,bends:(model.bends||[]).map((bend,index)=>markerIndices.includes(index)&&markerIndices.includes(index+1)?bend:null)};
+ const options={bends:model.bends||[],markerModel:model,markerIndices,markers:true,illustrative,paintedMarker:'star',highContrast:true,horizontalBounds:[0,width],verticalBounds:[0,height],angleOverlay:(section,labels,handles)=>profileAnglesOverlay(shownAngles,section,labels,handles,[0,width],[0,height])};
+ let content,legend='';
+ try{content=publicProfileDiagramContent(model,mapped,options);}
+ catch(error){
+  if(!String(error.message||'').startsWith('Cotation technique sans espace'))throw error;
+  // Dense profiles retain their side labels and an explicit measured legend;
+  // no entered dimension is silently removed or replaced by a sample value.
+  content=publicProfileDiagramContent(model,mapped,{...options,showMeasurements:false,angleOverlay:undefined});
+  if(!illustrative){
+   const cell=(width-16)/Math.max(1,markerIndices.length);
+   legend='<g class="mir-field-dimension-legend"><rect x="4" y="'+(height-28)+'" width="'+(width-8)+'" height="26" rx="5" fill="#252624"/>'+markerIndices.map((index,position)=>'<text x="'+fmt(8+cell*(position+.5))+'" y="'+(height-14)+'" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#f2efe6">'+esc(model.segments[index].label+' · '+M.formatMeasurement(model.segments[index].lengthMM,model.unit))+'</text>').join('')+'</g>';
+  }
+ }
+ if(!illustrative)content=content.replace(/<g class="profile-side-marker" data-marker-label="([^"]+)"[^>]*>/g,(match,label)=>{
+  const index=model.segments.findIndex(segment=>segment.label===label);
+  return index>=0&&profileMeasureInput(index,label)?match.replace(/\s+pointer-events="none"/,'').replace(/\s+aria-hidden="true"/,'').replace(/>$/,` data-edit-profile-measure="${index}" role="button" tabindex="0" aria-label="Modifier la cote ${esc(label)}" style="cursor:pointer">`):match;
+ });
+ return `<svg xmlns="http://www.w3.org/2000/svg" class="mir-field-measured-profile" viewBox="0 0 ${width} ${height}" role="group" aria-label="${esc(model.name)} — ${illustrative?'proportions illustratives':'cotes de la pièce finie'}" data-measurement-presentation="${legend?'legend':illustrative?'illustrative':'dimensions'}"><title>${esc(model.name)} — ${illustrative?'proportions illustratives, sans cotes de fabrication':markerIndices.map(index=>model.segments[index].label+' : '+M.formatMeasurement(model.segments[index].lengthMM,model.unit)).join(' ; ')}</title>${content}${legend}</svg>`;
+}
 function diagramSVG(model,{illustrative=false,small=false,interactive=true}={}){
+ if(fieldPliage03&&clientStep===2&&model.kind==='profile'&&interactive&&!small&&tool==='select'&&matchMedia('(max-width:959px)').matches)return fieldProfileDiagramSVG(model,{illustrative});
  if(clientProfileWizard()&&!publicPliage03()&&model.kind==='profile'&&interactive&&!small&&clientStep===2&&innerWidth<780&&tool==='select')return compactClientProfileSVG(model,{illustrative});
  if(model.kind==='panel'&&window.MIRProductionVolume)return panelDiagramSVG(model,{illustrative,small,interactive});
  const freehand=interactive&&tool==='draw'&&model.kind==='profile';
@@ -639,7 +673,7 @@ function diagramSVG(model,{illustrative=false,small=false,interactive=true}={}){
  if(interactive&&!drag)drawTransform=tr;
  const mapped=points.map(p=>pointOnView(p,tr)),polygon=model.kind==='panel',pointString=mapped.map(p=>p.map(fmt).join(',')).join(' '),hex=/^#[0-9a-f]{6}$/i.test(model.finish?.hex||'')?model.finish.hex:'#dce5d4';let output=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}" role="group" aria-label="${esc(model.name)} — ${illustrative?'illustration du modèle':'cotes de la pièce finie'}" font-family="Arial,sans-serif"><title>${esc(model.name)} — ${illustrative?'proportions illustratives, sans cotes de fabrication':'dimensions de la pièce finie'}</title>${grid}`;
  if(polygon)output+=`<polygon points="${pointString}" fill="${hex}" fill-opacity=".65" stroke="#546b4a" stroke-width="2"/>`;else {
- output+=publicProfileDiagramContent(model,mapped,{bends:freehand&&drawPoints.length<3?[]:model.bends||[],markers:!small,markerModel:freehand||publicProfile?{segments:model.segments?.map(({label})=>({label}))}:model,paintedMarker:publicProfile?'star':'stripe',highContrast:publicProfile,handles:tool==='draw'||tool==='edit'?mapped:[],illustrative:illustrative||(interactive&&tool!=='select'),togglePaintedFace:interactive&&!small&&tool==='select'&&!illustrative&&(!clientProfileWizard()||clientStep===3),
+ output+=publicProfileDiagramContent(model,mapped,{bends:freehand&&drawPoints.length<3?[]:model.bends||[],markers:!small,markerModel:freehand||publicProfile&&(!fieldPliage03||illustrative)?{segments:model.segments?.map(({label})=>({label}))}:model,paintedMarker:publicProfile?'star':'stripe',highContrast:publicProfile,handles:tool==='draw'||tool==='edit'?mapped:[],illustrative:illustrative||(interactive&&tool!=='select'),togglePaintedFace:interactive&&!small&&tool==='select'&&!illustrative&&(!clientProfileWizard()||clientStep===3),
   horizontalBounds,angleOverlay:!small&&(!illustrative||publicProfile)?(section,labels,handles)=>profileAnglesOverlay(model,section,labels,handles,horizontalBounds):undefined});
  }
  const count=polygon?points.length:Math.max(0,points.length-1);for(let i=0;i<count;i++){const a=mapped[i],b=mapped[(i+1)%mapped.length],delta=[b[0]-a[0],b[1]-a[1]],len=Math.hypot(...delta)||1,mid=[(a[0]+b[0])/2,(a[1]+b[1])/2],normal=[-delta[1]/len,delta[0]/len];if(polygon){const edge=model.edges?.[i],bottom=edge?.id===model.bottomEdgeId;if(bottom&&!illustrative)output+=`<line x1="${fmt(a[0])}" y1="${fmt(a[1])}" x2="${fmt(b[0])}" y2="${fmt(b[1])}" stroke="${model.perforation?.enabled?'#26758d':'#54863f'}" stroke-width="6"${model.perforation?.enabled?' stroke-dasharray="11 6"':''}/>`;output+=`<g${interactive&&edge&&!authoring?` data-select-bottom="${esc(edge.id)}" role="button" tabindex="0" aria-label="Choisir ${esc(edge.name)} comme bas"`:''}><circle cx="${fmt(mid[0])}" cy="${fmt(mid[1])}" r="13" fill="#fff" stroke="#b2c4a1"/><text x="${fmt(mid[0])}" y="${fmt(mid[1]+4.5)}" text-anchor="middle" font-size="13" fill="#4f6c3c">${i+1}</text></g>`;}
@@ -819,6 +853,10 @@ function renderTools(){
  const drawing=tool==='draw';
  if(clientProfileWizard()){
   const instruction=!drawPoints.length?clientTracePrompt():drawPoints.length<3?'Placez au moins trois points pour créer deux côtés.':build().valid?'Ajoutez un côté ou terminez le dessin.':'Annulez le dernier point et réessayez.';
+  if(fieldPliage03){
+   el.innerHTML=`<div class="client-trace-actions" role="group" aria-label="Actions du tracé"><button type="button" data-drawing-undo${!drawPoints.length?' disabled':''}>Annuler le dernier point</button><button type="button" id="client-new-trace"${!drawPoints.length?' disabled':''}>Recommencer</button><button type="button" class="draw-primary" data-draw-tool="draw"${drawPoints.length<3||!build().valid?' disabled':''} aria-label="Suivant — terminer le dessin">Suivant</button></div><p class="client-trace-help" role="status">${esc(instruction)}</p><details class="client-trace-options"><summary>Options du tracé</summary>${!drawPoints.length?'<button type="button" id="client-example-l">Essayer un L en trois points</button>':''}<details class="client-keyboard-trace"><summary>Saisir les points au clavier</summary><p>Coordonnées absolues en ${draft.unit==='mm'?'mm':'po'} : X vers la droite, Y vers le haut.</p><label>X<input id="client-point-x" inputmode="decimal" value="0"></label><label>Y<input id="client-point-y" inputmode="decimal" value="0"></label><button type="button" id="client-keyboard-point">Ajouter ce point</button></details><label class="client-trace-scale">Échelle de la grille<select id="trace-height">${traceHeights.map(height=>`<option value="${height}"${height===traceHeight?' selected':''}>${height} po de haut</option>`).join('')}</select></label></details>`;
+   return;
+  }
   el.innerHTML=`<p class="client-trace-help">${esc(instruction)}</p>${!drawPoints.length?'<button type="button" id="client-example-l">Essayer un L en trois points</button>':''}<details class="client-keyboard-trace"><summary>Saisir les points au clavier</summary><p>Coordonnées absolues en ${draft.unit==='mm'?'mm':'po'} : X vers la droite, Y vers le haut.</p><label>X<input id="client-point-x" inputmode="decimal" value="0"></label><label>Y<input id="client-point-y" inputmode="decimal" value="0"></label><button type="button" id="client-keyboard-point">Ajouter ce point</button></details><button type="button" id="client-new-trace">Nouveau tracé</button><label class="client-trace-scale">Échelle de la grille<select id="trace-height">${traceHeights.map(height=>`<option value="${height}"${height===traceHeight?' selected':''}>${height} po de haut</option>`).join('')}</select></label><button type="button" data-drawing-undo${!drawPoints.length?' disabled':''}>Annuler le point</button><button type="button" class="draw-primary" data-draw-tool="draw"${drawPoints.length<3||!build().valid?' disabled':''} aria-label="Suivant — terminer le dessin">Suivant</button>`;
   return;
  }
@@ -1034,7 +1072,7 @@ function renderClientWizard(model,blockJ){
  }
  const next=$('#client-step-next');
  $('#client-step-back').hidden=clientStep===1||clientStep===2&&!!editingItemId&&!clientEditableTrace();
- $('#client-step-back').textContent=clientStep===2&&!selectedTemplate&&draft.template==='custom'?'Modifier le tracé':'Retour';
+ $('#client-step-back').textContent=fieldPliage03?(clientStep===2?(!selectedTemplate&&draft.template==='custom'?'Retour au tracé':'Retour au modèle'):clientStep===3?'Retour aux mesures':'Retour à la finition'):clientStep===2&&!selectedTemplate&&draft.template==='custom'?'Modifier le tracé':'Retour';
  const status=$('#client-step-status'),message=issues[clientStep]||'';
  if(status.textContent!==message)status.textContent=message;
  next.disabled=Boolean(message)||busy||clientStep===4&&$('#add-production-piece').disabled;
@@ -1934,8 +1972,8 @@ function drawDragPreview(segment, gesture){
  svg.querySelector('[data-trace-preview]')?.remove();
  if(!segment)return;
  const [x,y]=pointOnView(gesture.start,drawTransform),[ex,ey]=pointOnView(segment.point,drawTransform);
- const scale=Math.max(1,Math.min(2.2,800/svg.clientWidth));
- const label=(x,y,value,halo=6)=>`<text x="${fmt(x)}" y="${fmt(y)}" text-anchor="middle" dominant-baseline="central" font-size="${fmt(17*scale)}" font-weight="700" fill="#603b20" stroke="#fff5e3" stroke-width="${fmt(halo*scale)}" stroke-linejoin="round" paint-order="stroke">${esc(value)}</text>`;
+ const scale=Math.max(1,Math.min(2.2,(fieldPliage03?svg.viewBox?.baseVal?.width||440:800)/svg.clientWidth));
+ const label=(x,y,value,halo=6)=>`<text class="mir-field-live-measure" x="${fmt(x)}" y="${fmt(y)}" text-anchor="middle" dominant-baseline="central" font-size="${fmt(17*scale)}" font-weight="700" fill="#603b20" stroke="#fff5e3" stroke-width="${fmt(halo*scale)}" stroke-linejoin="round" paint-order="stroke">${esc(value)}</text>`;
  const size=Math.hypot(ex-x,ey-y), outgoing=Math.atan2(ey-y,ex-x);
  const normal=[-Math.sin(outgoing),Math.cos(outgoing)];
  // La cote suit le côté sans recouvrir le trait, les badges B/C ou l'angle.
@@ -2584,7 +2622,7 @@ function handleClick(event){if(event.target.closest('[data-toggle-painted-face]'
    const segments=clientProfileSegments();
    const options=clientProfileBends().map((bend,index)=>bend.mode==='hem'?'<option value="'+index+'">'+esc(segments[index].label+'–'+segments[index+1].label)+' · Repli 180°</option>':'').join('');
    if(!options)return;
-   dialog('Ouvrir un repli du modèle','Le repli à 180° est conservé tant que vous ne choisissez pas explicitement un angle ouvert. La modification concerne cette pièce.', '<label>Repli à modifier<select id="client-hem-index">'+options+'</select></label><label>Nouvel angle intérieur (°)<input id="client-hem-interior" type="number" min="0.001" max="180" step="any" value="90"></label><div class="dialog-actions"><button type="button" class="secondary-button" data-close-production-dialog>Conserver le repli</button><button type="button" class="primary-button" id="client-open-model-hem">Appliquer l’angle ouvert</button></div>');
+   dialog('Ouvrir un repli du modèle','Le repli à 180° est conservé tant que vous ne choisissez pas explicitement un angle ouvert. La modification concerne cette pièce.', '<label>Repli à modifier<select id="client-hem-index">'+options+'</select></label><label>Nouvel angle intérieur (°)<input id="client-hem-interior" type="number"'+(fieldPliage03?' inputmode="decimal"':'')+' min="0.001" max="180" step="any" value="90"></label><div class="dialog-actions"><button type="button" class="secondary-button" data-close-production-dialog>Conserver le repli</button><button type="button" class="primary-button" id="client-open-model-hem">Appliquer l’angle ouvert</button></div>');
    return;
   }
   if(button.id==='client-open-model-hem'){
@@ -2600,9 +2638,13 @@ function handleClick(event){if(event.target.closest('[data-toggle-painted-face]'
   if(publicPliage03()&&d.clientAngleNudge!==undefined){const input=$(`[data-client-bend-angle="${d.clientAngleNudge}"]`);if(!input||input.readOnly)return;const current=input.value===''?NaN:Number(input.value);if(!Number.isFinite(current)){input.focus();return;}input.value=String(Number((current+Number(d.delta)).toFixed(6)));selectedClientAngle=Number(d.clientAngleNudge);input.dispatchEvent(new Event('input',{bubbles:true}));input.focus({preventScroll:true});return;}
   if(d.clientStep)return goClientStep(Number(d.clientStep));
   if(button.id==='client-step-back'){if(clientStep===2&&!selectedTemplate&&draft.template==='custom')return resumeClientTrace();return goClientStep(clientStep-1);}
-  if(button.id==='client-new-trace'){choose('profile','custom');startProfileDrawing({fullscreen:false});return;}
+  if(button.id==='client-new-trace'){
+   if(fieldPliage03&&drawPoints.length)return dialog('Recommencer ce tracé ?','Le tracé en cours sera effacé. Les pièces déjà ajoutées à votre commande sont conservées.','<div class="dialog-actions"><button type="button" class="secondary-button" data-close-production-dialog>Garder mon tracé</button><button type="button" class="primary-button" id="confirm-client-new-trace">Recommencer le tracé</button></div>');
+   choose('profile','custom');startProfileDrawing({fullscreen:false});return;
+  }
+  if(button.id==='confirm-client-new-trace'&&fieldPliage03){closeDialog();choose('profile','custom');startProfileDrawing({fullscreen:false});focusClientEntry('#production-drawing');return;}
   if(button.id==='client-example-l'){appendTracePoint([50.8,50.8]);appendTracePoint([152.4,50.8]);appendTracePoint([152.4,127]);return;}
-  if(button.id==='client-keyboard-point'){const x=M.parseMeasurement($('#client-point-x').value,draft.unit),y=M.parseMeasurement($('#client-point-y').value,draft.unit);if(!x.ok||!y.ok)return toast('Entrez deux coordonnées valides.');appendTracePoint([x.mm,y.mm]);const editor=$('.client-keyboard-trace');if(editor){editor.open=true;$('#client-point-x').value=String(x.value);$('#client-point-y').value=String(y.value);$('#client-point-x').focus();$('#client-point-x').select();}return;}
+  if(button.id==='client-keyboard-point'){const x=M.parseMeasurement($('#client-point-x').value,draft.unit),y=M.parseMeasurement($('#client-point-y').value,draft.unit);if(!x.ok||!y.ok)return toast('Entrez deux coordonnées valides.');appendTracePoint([x.mm,y.mm]);const editor=$('.client-keyboard-trace');if(editor){editor.open=true;if(fieldPliage03&&$('.client-trace-options'))$('.client-trace-options').open=true;$('#client-point-x').value=String(x.value);$('#client-point-y').value=String(y.value);$('#client-point-x').focus();$('#client-point-x').select();}return;}
   if(button.id==='client-step-next')return clientStep===4?addPiece():goClientStep(clientStep+1,{confirm:true});
   if(d.clientFace&&clientStep===3){
    draft.coloredFace={side:d.clientFace,segmentId:window.MIRBendingPresets?.preferredFaceSegment?.(draft)||draft.coloredFace?.segmentId||build().segments[0]?.label||'A'};
@@ -3031,6 +3073,14 @@ async function boot(){M=window.MIRProduction;if(!M?.createTemplate)throw new Err
  if(!client&&params.get('shared-request'))openRequest(params.get('shared-request'));
  window.MIRProductionWorkspace=Object.freeze({version:'1.1.0',storageKeys:{...KEYS},localOnly:true,newPurchaseOrder(){if(client||!switchWorkshopOrder(defaultOrder()))return false;workflow='configure';render();return true;},openPurchaseOrder(po){if(client)return false;if(!po.items?.every(i=>i.spec&&i.snapshot?.schema==='mir-production-instance-1'&&build(i.spec).valid)){toast('Ancien format ou géométrie à vérifier : dessin conservé; exportez le dossier avant une conversion.');return false;}const next={...defaultOrder(),id:'procurement-'+po.id,poNumber:po.poNumber,project:po.job,foreman:po.foreman,date:po.requestedDate,revision:po.revision,notes:po.notes,items:copy(po.items)};if(!switchWorkshopOrder(next))return false;workflow='configure';authoring=false;render();return true;},getEstimationDossier(){return client?copy(order):null;},getLivePreviewState(){return {model:build(),tool,kind,authoring,editingItemId,preview:view,zoom,pan:{...viewPan},drawPointsMM:drawPoints.map(point=>point.slice()),canUndo:kind==='panel'?panelDirectUndo.length>0:freeformCanUndo(),canRedo:kind==='panel'?panelDirectRedo.length>0:freeformRedo.length>0};},saveCurrentPiece:saveWorkspacePiece,setOrderItemQuantity,openContinueMenu,openOrderPanelEditor(id,key,edge){if(client||!order.items.some(row=>row.id===id&&row.kind==='panel'))return false;editPiece(id);if(edge)openPanelEdge(edge);else openPanelMeasure(key);return true;},editOrderItem(id){if(client||!order.items.some(row=>row.id===id))return false;editPiece(id);return true;},editFieldOrderItem,finishFreeformTrace(){if(client||kind!=='profile'||authoring||editingItemId)return false;if(!build().valid||(draft.segments||[]).length<2)return false;if(tool==='draw')freeformFinish();return true;},openModelFromCurrent(){if(client||kind!=='profile'||authoring||editingItemId)return false;if(!build().valid){toast('Termine les cotes avant d’enregistrer ce modèle.');return false;}saveTemplateDialog();return true;}});
  matchMedia('(max-width:600px)').addEventListener('change',()=>{if(clientProfileWizard()&&tool==='draw'&&!drag)updateDrawing();});
+ if(fieldPliage03){
+  const redrawFieldMeasures=()=>{if(clientStep===2&&tool==='select'&&!drag)updateDrawing({keepForm:true});};
+  window.addEventListener('mir:field-measure-page',redrawFieldMeasures);
+  if(typeof ResizeObserver==='function'){
+   let previewSize='';
+   new ResizeObserver(entries=>{const box=entries[0]?.contentRect;if(!box)return;const size=Math.round(box.width)+':'+Math.round(box.height);if(size===previewSize)return;previewSize=size;requestAnimationFrame(redrawFieldMeasures);}).observe($('#production-drawing'));
+  }
+ }
  if(publicClientDossier()){
   void refreshBendTariff();
   window.addEventListener('pageshow',event=>{if(event.persisted)void refreshBendTariff();});

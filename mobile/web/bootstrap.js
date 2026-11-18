@@ -8,6 +8,10 @@ window.MIRAndroid=Object.freeze({Native,App,Geolocation,Policy});
 // so the public account workspace must not divide its controls into a pager.
 document.documentElement.dataset.mirNative='true';
 const origin=location.origin;
+function embeddedFieldPliage(){
+ try{const query=new URLSearchParams(location.search),context=window.parent!==window&&window.parent.MIRFieldDrawingContext?.();return location.pathname.endsWith('/production.html')&&query.get('mode')==='client'&&query.get('source')==='store'&&query.get('kind')==='profile'&&context?.personal===true&&context.presentation==='pliage03'&&typeof context.ownerId==='string'&&context.ownerId.trim().length>0&&window.parent.document.body.dataset.fieldShell==='true';}catch{return false;}
+}
+const fieldPliageFrame=embeddedFieldPliage();
 const rawFetch=window.fetch.bind(window);
 window.fetch=(input,options)=>{const url=input instanceof Request?input.url:input;if(!Policy.allowedRequest(url,origin))return Promise.reject(new Error('Service refusé : application MIR TEST uniquement.'));return rawFetch(input,options);};
 const rawOpen=XMLHttpRequest.prototype.open;
@@ -36,8 +40,8 @@ function restoreAbsence(){
 }
 document.addEventListener('input',rememberAbsence,true);document.addEventListener('change',rememberAbsence,true);
 for(const name of ['submit','reset'])document.addEventListener(name,event=>{if(event.target.id==='absence-draft-form')absenceDraft=null;},true);
-function showError(error){if(document.body.dataset.fieldShell==='true'||document.getElementById('mir-device-lock')){let alert=document.getElementById('mir-native-error');if(!alert){alert=document.createElement('div');alert.id='mir-native-error';alert.setAttribute('role','alert');const text=document.createElement('span'),close=document.createElement('button');close.type='button';close.textContent='Fermer';close.onclick=()=>alert.remove();alert.append(text,close);(document.getElementById('mir-device-lock')||document.querySelector('#portal-main'))?.prepend(alert);}const host=document.getElementById('mir-device-lock')||document.querySelector('#portal-main');if(host&&alert.parentElement!==host)host.prepend(alert);alert.querySelector('span').textContent=error?.message||'Action indisponible. Rien n’a été envoyé.';return;}const node=document.getElementById('mir-native-state');if(node){node.textContent=error?.message||'Action indisponible. Rien n’a été envoyé.';node.setAttribute('role','alert');}}
-function networkState(){const node=document.getElementById('mir-native-state');if(node)node.textContent=navigator.onLine?'MIR TEST · Notifications par actualisation':'MIR TEST · Hors ligne — les enregistrements serveur restent à confirmer';}
+function showError(error){if(document.body.dataset.fieldShell==='true'||document.getElementById('mir-device-lock')){let alert=document.getElementById('mir-native-error');if(!alert){alert=document.createElement('div');alert.id='mir-native-error';alert.setAttribute('role','alert');const text=document.createElement('span'),close=document.createElement('button');close.type='button';close.textContent='Fermer';close.onclick=()=>alert.remove();alert.append(text,close);(document.getElementById('mir-device-lock')||document.querySelector('#portal-main'))?.prepend(alert);}const host=document.getElementById('mir-device-lock')||document.querySelector('#portal-main');if(host&&alert.parentElement!==host)host.prepend(alert);alert.querySelector('span').textContent=error?.message||'Action indisponible. Rien n’a été envoyé.';return;}const node=document.getElementById('mir-native-state');if(node){node.hidden=false;node.textContent=error?.message||'Action indisponible. Rien n’a été envoyé.';node.setAttribute('role','alert');}}
+function networkState(){const node=document.getElementById('mir-native-state');if(node){if(fieldPliageFrame){node.hidden=true;return;}node.textContent=navigator.onLine?'MIR TEST · Notifications par actualisation':'MIR TEST · Hors ligne — les enregistrements serveur restent à confirmer';}}
 function nativeAuthLayout(){
  const grid=document.querySelector('.auth-grid'),signin=grid?.querySelector('#auth-signin-form');
  document.body.classList.toggle('mir-native-auth',!!grid);
@@ -93,7 +97,10 @@ function nativeAuthLayout(){
  help.onclick=()=>{const launch=document.querySelector('.mir-help-launch');if(launch)launch.click();else showError(new Error('Le Centre d’aide est indisponible. Contactez votre responsable MIR.'));};grid.append(help);
 }
 function mount(){
- const style=document.createElement('style');style.textContent='body{padding-top:calc(env(safe-area-inset-top) + 30px)!important;padding-bottom:env(safe-area-inset-bottom)}#mir-native-state{position:fixed;top:0;left:0;right:0;z-index:10000;background:var(--mir-surface-soft,#e9eee7);color:var(--mir-text,#24422e);padding:5px 10px;font:13px system-ui;min-height:20px}button,input,select{scroll-margin-bottom:100px}.mir-native-signin .mir-help-launch{position:static!important;transform:none!important;pointer-events:auto!important;display:block;margin:16px}';document.head.append(style);
+ // The embedded personal drawing already lives below the parent's native
+ // status/safe-area chrome. Keep local errors, but never add a second fixed
+ // TEST/network banner or a second 30px top inset over the drawing title.
+ const style=document.createElement('style');style.textContent=(fieldPliageFrame?'#mir-native-state{position:static}':'body{padding-top:calc(env(safe-area-inset-top) + 30px)!important;padding-bottom:env(safe-area-inset-bottom)}#mir-native-state{position:fixed;top:0;left:0;right:0;z-index:10000}')+'#mir-native-state{background:var(--mir-surface-soft,#e9eee7);color:var(--mir-text,#24422e);padding:5px 10px;font:13px system-ui;min-height:20px}button,input,select{scroll-margin-bottom:100px}.mir-native-signin .mir-help-launch{position:static!important;transform:none!important;pointer-events:auto!important;display:block;margin:16px}';document.head.append(style);
  const banner=document.createElement('div');banner.id='mir-native-state';banner.setAttribute('role','status');document.body.prepend(banner);networkState();
  const observer=new MutationObserver(()=>{
   restoreAbsence();

@@ -14,6 +14,57 @@
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const put=(node,value)=>{if(node&&node.textContent!==T(value))node.textContent=T(value);};
  let mounted=false;
+ let measurePage=0,measurePageSize=3,measureSignature='',measureStep=1,measureLayout='';
+ function measurementIndices(count){
+  const start=Math.min(measurePage*(measurePageSize-1),Math.max(0,count-1));
+  return Array.from({length:Math.max(0,Math.min(measurePageSize,count-start))},(_,index)=>start+index);
+ }
+ function syncFieldMeasurementPages(){
+  if(!fieldPliage03)return;
+  const host=$('#production-dimensions');if(!host)return;
+  const sides=Array.from(host.querySelectorAll('.client-measure-field'));
+  const angles=Array.from(host.querySelectorAll('.client-angle-field'));
+  const mobile=matchMedia('(max-width:959px)').matches;
+  const signature=sides.map(node=>node.querySelector('.letter-label b')?.textContent||'').join('|');
+  if(signature!==measureSignature){measureSignature=signature;measurePage=0;}
+  const focused=document.activeElement,editing=host.contains(focused)&&focused?.tagName==='INPUT';
+  // Do not change the page under an active input when the Android keyboard opens.
+  if(!editing){
+   const font=Math.max(parseFloat(getComputedStyle(document.documentElement).fontSize)||16,parseFloat(sides[0]?getComputedStyle(sides[0]).fontSize:'16')||16);
+   measurePageSize=mobile&&(innerHeight<360||font>20)?2:3;
+  }
+  const count=mobile?Math.max(1,Math.ceil((sides.length-1)/(measurePageSize-1))):1;
+  measurePage=Math.max(0,Math.min(count-1,measurePage));
+  const start=mobile?measurePage*(measurePageSize-1):0,end=mobile?Math.min(sides.length,start+measurePageSize):sides.length;
+  sides.forEach((node,index)=>{node.hidden=index<start||index>=end;node.dataset.fieldMeasureIndex=String(index);});
+  angles.forEach((node,index)=>{node.hidden=index<start||index>=end-1;});
+  host.dataset.fieldMeasurePage=String(measurePage+1);
+  host.dataset.fieldMeasurePageSize=String(measurePageSize);
+  host.dataset.fieldMeasurePageCount=String(count);
+  let nav=host.querySelector('.client-measure-pages');
+  if(!nav&&count>1){
+   nav=document.createElement('nav');nav.className='client-measure-pages';nav.setAttribute('aria-label',T('Pages des mesures et angles'));
+   nav.innerHTML='<button type="button" data-field-measure-page-step="-1" aria-label="'+esc(T('Mesures précédentes'))+'"><span aria-hidden="true">←</span><span>'+esc(T('Précédent'))+'</span></button><span class="client-measure-page-status" role="status" aria-live="polite"><span>'+esc(T('Côtés'))+'</span> <b id="client-measure-page-range"></b><small id="client-measure-page-count"></small></span><button type="button" data-field-measure-page-step="1" aria-label="'+esc(T('Mesures suivantes'))+'"><span>'+esc(T('Suivant'))+'</span><span aria-hidden="true">→</span></button>';
+   host.prepend(nav);
+  }
+  if(nav){
+   nav.hidden=count<=1||measureStep!==2;
+   nav.querySelector('[data-field-measure-page-step="-1"]').disabled=measurePage===0;
+   nav.querySelector('[data-field-measure-page-step="1"]').disabled=measurePage===count-1;
+   $('#client-measure-page-range').textContent=(sides[start]?.querySelector('.letter-label b')?.textContent||'')+'–'+(sides[end-1]?.querySelector('.letter-label b')?.textContent||'');
+   $('#client-measure-page-count').textContent=(measurePage+1)+' / '+count;
+  }
+  const layout=start+':'+end;
+  if(layout!==measureLayout){measureLayout=layout;requestAnimationFrame(()=>window.dispatchEvent(new Event('mir:field-measure-page')));}
+ }
+ if(fieldPliage03){
+  document.addEventListener('click',event=>{
+   const button=event.target.closest?.('[data-field-measure-page-step]');if(!button||button.disabled)return;
+   measurePage+=Number(button.dataset.fieldMeasurePageStep);
+   syncFieldMeasurementPages();
+  });
+  window.addEventListener('resize',()=>requestAnimationFrame(syncFieldMeasurementPages));
+ }
  function sync({model,step,entry,product,editing,selectedAngle}){
   if(!document.body.classList.contains('mir-pliage03'))return;
   const workspace=$('.production-workspace'),nav=$('.mir-production-steps');
@@ -33,6 +84,7 @@
   put($('#client-entry-intro'),'Commencez par un modèle ou dessinez votre propre moulure.');
   if(step===2){put($('#client-step-hint'),'Chaque angle se règle séparément.');put($('.client-angle-heading h3'),'Angles individuels');}
   if(step===4){put($('#client-step-title'),'Vérifier mon pliage');put($('#client-step-hint'),'Vérifiez vos choix et indiquez la quantité à ajouter au panier.');}
+  measureStep=step;syncFieldMeasurementPages();
   let faceHost=$('#mir-pliage03-faces');if(!faceHost){faceHost=document.createElement('div');faceHost.id='mir-pliage03-faces';$('#production-preview').append(faceHost);}
   const freshFace=$('#production-profile-options>.client-painted-face');
   if(freshFace){faceHost.replaceChildren(freshFace);}
@@ -60,5 +112,5 @@
   }
 
  }
- window.MIRPliage03=Object.freeze({sync});
+ window.MIRPliage03=Object.freeze({sync,measurementIndices});
 })();

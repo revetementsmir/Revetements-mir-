@@ -23,10 +23,18 @@ const keyboardTest=keyboardSource.slice(keyboardSource.indexOf('@Test public voi
 assert.match(keyboardTest,/uptimeMillis\(\)\+5000/);assert.match(keyboardTest,/isVisible\(androidx\.core\.view\.WindowInsetsCompat\.Type\.ime\(\)\)/);assert.match(keyboardTest,/assertTrue\("Clavier Android visible",keyboard\.get\(\)\)/);assert.doesNotMatch(keyboardTest,/\.focus\(|showSoftInput/);
 const metadata=source.slice(source.indexOf('private String fieldMetadataReady('),source.indexOf('private JSONArray assertAndroidFontScales('));
 const metadataExpressions=[...metadata.matchAll(/return ("(?:[^"\\]|\\.)*");/g)].map(m=>JSON.parse(m[1]));
-assert.match(metadata,/if\(view\.equals\("command"\)\|\|view\.equals\("catalogue"\)\)/,'C02 direct Commande and its Magasin tab share the selected-job proof');
+assert.match(metadata,/if\(view\.equals\("command"\)\|\|view\.equals\("catalogue"\)\)/,'C02 direct Commande and its Magasin tab share the real-catalogue proof');
 assert.equal(metadataExpressions.length,2,'Actual Java metadata keeps catalogue and Punch predicates');
 const metadataByView={command:metadataExpressions[0],catalogue:metadataExpressions[0],punch:metadataExpressions[1]};
 for(const [view,predicate] of Object.entries(metadataByView)){
+ if(view!=='punch'){
+  const items=[],present=new Set(),browse={querySelector:selector=>present.has(selector)?{}:null,querySelectorAll:()=>items},context={document:{querySelector:selector=>selector==='#employee-browse'?browse:null}};
+  assert.equal(Boolean(vm.runInNewContext(predicate,context)),false,'Empty catalogue chrome is not a product proof');
+  present.add('#catalogue-search');present.add('[data-field-store-filters]');items.push({dataset:{fieldProduct:'qa-real-product'},textContent:'Article QA chargé'});
+  assert.equal(vm.runInNewContext(predicate,context),true,'Loaded product and compact search/filter controls qualify the screenshot');
+  present.add('#order-job,#order-job-reference,.field-store-context,.field-store-cart');assert.equal(vm.runInNewContext(predicate,context),false,'Checkout context must not consume catalogue space');
+  continue;
+ }
  const node={value:'7da20261-1114-4000-8000-000000000001',textContent:'Adresse à préciser',selectedOptions:[{textContent:'Adresse à préciser'}],nextElementSibling:{textContent:'Adresse à préciser'}};
  const selector=view==='punch'?'[data-field-punch-job]':'#order-job';
  const context={document:{querySelector:value=>value===selector?node:null}};

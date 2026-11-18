@@ -241,3 +241,38 @@ body[data-field-shell=true][data-field-design=home-test] .mir-app-quick:not([ope
 body[data-field-shell=true][data-field-design=home-test][data-field-dense=true] .mir-app-c02{height:auto!important;min-height:var(--field-available-height)}
 body[data-field-shell=true][data-field-design=home-test][data-field-dense=true] .mir-app-c02 #employee-browse{flex:0 0 auto}
 body[data-field-shell=true][data-field-design=home-test][data-field-dense=true] .mir-app-c02 .field-store-results{flex:0 0 auto;min-height:120px;max-height:clamp(160px,40dvh,420px)}
+
+/* The drawing needs the available phone height, including when the keyboard
+   resizes the WebView. Its own labelled step replaces the duplicate heading. */
+@media(max-width:959px){
+  body[data-field-shell=true][data-field-design=home-test][data-field-view=draw] #portal-main{padding-block:8px!important}
+  body[data-field-shell=true][data-field-design=home-test] .mir-app-drawing{height:var(--field-available-height,calc(100dvh - 175px))!important;min-height:0!important;gap:6px;overflow:hidden}
+  body[data-field-shell=true][data-field-design=home-test] .mir-app-drawing .mir-app-heading{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;margin:0!important}
+  body[data-field-shell=true][data-field-design=home-test] .mir-app-drawing iframe{display:block;min-height:0!important;height:0;flex:1 1 0;min-width:0}
+}
+
+/* Catalogue: use the freed chantier/cart space for five readable product rows.
+   Category and favourite controls live in the search-row menu. */
+body[data-field-shell=true][data-field-design=home-test] .field-cart-context{display:grid;gap:10px;margin:0 0 16px;padding:12px;border:1px solid var(--field-border);border-radius:5px;background:var(--field-surface)}
+body[data-field-shell=true][data-field-design=home-test] .field-cart-context>label{display:block;margin:0;font-size:.875rem;color:var(--field-text)}
+body[data-field-shell=true][data-field-design=home-test] .field-cart-context :is(input,select,.mir-choice-trigger){width:100%;min-height:44px;margin-top:5px}
+body[data-field-shell=true][data-field-design=home-test] #field-filter-host .field-store-filter{display:flex;flex-direction:column;align-items:stretch;gap:12px;margin:12px 0 18px}
+body[data-field-shell=true][data-field-design=home-test] #field-filter-host .favorites-filter{justify-content:flex-start}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-filter-button.is-active{border-color:var(--field-accent)!important;color:var(--field-accent)!important;background:var(--field-selection)!important}
+@media(max-width:959px){
+  body[data-field-shell=true][data-field-design=home-test][data-field-view=catalogue] #portal-main{padding-block:10px!important}
+  body[data-field-shell=true][data-field-design=home-test] .mir-app-c02 .mir-app-heading{margin-bottom:8px!important}
+  body[data-field-shell=true][data-field-design=home-test] .mir-app-c02 .mir-app-heading .mir-app-eyebrow{display:none}
+  body[data-field-shell=true][data-field-design=home-test] .mir-app-c02 .mir-app-heading h1{font-size:1.5rem!important;line-height:1.1}
+  body[data-field-shell=true][data-field-design=home-test] .mir-app-c02 #employee-browse{gap:6px}
+  body[data-field-shell=true][data-field-design=home-test] .mir-app-c02 .field-store-results{gap:5px;min-height:0}
+  body[data-field-shell=true][data-field-design=home-test] .mir-app-c02 .mir-app-results-heading{min-height:20px}
+  body[data-field-shell=true][data-field-design=home-test] .mir-app-c02 .mir-app-results-heading h2{font-size:.875rem!important}
+  body[data-field-shell=true][data-field-design=home-test] .mir-app-c02 .mir-app-product-list{gap:5px}
+  body[data-field-shell=true][data-field-design=home-test] .mir-app-c02 .field-store-item{grid-template-columns:40px minmax(0,1fr) auto;gap:8px;min-height:64px!important;padding:6px!important}
+  body[data-field-shell=true][data-field-design=home-test] .mir-app-c02 .field-store-item .mir-app-product-thumb{width:40px;height:40px}
+  body[data-field-shell=true][data-field-design=home-test] .mir-app-c02 .mir-app-product-copy strong{display:-webkit-box!important;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden!important;font-size:.8125rem!important;line-height:1.25;overflow-wrap:anywhere}
+  body[data-field-shell=true][data-field-design=home-test] .mir-app-c02 .mir-app-product-copy small{margin-top:3px;font-size:.6875rem!important;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  body[data-field-shell=true][data-field-design=home-test] .mir-app-c02 .mir-app-choose{padding:5px 6px;font-size:.625rem}
+  body[data-field-shell=true][data-field-design=home-test] .mir-app-c02 .mir-app-store-tools{min-height:44px;gap:6px}
+}

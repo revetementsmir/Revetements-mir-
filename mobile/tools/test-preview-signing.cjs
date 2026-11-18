@@ -35,22 +35,22 @@ test('signature verification refuses a different signer, several signers or an u
 });
 
 test('the delivery package cannot be confused with the previous installation or an instrumentation APK', () => {
-  const output = "package: name='" + appId + "' versionCode='130006' versionName='0.13.3-test' platformBuildVersionName='16'\napplication-label:'MIR TEST Aperçu'\n";
-  assert.equal(readPackage(output, 130006).applicationId, appId);
-  assert.throws(() => readPackage(output.replace('.test.preview', '.test'), 130006));
-  assert.throws(() => readPackage(output, 130005));
-  assert.throws(() => readPackage(output.replace('MIR TEST Aperçu', 'MIR TEST'), 130006));
+  const output = "package: name='" + appId + "' versionCode='130008' versionName='0.13.4-test' platformBuildVersionName='16'\napplication-label:'MIR TEST Aperçu'\n";
+  assert.equal(readPackage(output, 130008).applicationId, appId);
+  assert.throws(() => readPackage(output.replace('.test.preview', '.test'), 130008));
+  assert.throws(() => readPackage(output, 130007));
+  assert.throws(() => readPackage(output.replace('MIR TEST Aperçu', 'MIR TEST'), 130008));
   const instrumentation = output.replace(appId, appId + '.test');
   assert.equal(readPackage(instrumentation, null, true).applicationId, appId + '.test');
-  assert.throws(() => readPackage(instrumentation, 130006));
+  assert.throws(() => readPackage(instrumentation, 130008));
 });
 
 test('an unversioned instrumentation APK is valid while delivery APKs still require their exact version', () => {
   const output = "package: name='" + appId + ".test' versionCode='' versionName='' platformBuildVersionName='16'\n";
   assert.deepEqual(readPackage(output, null, true), {applicationId: appId + '.test', versionCode: null, versionName: ''});
-  assert.throws(() => readPackage(output, 130006));
+  assert.throws(() => readPackage(output, 130008));
   const unversionedApp = output.replace(appId + '.test', appId) + "application-label:'MIR TEST Aperçu'\n";
-  assert.throws(() => readPackage(unversionedApp, 130006));
+  assert.throws(() => readPackage(unversionedApp, 130008));
   assert.throws(() => readPackage(unversionedApp, null));
   assert.throws(() => readPackage(output.replace("versionCode=''", "versionCode='not-a-number'"), null, true));
   assert.throws(() => readPackage(output.replace(appId + '.test', 'ca.revetementsmir.equipe.test.test'), null, true));

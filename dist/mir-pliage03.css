@@ -365,3 +365,99 @@ html body.mir-pliage03.mir-prestige[data-client-entry] :is(.eyebrow,#client-step
  html body.mir-pliage03.mir-prestige[data-client-entry][data-client-stage="3"] #mir-pliage03-faces .client-face-choices svg{height:140px}
  html body.mir-pliage03.mir-prestige[data-client-entry][data-client-stage="3"] #mir-pliage03-faces .mir-pliage03-face-card{min-height:190px}
 }
+
+/* Personal app: a bounded editor, not a desktop document inside an iframe.
+   Public configurators, workshop drawings and PDF output keep their layout. */
+html[data-field-pliage03=true] body.mir-pliage03.mir-prestige .mir-field-live-measure{
+ fill:var(--p03-text)!important;stroke:var(--p03-drawing)!important;stroke-width:3px!important;paint-order:stroke fill;stroke-linejoin:round;
+}
+html[data-field-pliage03=true] body.mir-pliage03.mir-prestige .mir-field-measured-profile>path[stroke-width="9"]{stroke-width:4px}
+html[data-field-pliage03=true] body.mir-pliage03.mir-prestige .mir-field-measured-profile>path[stroke-width="4"]{stroke-width:1.5px}
+@media(max-width:959px){
+ html[data-field-pliage03=true]:has(body[data-client-stage="2"]),
+ html[data-field-pliage03=true]:has(body[data-client-entry="draw"]){height:100%;overflow:hidden}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige:is([data-client-stage="2"],[data-client-entry="draw"]){height:100dvh;min-height:0!important;max-height:100dvh;overflow:hidden!important}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige:is([data-client-stage="2"],[data-client-entry="draw"]) #production-main{display:flex;flex-direction:column;height:100%;min-height:0;max-height:100%;padding:6px 8px 8px!important;overflow:hidden;box-sizing:border-box}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige:is([data-client-stage="2"],[data-client-entry="draw"]) .mir-pliage03-heading{display:none!important}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige:is([data-client-stage="2"],[data-client-entry="draw"]) .production-workspace{flex:1;display:grid!important;grid-template-columns:minmax(0,1fr)!important;grid-template-rows:44px minmax(140px,1fr) auto;gap:6px;align-items:stretch;min-height:0;height:100%;overflow:hidden}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige:is([data-client-stage="2"],[data-client-entry="draw"]) .mir-production-steps{position:static;grid-column:1;grid-row:1;margin:0;padding:0!important;border:0;min-height:0}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige:is([data-client-stage="2"],[data-client-entry="draw"]) #client-step-list{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:3px;height:44px;margin:0;padding:0}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige:is([data-client-stage="2"],[data-client-entry="draw"]) #client-step-list button{display:flex;flex-direction:column;justify-content:center;gap:2px;min-height:44px;height:44px;padding:3px 1px;font-size:11px;line-height:1.1;text-align:center}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige:is([data-client-stage="2"],[data-client-entry="draw"]) #client-step-list button>span:first-child{flex:0 0 16px;width:16px;height:16px;min-width:16px;line-height:16px;font-size:10px;border-radius:50%;margin:0}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige:is([data-client-stage="2"],[data-client-entry="draw"]) #production-preview{grid-column:1;grid-row:2;position:relative;display:block!important;width:100%;height:100%;min-height:0;padding:0;margin:0;overflow:hidden}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-stage="2"] #production-preview>.mir-panel-synced-views{height:100%;min-height:0}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige:is([data-client-stage="2"],[data-client-entry="draw"]) #production-drawing{display:grid;height:100%!important;min-height:0!important;max-height:none!important;width:100%;border-radius:4px;background:var(--p03-drawing);overflow:hidden}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige:is([data-client-stage="2"],[data-client-entry="draw"]) #production-drawing>svg{display:block;width:100%!important;height:100%!important;min-height:0!important;max-height:100%!important}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-stage="2"] #production-preview :is(.drawing-head,#drawing-tools,#drawing-navigation,#trace-readout,#profile-dimension-list){display:none!important}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-stage="2"] .config-card{grid-column:1;grid-row:3;display:flex;flex-direction:column;min-height:0;padding:0;margin:0;overflow:visible}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-stage="2"] #client-step-scroll{position:relative;display:flex;flex-direction:column;gap:0;min-height:0;max-height:none;padding:0;margin:0;overflow:visible}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-stage="2"] :is(#client-step-count,#client-step-hint,#measure-hint,#client-step-length){display:none!important}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-stage="2"] :is(#client-step-title,#client-local-save[data-client-save-state=saved]){position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-stage="2"] #client-step-scroll>.section-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;order:0;min-height:44px;margin:0 0 4px;padding:0}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-stage="2"] #client-step-scroll>.section-heading h2{font-size:15px!important;line-height:1.2;margin:0;font-weight:500}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-stage="2"] #client-step-scroll>.section-heading .step-dot{display:none}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-stage="2"] .unit-field{width:112px;flex:0 0 112px;margin:0!important}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-stage="2"] .unit-field :is(select,.mir-choice-trigger){min-height:44px!important;height:44px!important;padding:6px 8px!important;font-size:12px!important}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-stage="2"] #production-dimensions{order:1;min-width:0;margin:0}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-stage="2"] #production-dimensions .client-measures-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:6px;margin:0!important}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-stage="2"] #production-dimensions[data-field-measure-page-size="2"] .client-measures-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-stage="2"] #production-dimensions .client-measure-field{display:flex;align-items:center;gap:4px;min-width:0;min-height:44px;margin:0;font-size:14px}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-stage="2"] .client-measure-field>.letter-label{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;flex:0 0 17px;min-width:17px}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-stage="2"] .client-measure-field>.letter-label>span{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-stage="2"] .client-measure-field>.letter-label :is(b,small){display:block;line-height:1.1;margin:0}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-stage="2"] .client-measure-field>.letter-label small{font-size:10px;color:var(--p03-muted)}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-stage="2"] #production-dimensions input{width:100%;min-width:0;min-height:44px;height:44px;padding:7px 8px!important;font-size:16px!important;line-height:1.2;margin:0}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-stage="2"] .client-angle-controls{margin:4px 0 0;padding:0}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-stage="2"] .client-angle-heading{display:flex;align-items:center;justify-content:space-between;gap:4px;min-height:44px;margin:0!important}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-stage="2"] .client-angle-heading h3{font-size:12px!important;line-height:1.2;margin:0;max-width:58px;font-weight:500}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-stage="2"] .client-angle-heading button{min-height:44px!important;font-size:11px!important;line-height:1.2;padding:6px!important;margin:0;max-width:118px;border:0;background:transparent}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-stage="2"] #production-dimensions .client-angles-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px;margin:0!important}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-stage="2"] .client-angle-field{min-width:0;padding:0!important;outline-offset:2px}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-stage="2"] .client-angle-field>label{display:flex;align-items:center;gap:5px;min-width:0;margin:0;font-size:12px!important}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-stage="2"] .client-angle-field>label>span{flex:0 0 48px;max-width:48px;font-size:11px;line-height:1.2}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-stage="2"] .client-angle-field small{font-size:10px;line-height:1.1}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-stage="2"] #production-profile-options{order:2;margin:0;padding:0}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-stage="2"] #production-profile-options .mir-developed-total{margin:5px 0 0;font-size:11px;line-height:1.3}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-stage="2"] #client-step-actions{flex:none;position:static;padding:6px 0 0;margin:6px 0 0;border-top:1px solid var(--p03-line);background:transparent}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-stage="2"] #client-step-actions .client-step-buttons{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:8px}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-stage="2"] #client-step-actions button{min-width:0;min-height:44px!important;padding:7px 8px!important;font-size:13px!important;line-height:1.2;margin:0;gap:5px}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-stage="2"] #client-step-status{max-height:42px;overflow:auto;margin:0 0 5px;font-size:12px;line-height:1.3}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-stage="2"] .client-measure-pages{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:5px;min-height:44px;margin:0 0 4px}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-stage="2"] .client-measure-pages button{display:flex;align-items:center;gap:4px;min-height:44px;padding:5px 7px;background:var(--p03-input);color:var(--p03-text);border:1px solid var(--p03-line);border-radius:4px;font-size:11px}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-stage="2"] .client-measure-pages button:disabled{color:var(--p03-muted);opacity:.55}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-stage="2"] .client-measure-page-status{font-size:12px;line-height:1.2;text-align:center}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-stage="2"] .client-measure-page-status small{display:block;margin-top:2px;font-size:10px;color:var(--p03-muted)}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-stage="2"] #client-step-scroll:has(.client-measure-pages:not([hidden]))>.section-heading{justify-content:flex-end}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-stage="2"] #client-step-scroll:has(.client-measure-pages:not([hidden]))>.section-heading>div{display:none}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-stage="2"] .client-measure-pages{position:absolute;inset:0 120px auto 0;grid-template-columns:44px minmax(0,1fr) 44px;height:44px;margin:0}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-stage="2"] .client-measure-pages button{justify-content:center}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-stage="2"] .client-measure-pages button>span,
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-stage="2"] .client-measure-page-status>span{display:none}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-stage="2"] .client-measure-pages button[data-field-measure-page-step="-1"]>span:first-child,
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-stage="2"] .client-measure-pages button[data-field-measure-page-step="1"]>span:last-child{display:inline;font-size:20px}
+
+ /* Draw mode keeps undo, restart and next together below the complete canvas. */
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-entry="draw"] .production-workspace{grid-template-rows:44px minmax(0,1fr)}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-entry="draw"] #client-entry{display:none!important}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-entry="draw"] #production-preview{display:flex!important;flex-direction:column;gap:6px;overflow:hidden}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-entry="draw"] #production-preview>.mir-panel-synced-views{flex:1;min-height:90px;height:0;order:0}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-entry="draw"] #production-preview :is(.drawing-head,#drawing-navigation,#trace-readout,.mobile-trace-notice,.mobile-trace-exit){display:none!important}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-entry="draw"] #drawing-tools{display:flex;flex-direction:column;flex:0 0 auto;gap:4px;min-width:0;max-height:50%;overflow:auto;order:1;padding:0!important;margin:0!important;background:transparent;border:0}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-entry="draw"] .client-trace-actions{display:grid;grid-template-columns:1fr 1fr .85fr;gap:6px;margin:0}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-entry="draw"] .client-trace-actions button{display:flex;align-items:center;justify-content:center;min-width:0;min-height:44px!important;padding:6px!important;font-size:12px!important;line-height:1.15;text-align:center;margin:0}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-entry="draw"] .client-trace-actions button:last-child{background:var(--p03-sand)!important;color:var(--p03-bg)!important;border-color:var(--p03-sand)!important}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-entry="draw"] .client-trace-help{font-size:11px;line-height:1.3;margin:0;color:var(--p03-muted)}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-entry="draw"] .client-trace-options{padding:0;margin:0;border:0;background:transparent}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-entry="draw"] .client-trace-options>summary{min-height:44px;display:flex;align-items:center;padding:6px 0;font-size:12px}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-entry="draw"] .client-trace-options:not([open])>:not(summary){display:none!important}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige :is(.client-measure-field,.client-angle-field,.client-measure-pages)[hidden]{display:none!important}
+}
+
+/* A keyboard or a short landscape viewport may need a small inner form scroller;
+   the page, drawing and navigation remain anchored and no input is discarded. */
+@media(max-width:959px) and (max-height:430px){
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-stage="2"] .production-workspace{grid-template-rows:44px minmax(70px,.8fr) minmax(135px,1.2fr);gap:4px}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-stage="2"] .config-card{overflow:hidden}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-stage="2"] #client-step-scroll{flex:1;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;padding:0 2px 2px;scroll-padding:8px}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-stage="2"] #client-step-actions{margin-top:4px;padding-top:4px}
+}
