@@ -43,7 +43,7 @@ function mounting({ready=true}={}){
   getBoundingClientRect:()=>({top:100,left:0,height:300,width:390}),
   getAttribute:key=>key==='src'?'production.html?mode=client&source=store&kind=profile':attributes[key],
   setAttribute:(key,value)=>attributes[key]=value,removeAttribute:key=>delete attributes[key],
-  addEventListener:(name,fn)=>{listeners[name]=fn;},
+  addEventListener:(name,fn)=>{listeners[name]=fn;if(name==='load')frame.loaded=fn;},
   src:'production.html?mode=client&source=store&kind=profile'};
  const box={actorId:'worker-a',mode:'employee',view:'draw',job:'job-a',innerHeight:800,
   location:{href:'https://example.test/chantier.html'},

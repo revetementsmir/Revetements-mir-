@@ -32,6 +32,7 @@ jobs:
       # Fail early on an actual Pliages defect; the full browser, security and
       # Android suites still run on passing release candidates.
       - name: Contrôle rapide Pliages et chargement — avant la longue recette
+        id: field-quick
         env:
           MIR_CHROMIUM_BIN: /usr/bin/google-chrome
           NODE_PATH: ./mobile/node_modules
@@ -93,7 +94,7 @@ jobs:
             artifacts/field-stepper/
             artifacts/temporary-jobs/browser/
       - name: Non-régressions existantes sans serveur
-        if: ${{ !cancelled() && steps.web-adapter.outcome == 'success' }}
+        if: ${{ !cancelled() && steps.web-adapter.outcome == 'success' && steps.field-quick.outcome == 'success' }}
         env:
           MIR_CHROMIUM_BIN: /usr/bin/google-chrome
           NODE_PATH: ./mobile/node_modules
