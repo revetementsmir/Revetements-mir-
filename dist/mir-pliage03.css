@@ -408,8 +408,10 @@ html body.mir-pliage03.mir-prestige[data-client-entry] :is(.eyebrow,#client-step
 html[data-field-pliage03=true] body.mir-pliage03.mir-prestige .mir-field-live-measure{
  fill:var(--p03-text)!important;stroke:var(--p03-drawing)!important;stroke-width:3px!important;paint-order:stroke fill;stroke-linejoin:round;
 }
-html[data-field-pliage03=true] body.mir-pliage03.mir-prestige .mir-field-measured-profile>path[stroke-width="9"]{stroke-width:4px}
-html[data-field-pliage03=true] body.mir-pliage03.mir-prestige .mir-field-measured-profile>path[stroke-width="4"]{stroke-width:1.5px}
+html[data-field-pliage03=true] body.mir-pliage03.mir-prestige .mir-field-measured-profile>path[stroke-width="9"],
+html[data-field-pliage03=true] body.mir-pliage03.mir-prestige .mir-field-review-projection>path[stroke-width="9"]{stroke-width:4px}
+html[data-field-pliage03=true] body.mir-pliage03.mir-prestige .mir-field-measured-profile>path[stroke-width="4"],
+html[data-field-pliage03=true] body.mir-pliage03.mir-prestige .mir-field-review-projection>path[stroke-width="4"]{stroke-width:1.5px}
 @media(max-width:959px){
  html[data-field-pliage03=true]:has(body[data-client-stage="2"]),
  html[data-field-pliage03=true]:has(body[data-client-entry="draw"]){height:100%;overflow:hidden}

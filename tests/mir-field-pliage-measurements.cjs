@@ -105,7 +105,7 @@ function compactFieldRenderer(width,height,indices,production=M){
  const code=['bendAngleLabel','profileAnglesOverlay','publicProfileDiagramContent','fieldProfileDiagramSVG'].map(source).join('\n');
  const win={MIRPliageSurfaces:S,MIRPliage03:{measurementIndices:()=>indices}},host={clientWidth:width,clientHeight:height};
  return new Function('M','window','$','innerWidth','pointOnView','fmt','esc','profileMeasureInput','publicPliage03',
-  'const fieldPliage03=true,tool="select",selectedClientAngle=0;let drawTransform;\n'+code+'\nreturn model=>({svg:fieldProfileDiagramSVG(model),transform:drawTransform});')(
+  'const fieldPliage03=true,clientStep=2,tool="select",selectedClientAngle=0;let drawTransform;\n'+code+'\nreturn model=>({svg:fieldProfileDiagramSVG(model),transform:drawTransform});')(
   production,win,()=>host,width,(point,tr)=>[tr.ox+point[0]*tr.scale,tr.oy-point[1]*tr.scale],value=>String(Math.round(value*10000)/10000),String,()=>true,()=>true);
 }
 
@@ -137,6 +137,7 @@ test('reprendre le tracé après les mesures rétablit ses coordonnées SVG sans
  const start=app.indexOf('function resumeClientTrace('),end=app.indexOf('\nfunction ',start+1);
  assert.ok(start>=0);
  const resume=app.slice(start,end);
+ const traceLayout=['fieldTraceViewport','fieldTraceProjection'].map(name=>{const start=app.indexOf('function '+name+'('),end=app.indexOf('\nfunction ',start+1);return app.slice(start,end);}).join('\n');
  // Exact native keyboard profile, including its non-zero drawing origin.
  const model=M.buildProfile({kind:'profile',template:'custom',name:'Profil dessiné',unit:'in',
   segments:[{label:'A',length:5.5},{label:'B',length:3},{label:'C',length:1.5}],
@@ -156,8 +157,9 @@ test('reprendre le tracé après les mesures rétablit ses coordonnées SVG sans
  for(const compact of [true,false]){
   const result=new Function('model','initialPoints','initialTransform','compact','renderTrace',
    'const fieldPliage03=true,build=()=>model,matchMedia=()=>({matches:compact});'+
-   'const renderDimensions=()=>{},focusClientEntry=()=>{};let drawPoints=initialPoints.map(p=>p.slice()),drawTransform={...initialTransform},clientStep=2,clientEntry="draw",tool="select",view="face",svg;'+
-   'const updateDrawing=()=>{svg=renderTrace(drawTransform,drawPoints,compact);};'+resume+
+   'const document={body:{dataset:{clientEntry:"measures",clientStage:"2"}}},$=()=>({clientWidth:compact?440:800,clientHeight:520});'+
+   'const renderDimensions=()=>{},focusClientEntry=()=>{},renderClientEntry=()=>{document.body.dataset.clientEntry="draw";},syncFieldTraceToolbar=()=>{};let drawPoints=initialPoints.map(p=>p.slice()),drawTransform={...initialTransform},clientStep=2,clientEntry="draw",tool="select",view="face",svg;'+
+   'const updateDrawing=()=>{svg=renderTrace(drawTransform,drawPoints,compact);};'+traceLayout+'\n'+resume+
    ';resumeClientTrace();return {points:drawPoints,transform:drawTransform,step:clientStep,tool,svg};')(model,points,measured,compact,renderTrace);
   assert.equal(result.step,1);assert.equal(result.tool,'draw');
   assert.deepEqual(result.points,points,'origine et coordonnées réelles conservées');

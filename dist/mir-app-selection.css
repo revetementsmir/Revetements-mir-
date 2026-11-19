@@ -93,7 +93,7 @@ body[data-field-shell=true][data-field-design=home-test] .mir-app-heading{flex:n
 body[data-field-shell=true][data-field-design=home-test] .mir-app-heading h1{margin:0!important;font-size:clamp(1.75rem,5.4vw,2.1rem)!important;line-height:1.12;letter-spacing:-.045em;font-weight:400!important}
 body[data-field-shell=true][data-field-design=home-test] .mir-app-heading p{margin:6px 0 0;color:var(--field-muted)!important;font-size:.8125rem}
 body[data-field-shell=true][data-field-design=home-test] .mir-app-heading .mir-app-eyebrow{margin:0 0 8px!important;font-size:.6rem!important;line-height:1.5;letter-spacing:.17em;color:#bda889!important;font-weight:500}
-body[data-field-shell=true][data-field-design=home-test] .mir-app-segments{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;flex:none;min-width:0}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-segments{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;flex:none;min-width:0}
 body[data-field-shell=true][data-field-design=home-test] .mir-app-segments button{min-height:44px;border:1px solid transparent;border-radius:4px;background:#2d2e2a;color:var(--field-muted);font-size:.875rem;font-weight:400;padding:8px}
 body[data-field-shell=true][data-field-design=home-test] .mir-app-segments button[aria-pressed=true]{color:#f4f1ea;background:#454236;border-color:#bda889}
 
@@ -193,9 +193,14 @@ body[data-field-shell=true][data-field-design=home-test] .mir-app-menu .field-ro
 body[data-field-shell=true][data-field-design=home-test] .mir-app-menu .field-row strong{display:flex;align-items:center;gap:13px;font-weight:400;font-size:.875rem;line-height:1.35}
 body[data-field-shell=true][data-field-design=home-test] .mir-app-menu .field-row strong svg{width:19px;height:19px;margin:0;color:#bda889}
 body[data-field-shell=true][data-field-design=home-test] .mir-app-menu .field-row>svg{width:16px;height:16px;margin:0;color:var(--field-muted)}
-body[data-field-shell=true][data-field-design=home-test] .mir-app-drawing{height:var(--field-available-height,calc(100dvh - 175px));display:flex;flex-direction:column;min-height:0;gap:10px}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-drawing{height:var(--field-available-height,calc(100dvh - 175px));display:flex;flex-direction:column;min-height:0;gap:10px;position:relative}
 body[data-field-shell=true][data-field-design=home-test] .mir-app-drawing .mir-app-heading{margin-bottom:2px!important}
 body[data-field-shell=true][data-field-design=home-test] .mir-app-drawing iframe{width:100%;min-height:240px!important;border:1px solid var(--field-border);border-radius:5px;flex:1;background:#242522}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-drawing:is([data-field-drawing-state=loading],[data-field-drawing-state=error]) iframe{visibility:hidden;pointer-events:none}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-drawing .field-drawing-loading{position:absolute;left:0;right:0;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;box-sizing:border-box;padding:20px;border:1px solid var(--field-border);border-radius:5px;background:#242522;color:var(--field-muted);text-align:center}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-drawing .field-drawing-loading[hidden]{display:none!important}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-drawing .field-drawing-loading p{margin:0;font-size:.875rem;line-height:1.5;max-width:32ch}
+body[data-field-shell=true][data-field-design=home-test] .mir-app-drawing [data-field-drawing-retry]{min-height:44px;padding:10px 20px;border:1px solid #bda889;border-radius:4px;background:#454236;color:#f4f1ea;font:inherit}
 
 @media(max-width:380px){
   body[data-field-shell=true][data-field-design=home-test]:not([data-field-view=day]):not([data-field-view=punch]) #portal-main{padding-inline:12px!important}

@@ -23,11 +23,13 @@ function environment(extra={}){
  return {env,nodes};
 }
 
-test('le magasin garde ses trois onglets et sa recherche, sans chantier, catégories permanentes ni barre panier',()=>{
+test('le magasin garde Magasin et Pliages, sans onglet Dessin doublon, avec recherche et panier commun',()=>{
  const {env}=environment();const html=env.fieldCatalogueMarkup();
  assert.match(html,/data-field-catalogue="material"[^>]*>Magasin/);
  assert.match(html,/data-field-catalogue="fold"[^>]*>Pliages/);
- assert.match(html,/data-field-draw[^>]*>Dessin/);
+ assert.doesNotMatch(html,/data-field-draw/,'le dessin se choisit dans le parcours Pliages');
+ const tabs=html.match(/<nav class="mir-app-segments"[\s\S]*?<\/nav>/)?.[0]||'';
+ assert.equal((tabs.match(/<button\b/g)||[]).length,2,'exactement deux onglets de commande');
  assert.match(html,/id="catalogue-search"/);
  assert.match(html,/data-field-store-filters[^>]*aria-haspopup="dialog"[^>]*aria-controls="portal-dialog"/);
  assert.doesNotMatch(html,/id="order-job(?:-reference)?"|mir-app-catalogue-context|id="catalogue-category"|field-store-footer|Ouvrir mon panier/);

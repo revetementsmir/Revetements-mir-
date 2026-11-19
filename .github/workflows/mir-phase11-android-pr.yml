@@ -66,7 +66,7 @@ jobs:
           node tests/mir-field-stepper-browser.cjs || result=1
           node tests/mir-pliage03-field-contract.cjs || result=1
           node --test tests/mir-field-pliage-measurements.cjs || result=1
-          node --test tests/mir-field-horizontal-labels.cjs tests/mir-field-trace-controls.cjs || result=1
+          node --test tests/mir-field-horizontal-labels.cjs tests/mir-field-trace-controls.cjs tests/mir-field-review-labels.cjs || result=1
           node --test tests/mir-field-catalogue-context.cjs || result=1
           node --test tests/mir-temporary-jobs-client.cjs tests/mir-temporary-jobs-metadata.cjs || result=1
           node tests/mir-temporary-jobs-browser.cjs || result=1

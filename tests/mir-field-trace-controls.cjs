@@ -1,6 +1,6 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
-const M=require('../dist/production-model.js');
+const M=require('../dist/production-model.js'),surfaces=require('../dist/mir-pliage-surfaces.js');
 const source=fs.readFileSync(require.resolve('../dist/production-app.js'),'utf8');
 function implementation(name){
  const start=source.indexOf('function '+name+'('),end=source.indexOf('\nfunction ',start+1);
@@ -54,7 +54,7 @@ test('la grille suit toute la surface disponible et le recadrage conserve exacte
  const context={fieldPliage03:true,drawPoints:copy(points),drawTransform:{scale:520/(14*25.4),ox:140,oy:395},drag:null,
   $:()=>stage,matchMedia:()=>({matches:true}),canDrawProfile:()=>true,build:()=>model,drawingModel:()=>({model,illustrative:false}),diagramSVG:()=>'<svg />'};
  const ctx=vm.createContext(context);
- vm.runInContext(implementation('fieldTraceViewport')+'\n'+implementation('refreshFieldTraceCanvas'),ctx);
+ vm.runInContext(['fieldTraceViewport','fieldTraceProjection','refreshFieldTraceCanvas'].map(implementation).join('\n'),ctx);
  const before=JSON.stringify({points:ctx.drawPoints,model});
  const normal=ctx.fieldTraceViewport();assert.ok(Math.abs(normal.width/normal.height-stage.clientWidth/stage.clientHeight)<1e-12,'le ratio SVG remplit le canevas sans étirement');
  stage.clientHeight=360;const expanded=ctx.fieldTraceViewport();assert.ok(expanded.height>normal.height*1.4,'Agrandir ajoute une zone de tracé utile');
@@ -63,4 +63,32 @@ test('la grille suit toute la surface disponible et le recadrage conserve exacte
  for(const [x,y]of points){const px=tr.ox+x*tr.scale,py=tr.oy-y*tr.scale;assert.ok(px>=v.x-1e-6&&px<=v.x+v.width+1e-6&&py>=v.y-1e-6&&py<=v.y+v.height+1e-6,'profil entier visible après réduction');}
  assert.equal(JSON.stringify({points:ctx.drawPoints,model}),before,'agrandir/réduire ne change ni les points ni le modèle');
  const projected=JSON.stringify(ctx.drawTransform);ctx.refreshFieldTraceCanvas();assert.equal(JSON.stringify(ctx.drawTransform),projected,'projection stable sans redimensionnement');
+});
+
+test('retour au tracé : le vrai SVG et ses trois labels tiennent dès le premier rendu du petit canevas',()=>{
+ for(const height of [156,240,300,360])for(const direction of ['left','right']){
+  const draft={kind:'profile',template:'custom',name:'L replié',unit:'in',startAngle:-90,
+   segments:[{label:'A',length:5.5},{label:'B',length:3},{label:'C',length:.75}],
+   bends:[{mode:'signed',angle:90},{mode:'hem',angle:180,direction}]};
+  const model=M.buildProfile(draft),origin=[50.8,50.8],points=model.pointsMM.map(([x,y])=>[x+origin[0],y+origin[1]]),before=JSON.stringify({draft,model,points});
+  const dataset={clientEntry:'measures',clientStage:'2'},stage={clientWidth:377,get clientHeight(){return dataset.clientEntry==='draw'?height:100;},innerHTML:''};
+  const events=[];let firstSVG;
+  const context={M,draft,fieldPliage03:true,kind:'profile',client:true,clientStep:2,clientEntry:'measures',tool:'select',view:'face',drawPoints:copy(points),drawTransform:{scale:1,ox:120,oy:120},drag:null,zoom:1,viewPan:{x:0,y:0},selectedClientAngle:-1,
+   traceGridDivisor:4,snap:true,innerWidth:409,innerHeight:500,editingItemId:null,authoring:false,
+   document:{body:{dataset}},window:{MIRPliageSurfaces:surfaces},
+   $:()=>stage,matchMedia:()=>({matches:true}),build:()=>model,drawingModel:()=>({model,illustrative:false}),clientProfileWizard:()=>true,publicPliage03:()=>true,
+   fmt:n=>String(Math.round(n*1e4)/1e4),esc:n=>String(n??''),
+   renderDimensions:()=>events.push('dimensions'),focusClientEntry:()=>{},
+   renderClientEntry:()=>{dataset.clientEntry='draw';events.push('layout');},syncFieldTraceToolbar:()=>events.push('toolbar'),
+   updateDrawing:()=>{events.push('svg');firstSVG=ctx.diagramSVG(model,{illustrative:false});}};
+  const ctx=vm.createContext(context);
+  vm.runInContext(['fieldTraceViewport','fieldTraceProjection','traceGridStepMM','traceGridSVG','pointOnView','bendAngleLabel','profileAnglesOverlay','publicProfileDiagramContent','diagramSVG','resumeClientTrace'].map(implementation).join('\n'),ctx);
+  ctx.resumeClientTrace();
+  assert.deepEqual(events,['dimensions','layout','toolbar','svg'],'le layout dessin est mesuré avant le tout premier rendu');
+  assert.equal(ctx.clientStep,1);assert.equal(ctx.tool,'draw');
+  assert.deepEqual([...firstSVG.matchAll(/data-marker-label="([^"]+)"/g)].map(m=>m[1]),['A','B','C']);
+  const viewport=ctx.fieldTraceViewport(),tr=ctx.drawTransform;
+  for(const [x,y]of ctx.drawPoints){const px=tr.ox+x*tr.scale,py=tr.oy-y*tr.scale;assert.ok(px>=viewport.x&&px<=viewport.x+viewport.width&&py>=viewport.y&&py<=viewport.y+viewport.height,JSON.stringify({height,direction,px,py,viewport}));}
+  assert.equal(JSON.stringify({draft,model,points:ctx.drawPoints}),before,'retour sans changement de cotes, angle, origine ni points');
+ }
 });

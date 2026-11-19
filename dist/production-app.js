@@ -540,23 +540,25 @@ function fieldTraceViewport(){
  const height=w>0&&h>0?width*h/w:520;
  return {x:compact?100:0,y:(520-height)/2,width,height};
 }
+function fieldTraceProjection(points,viewport,tr=null){
+ if(!points.length)return tr;
+ // Reserve space for the side labels, hem returns and touch handles as well
+ // as the profile itself. This changes only the screen projection.
+ const margin=72,xs=points.map(p=>p[0]),ys=points.map(p=>p[1]);
+ const minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);
+ if(tr&&tr.ox+minX*tr.scale>=viewport.x+margin&&tr.ox+maxX*tr.scale<=viewport.x+viewport.width-margin&&tr.oy-maxY*tr.scale>=viewport.y+margin&&tr.oy-minY*tr.scale<=viewport.y+viewport.height-margin)return tr;
+ const scale=Math.min(tr?.scale??Infinity,Math.max(1,viewport.width-2*margin)/Math.max(.001,maxX-minX),Math.max(1,viewport.height-2*margin)/Math.max(.001,maxY-minY));
+ const cx=(minX+maxX)/2,cy=(minY+maxY)/2,halfW=(maxX-minX)*scale/2,halfH=(maxY-minY)*scale/2;
+ const centerX=tr?Math.max(viewport.x+margin+halfW,Math.min(viewport.x+viewport.width-margin-halfW,tr.ox+cx*scale)):viewport.x+viewport.width/2;
+ const centerY=tr?Math.max(viewport.y+margin+halfH,Math.min(viewport.y+viewport.height-margin-halfH,tr.oy-cy*scale)):viewport.y+viewport.height/2;
+ return {scale,ox:centerX-cx*scale,oy:centerY+cy*scale};
+}
 function refreshFieldTraceCanvas(){
  if(!fieldPliage03||!canDrawProfile()||drag)return;
- const viewport=fieldTraceViewport(),margin=24,tr=drawTransform;
- if(tr&&drawPoints.length){
+ if(drawTransform&&drawPoints.length){
   const model=build(),origin=drawPoints[0];
   const points=model.valid&&model.pointsMM.length===drawPoints.length?model.pointsMM.map(([x,y])=>[x+origin[0],y+origin[1]]):drawPoints;
-  const xs=points.map(p=>p[0]),ys=points.map(p=>p[1]);
-  const minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);
-  if(tr.ox+minX*tr.scale<viewport.x+margin||tr.ox+maxX*tr.scale>viewport.x+viewport.width-margin||tr.oy-maxY*tr.scale<viewport.y+margin||tr.oy-minY*tr.scale>viewport.y+viewport.height-margin){
-   const scale=Math.min(tr.scale,Math.max(1,viewport.width-2*margin)/Math.max(.001,maxX-minX),Math.max(1,viewport.height-2*margin)/Math.max(.001,maxY-minY));
-   const cx=(minX+maxX)/2,cy=(minY+maxY)/2,halfW=(maxX-minX)*scale/2,halfH=(maxY-minY)*scale/2;
-   const centerX=Math.max(viewport.x+margin+halfW,Math.min(viewport.x+viewport.width-margin-halfW,tr.ox+cx*scale));
-   const centerY=Math.max(viewport.y+margin+halfH,Math.min(viewport.y+viewport.height-margin-halfH,tr.oy-cy*scale));
-   // Reframe only the projection when reducing/resizing the canvas. Authored
-   // points, their origin, lengths and angles remain exactly as entered.
-   drawTransform={scale,ox:centerX-cx*scale,oy:centerY+cy*scale};
-  }
+  drawTransform=fieldTraceProjection(points,fieldTraceViewport(),drawTransform);
  }
  const shown=drawingModel();
  $('#production-drawing').innerHTML=diagramSVG(shown.model,{illustrative:shown.illustrative});
@@ -687,7 +689,7 @@ function fieldProfileDiagramSVG(model,{illustrative=false}={}){
   const tr={scale,ox:width/2-(minX+maxX)*scale/2,oy:(height+top-bottom)/2+(minY+maxY)*scale/2};
   return {tr,mapped:points.map(point=>pointOnView(point,tr))};
  };
- const markerIndices=window.MIRPliage03?.measurementIndices?.(model.segments.length)||model.segments.map((_,index)=>index).slice(0,3);
+ const markerIndices=clientStep===4?model.segments.map((_,index)=>index):window.MIRPliage03?.measurementIndices?.(model.segments.length)||model.segments.map((_,index)=>index).slice(0,3);
  const shownAngles={...model,bends:(model.bends||[]).map((bend,index)=>markerIndices.includes(index)&&markerIndices.includes(index+1)?bend:null)};
  const options={bends:model.bends||[],markerModel:model,markerIndices,markers:true,illustrative,paintedMarker:'star',highContrast:true,horizontalBounds:[0,width],verticalBounds:[0,height],angleOverlay:(section,labels,handles)=>profileAnglesOverlay(shownAngles,section,labels,handles,[0,width],[0,height])};
  let content,accepted,legend='';
@@ -708,14 +710,19 @@ function fieldProfileDiagramSVG(model,{illustrative=false}={}){
   }
  }
  drawTransform=accepted.tr;
- if(!illustrative)content=content.replace(/<g class="profile-side-marker" data-marker-label="([^"]+)"[^>]*>/g,(match,label)=>{
+ if(!illustrative&&clientStep===2)content=content.replace(/<g class="profile-side-marker" data-marker-label="([^"]+)"[^>]*>/g,(match,label)=>{
   const index=model.segments.findIndex(segment=>segment.label===label);
   return index>=0&&profileMeasureInput(index,label)?match.replace(/\s+pointer-events="none"/,'').replace(/\s+aria-hidden="true"/,'').replace(/>$/,` data-edit-profile-measure="${index}" role="button" tabindex="0" aria-label="Modifier la cote ${esc(label)}" style="cursor:pointer">`):match;
  });
- return `<svg xmlns="http://www.w3.org/2000/svg" class="mir-field-measured-profile" viewBox="0 0 ${width} ${height}" role="group" aria-label="${esc(model.name)} — ${illustrative?'proportions illustratives':'cotes de la pièce finie'}" data-measurement-presentation="${legend?'legend':illustrative?'illustrative':'dimensions'}"><title>${esc(model.name)} — ${illustrative?'proportions illustratives, sans cotes de fabrication':markerIndices.map(index=>model.segments[index].label+' : '+M.formatMeasurement(model.segments[index].lengthMM,model.unit)).join(' ; ')}</title>${content}${legend}</svg>`;
+ let output=content+legend;
+ if(clientStep===4){
+  drawTransform={scale:accepted.tr.scale*zoom,ox:width/2+(accepted.tr.ox-width/2)*zoom+viewPan.x,oy:height/2+(accepted.tr.oy-height/2)*zoom+viewPan.y};
+  output=`<g class="mir-field-review-projection" transform="translate(${fmt(viewPan.x)} ${fmt(viewPan.y)}) translate(${width/2} ${height/2}) scale(${fmt(zoom)}) translate(${-width/2} ${-height/2})">${output}</g>`;
+ }
+ return `<svg xmlns="http://www.w3.org/2000/svg" class="mir-field-measured-profile" viewBox="0 0 ${width} ${height}" role="group" aria-label="${esc(model.name)} — ${illustrative?'proportions illustratives':'cotes de la pièce finie'}" data-measurement-presentation="${legend?'legend':illustrative?'illustrative':'dimensions'}"><title>${esc(model.name)} — ${illustrative?'proportions illustratives, sans cotes de fabrication':markerIndices.map(index=>model.segments[index].label+' : '+M.formatMeasurement(model.segments[index].lengthMM,model.unit)).join(' ; ')}</title>${output}</svg>`;
 }
 function diagramSVG(model,{illustrative=false,small=false,interactive=true}={}){
- if(fieldPliage03&&clientStep===2&&model.kind==='profile'&&interactive&&!small&&tool==='select'&&matchMedia('(max-width:959px)').matches)return fieldProfileDiagramSVG(model,{illustrative});
+ if(fieldPliage03&&[2,4].includes(clientStep)&&model.kind==='profile'&&interactive&&!small&&tool==='select'&&matchMedia('(max-width:959px)').matches)return fieldProfileDiagramSVG(model,{illustrative});
  if(clientProfileWizard()&&!publicPliage03()&&model.kind==='profile'&&interactive&&!small&&clientStep===2&&innerWidth<780&&tool==='select')return compactClientProfileSVG(model,{illustrative});
  if(model.kind==='panel'&&window.MIRProductionVolume)return panelDiagramSVG(model,{illustrative,small,interactive});
  const freehand=interactive&&tool==='draw'&&model.kind==='profile';
@@ -2604,17 +2611,17 @@ function freeformFinish(){
 function resumeClientTrace(){
  const model=build();
  if(model.valid){const origin=drawPoints[0]||[0,0];drawPoints=model.pointsMM.map(([x,y])=>[x+origin[0],y+origin[1]]);}
- if(fieldPliage03&&model.valid){
-  // Measurements use CSS-sized SVG coordinates; the trace uses its own fixed
-  // viewBox. Reproject the existing points when returning to that coordinate
-  // space instead of reusing the last compact measurement transform.
-  const compact=matchMedia('(max-width:600px)').matches,xs=drawPoints.map(point=>point[0]),ys=drawPoints.map(point=>point[1]);
-  const minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);
-  const scale=Math.min((compact?300:580)/Math.max(1,maxX-minX),340/Math.max(1,maxY-minY));
-  drawTransform={scale,ox:(compact?320:400)-(minX+maxX)*scale/2,oy:255+(minY+maxY)*scale/2};
- }
  clientStep=1;clientEntry='draw';tool='draw';view='face';
- renderDimensions();updateDrawing();focusClientEntry('#production-drawing');
+ renderDimensions();
+ if(fieldPliage03&&model.valid){
+  // Commit the trace layout before reading its viewport: the previous
+  // measurements canvas can be much shorter. Fit before the first SVG render,
+  // including annotation space, rather than waiting for a resize callback.
+  document.body.dataset.clientStage='1';document.body.dataset.clientTrace='true';
+  renderClientEntry(true);syncFieldTraceToolbar();
+  drawTransform=fieldTraceProjection(drawPoints,fieldTraceViewport());
+ }
+ updateDrawing();focusClientEntry('#production-drawing');
 }
 function startProfileDrawing({fullscreen=true}={}){
  freeformRedo=[];selectedTemplate=null;
@@ -3147,14 +3154,14 @@ async function boot(){M=window.MIRProduction;if(!M?.createTemplate)throw new Err
  }
  if(publicPliage03()&&params.get('start')&&!params.get('quick')&&!linked&&!params.get('profile')){clientStep=1;clientEntry=params.get('start')==='models'?'models':'choice';if(params.get('start')==='draw'){if(draft.template==='custom'&&drawPoints.length)resumeClientTrace();else{choose('profile','custom');startProfileDrawing({fullscreen:false});}}render();const entered=new URL(location.href);entered.searchParams.delete('start');history.replaceState(history.state,'',entered.href);params.delete('start');}
  let fieldEntryApplied=false;
- if(fieldPliage03&&['models','draw'].includes(fieldDrawingContext.entry)&&!linked&&!params.get('profile')){
+ if(fieldPliage03&&['choice','models','draw'].includes(fieldDrawingContext.entry)&&!linked&&!params.get('profile')){
   const requestId=typeof fieldDrawingContext.entryRequestId==='string'?fieldDrawingContext.entryRequestId:'';
   const entryKey=KEYS.activeProfile+':entry';
   let enter=!restoredClientDraft;
   if(requestId){try{enter=sessionStorage.getItem(entryKey)!==requestId;}catch{}}
   if(enter){
    clientStep=1;
-   if(fieldDrawingContext.entry==='models'){clientEntry='models';tool='select';}
+   if(['choice','models'].includes(fieldDrawingContext.entry)){clientEntry=fieldDrawingContext.entry;tool='select';}
    else if(draft.template==='custom'&&drawPoints.length)resumeClientTrace();
    else{choose('profile','custom');startProfileDrawing({fullscreen:false});}
    render();fieldEntryApplied=true;

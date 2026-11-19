@@ -161,7 +161,19 @@ async function main(){
   assert.equal(await frame.locator('#production-quantity').inputValue(),'');
   for(const value of ['', '0', '-1', '1.5']){await frame.locator('#production-quantity').fill(value);assert.ok(await frame.locator('#client-step-next').isDisabled());}
   await frame.locator('#production-quantity').fill('2');const configured=(await state(frame)).model;
-  await frame.goto(frame.url(),{waitUntil:'networkidle'});await ready(frame);await stage(frame,4);assert.deepEqual((await state(frame)).model.spec,configured.spec,'reload preserves own draft');await layout(frame);await shot(page,'field-review-390');
+  await frame.goto(frame.url(),{waitUntil:'networkidle'});await ready(frame);await stage(frame,4);assert.deepEqual((await state(frame)).model.spec,configured.spec,'reload preserves own draft');await layout(frame);await settled(frame);
+  const reviewLabels=await frame.evaluate(()=>{
+   const host=document.querySelector('#production-drawing').getBoundingClientRect();
+   return [...document.querySelectorAll('#production-drawing .profile-side-marker text,#production-drawing .mir-angle-annotation text')].map(node=>{
+    const matrix=node.getScreenCTM(),rect=node.getBoundingClientRect();
+    return{text:node.textContent,pixels:parseFloat(getComputedStyle(node).fontSize)*Math.hypot(matrix.c,matrix.d),horizontal:Math.abs(matrix.b)<.01,
+     visible:rect.left>=host.left-.5&&rect.right<=host.right+.5&&rect.top>=host.top-.5&&rect.bottom<=host.bottom+.5};
+   });
+  });
+  assert.equal(reviewLabels.filter(label=>label.text.includes(' po')).length,configured.segments.length,'all review dimensions remain visible');
+  assert.ok(reviewLabels.some(label=>label.text==='113°'),'the actual whole-degree angle remains visible');
+  assert.ok(reviewLabels.every(label=>label.pixels>=14&&label.horizontal&&label.visible),'review labels readable at 100% without zoom: '+JSON.stringify(reviewLabels));
+  report.checks.push({name:'field-review-horizontal-dimensions-and-degrees-at-readable-css-size',passed:true,labels:reviewLabels});await shot(page,'field-review-390');
   const savedDraft=await frame.evaluate(key=>window.__qaRead(key),keyA);assert.ok(savedDraft);
   frame=await open(contextData('worker-a','job-b'));await stage(frame,1);assert.notEqual(await frame.evaluate(()=>MIRProductionWorkspace.storageKeys.activeProfile),keyA);await untouched(frame);
   frame=await open(contextData('worker-b','job-a'));await stage(frame,1);assert.notEqual(await frame.evaluate(()=>MIRProductionWorkspace.storageKeys.activeProfile),keyA);await untouched(frame);
