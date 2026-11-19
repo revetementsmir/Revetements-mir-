@@ -26,14 +26,103 @@ check('reediting preserves current cart quantity without committing a revision',
 const parent=fs.readFileSync(path.resolve(__dirname,'../dist/chantier-app.js'),'utf8');
 const mountBegin=parent.indexOf('function mountFieldDrawing('),mountEnd=parent.indexOf('\n  function authorizedFieldJobs',mountBegin);assert.ok(mountBegin>0&&mountEnd>mountBegin);
 function mounting({ready=true}={}){
- const appended=[],calls=[],doc={documentElement:{dataset:{}},createElement:tag=>({tag}),head:{append:node=>appended.push(node)},addEventListener(){},defaultView:{addEventListener:(name,fn)=>{if(name==='mir-production-ready')doc.ready=fn;}}};
- const workspace={editFieldOrderItem:(id,options)=>{calls.push({id,quantity:options.quantity});return true;}};if(ready)doc.defaultView.MIRProductionWorkspace=workspace;
- const frame={dataset:{},style:{},contentDocument:doc,isConnected:true,getBoundingClientRect:()=>({top:100}),addEventListener:(name,fn)=>{if(name==='load')frame.loaded=fn;}};
- const box={actorId:'worker-a',mode:'employee',view:'draw',job:'job-a',innerHeight:800,ui:{fieldDrawingRequest:'request-a',fieldDrawingEdit:{id:'M001',quantity:6,ownerId:'worker-a',jobId:'job-a',role:'employee',requestId:'request-a'}},$ :()=>({getBoundingClientRect:()=>({top:740})}),terrainRole:()=>true,toast(){}};
- box.currentJobId=()=>box.job;vm.createContext(box);vm.runInContext(parent.slice(mountBegin,mountEnd),box);box.mountFieldDrawing(frame);
- return{box,frame,doc,appended,calls,workspace};
+ const appended=[],calls=[],listeners={},attributes={},overlays={};
+ const message={textContent:'',setAttribute(){}},retry={hidden:true,addEventListener:(event,fn)=>{if(event==='click')retry.click=fn;}};
+ const overlay={dataset:{},style:{},hidden:false,querySelector:key=>({'[data-field-drawing-message]':message,'[data-field-drawing-retry]':retry})[key]};
+ const section={dataset:{},querySelector:key=>key==='[data-field-drawing-status]'?overlay:null,getBoundingClientRect:()=>({top:0,left:0})};
+ const workspace={editFieldOrderItem:(id,options)=>{calls.push({id,quantity:options.quantity});return true;}};
+ const win={listeners:{},addEventListener(name,fn){this.listeners[name]=fn;},MIRProductionWorkspace:ready?workspace:null,MIRFieldChoices:null};
+ const doc={location:{pathname:'/production.html'},documentElement:{dataset:{fieldDrawing:'true',mirFieldStartup:'ready',mirProductionReady:'true'}},
+  createElement:tag=>({tag,sheet:tag==='link'?null:undefined}),
+  head:{append:(...nodes)=>appended.push(...nodes)},
+  addEventListener(){},
+  querySelector:key=>key==='#production-drawing'?{}:key.includes('mir-pliage03.css')||key.includes('mir-field-trace.css')?{sheet:{}}:null,
+  defaultView:win};
+ const frame={dataset:{},style:{},attrs:attributes,isConnected:true,
+  closest:()=>section,
+  getBoundingClientRect:()=>({top:100,left:0,height:300,width:390}),
+  getAttribute:key=>key==='src'?'production.html?mode=client&source=store&kind=profile':attributes[key],
+  setAttribute:(key,value)=>attributes[key]=value,removeAttribute:key=>delete attributes[key],
+  addEventListener:(name,fn)=>{listeners[name]=fn;},
+  src:'production.html?mode=client&source=store&kind=profile'};
+ const box={actorId:'worker-a',mode:'employee',view:'draw',job:'job-a',innerHeight:800,
+  location:{href:'https://example.test/chantier.html'},
+  ui:{fieldDrawingRequest:'request-a',fieldDrawingEdit:{id:'M001',quantity:6,ownerId:'worker-a',jobId:'job-a',role:'employee',requestId:'request-a'}},
+  window:{addEventListener(){},removeEventListener(){}},
+  MutationObserver:class{observe(){}disconnect(){}},
+  requestAnimationFrame:fn=>fn(),
+  clearTimeout(){},setTimeout(fn){this.timeout=fn;return 1;},
+  $:key=>key==='#portal-navigation'?{getBoundingClientRect:()=>({top:740})}:key==='#portal-content'?{}:null,
+  terrainRole:()=>true,toast(){},URL,console};
+ box.currentJobId=()=>box.job;
+ box.canKeepFieldDrawing=()=>frame.isConnected&&box.view==='draw'&&box.actorId===frame.dataset.fieldActor&&box.job===frame.dataset.fieldJob&&box.mode===frame.dataset.fieldRole;
+ vm.createContext(box);vm.runInContext(parent.slice(mountBegin,mountEnd),box);box.mountFieldDrawing(frame);
+ const fireReady=()=>{
+   frame.loaded();
+   assert.equal(section.dataset.fieldDrawingState,'loading','first render remains masked even after document load');
+   assert.equal(frame.attrs['aria-hidden'],'true');
+   const stylesheet=appended.find(node=>node.tag==='link'),script=appended.find(node=>node.tag==='script');
+   assert.ok(stylesheet&&script,'real controls are loaded as separate resources');
+   stylesheet.sheet={};stylesheet.onload();
+   win.MIRProductionWorkspace=workspace;
+   win.MIRFieldChoices={upgrade(){}};
+   script.onload();
+   return{stylesheet,script};
+ };
+ return {box,frame,doc,win,section,overlay,message,retry,appended,calls,workspace,fireReady};
 }
-check('real parent mount injects only native controls and consumes the matching edit once',()=>{const x=mounting();x.frame.loaded();assert.deepEqual(x.calls,[{id:'M001',quantity:6}]);assert.equal(x.box.ui.fieldDrawingEdit,undefined);assert.deepEqual(x.appended.filter(n=>n.tag==='link').map(n=>n.href),['mir-field-controls.css']);assert.deepEqual(x.appended.filter(n=>n.tag==='script').map(n=>n.src),['mir-field-controls.js']);});
-check('delayed parent editing cannot cross actor, chantier, role, view or request',()=>{for(const [key,value]of[['actorId','worker-b'],['job','job-b'],['mode','chef_equipe'],['view','catalogue'],['request','request-b'],['connected',false]]){const x=mounting({ready:false});x.frame.loaded();if(key==='request')x.box.ui.fieldDrawingRequest=value;else if(key==='connected')x.frame.isConnected=value;else x.box[key]=value;x.doc.defaultView.MIRProductionWorkspace=x.workspace;x.doc.ready();assert.equal(x.calls.length,0,key);assert.equal(x.box.ui.fieldDrawingEdit,undefined,key);}});
-check('an old iframe or callback never consumes a newer edit request',()=>{for(const timing of['before-load','before-ready']){const x=mounting({ready:false});if(timing==='before-ready')x.frame.loaded();const fresh={...x.box.ui.fieldDrawingEdit,requestId:'new-request'};x.box.ui.fieldDrawingEdit=fresh;x.box.ui.fieldDrawingRequest=fresh.requestId;if(timing==='before-load')x.frame.loaded();else{x.doc.defaultView.MIRProductionWorkspace=x.workspace;x.doc.ready();}assert.equal(x.calls.length,0);assert.equal(x.box.ui.fieldDrawingEdit,fresh);}});
-console.log(JSON.stringify({passed:true,checks,scope:'actual field context/key logic and personal edit entrypoint; no browser rendering claim'}));
+check('real mount hides the old document until both styles and controls are ready',()=>{
+ const x=mounting();
+ assert.equal(x.section.dataset.fieldDrawingState,'loading');
+ assert.equal(x.frame.attrs['aria-hidden'],'true');
+ x.fireReady();
+ assert.equal(x.section.dataset.fieldDrawingState,'ready');
+ assert.equal(x.frame.attrs['aria-hidden'],undefined);
+ assert.equal(x.frame.inert,false);
+ assert.equal(x.calls.length,1);
+ assert.deepEqual(x.calls,[{id:'M001',quantity:6}]);
+ assert.equal(x.box.ui.fieldDrawingEdit,undefined);
+ assert.equal(x.appended.filter(n=>n.tag==='link')[0].href,'mir-field-controls.css');
+ assert.equal(x.appended.filter(n=>n.tag==='script')[0].src,'mir-field-controls.js');
+});
+check('a delayed child cannot consume editing from a different actor, chantier, role or request',()=>{
+ for(const [key,value]of[['actorId','worker-b'],['job','job-b'],['mode','chef_equipe'],['view','catalogue'],['request','request-b'],['connected',false]]){
+  const x=mounting({ready:false});
+  x.frame.loaded();
+  if(key==='request')x.box.ui.fieldDrawingRequest=value;
+  else if(key==='connected')x.frame.isConnected=value;
+  else x.box[key]=value;
+  const link=x.appended.find(n=>n.tag==='link'),script=x.appended.find(n=>n.tag==='script');
+  link.sheet={};link.onload();
+  x.win.MIRProductionWorkspace=x.workspace;x.win.MIRFieldChoices={upgrade(){}};
+  script.onload();
+  assert.equal(x.calls.length,0,key);
+  assert.notEqual(x.section.dataset.fieldDrawingState,'ready',key);
+ }
+});
+check('newer edit requests are never overwritten by an old iframe event',()=>{
+ const x=mounting({ready:false});x.frame.loaded();
+ const fresh={...x.box.ui.fieldDrawingEdit,requestId:'new-request'};
+ x.box.ui.fieldDrawingEdit=fresh;x.box.ui.fieldDrawingRequest=fresh.requestId;
+ x.win.MIRProductionWorkspace=x.workspace;x.win.MIRFieldChoices={upgrade(){}};
+ const link=x.appended.find(n=>n.tag==='link'),script=x.appended.find(n=>n.tag==='script');
+ link.sheet={};link.onload();script.onload();
+ assert.equal(x.calls.length,0);
+ assert.equal(x.box.ui.fieldDrawingEdit,fresh);
+ assert.notEqual(x.section.dataset.fieldDrawingState,'ready');
+});
+check('failed field controls remain private and offer a retry instead of showing the public UI',()=>{
+ const x=mounting();
+ x.frame.loaded();x.appended.find(n=>n.tag==='link').onerror();
+ assert.equal(x.section.dataset.fieldDrawingState,'error');
+ assert.equal(x.frame.attrs['aria-hidden'],'true');
+ assert.equal(x.frame.style.visibility,'hidden');
+ assert.equal(x.retry.hidden,false);
+});
+check('a child without verified same-origin field startup never becomes visible',()=>{
+ const x=mounting();x.doc.documentElement.dataset.fieldDrawing='false';x.frame.loaded();
+ assert.equal(x.section.dataset.fieldDrawingState,'error');
+ assert.equal(x.frame.attrs['aria-hidden'],'true');
+ assert.equal(x.calls.length,0);
+});
+console.log(JSON.stringify({passed:true,checks,scope:'actual field context/key logic; parent loader readiness, rejection and edit isolation (simulated DOM), no browser rendering claim'}));

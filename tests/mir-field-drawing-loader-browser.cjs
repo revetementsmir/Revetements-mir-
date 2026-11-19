@@ -59,7 +59,7 @@ const snapshot=()=>{const section=document.querySelector('.mir-app-drawing'),fra
     retryPage.setDefaultTimeout(10000);
     await retryPage.route('**/*',r=>r.request().url().startsWith(origin)?r.continue():r.abort());
     let blocked=0;
-    await retryPage.route('**/mir-field-controls.js*',r=>{if(blocked++===0)return r.abort('failed');return r.continue();});
+    await retryPage.route('**/mir-field-controls.js*',r=>{if(!r.request().frame().parentFrame())return r.continue();if(blocked++===0)return r.abort('failed');return r.continue();});
     await retryPage.goto(origin+'/chantier.html?chef=1');
     await retryPage.locator('#field-header').waitFor();
     await retryPage.locator('#portal-navigation [data-view=command]').click();
