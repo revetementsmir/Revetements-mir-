@@ -25,7 +25,7 @@ async function checkBrandCards(browser,base){
     const errors=[];
     page.on('pageerror',error=>errors.push(error.message));
     try{
-      await page.goto(base+'/boutique.html#collections',{waitUntil:'domcontentloaded'});
+      await page.goto(base+'/boutique.html?view=brands#collections',{waitUntil:'domcontentloaded'});
       const grid=page.locator('#shop-brand-directory');
       const cards=grid.locator('.brand-collection-card');
       await cards.first().waitFor({state:'visible'});
@@ -37,10 +37,17 @@ async function checkBrandCards(browser,base){
         const copy=cards.map(c=>box(c.querySelector('.brand-collection-copy')));
         return {
           count:cards.length, columns:getComputedStyle(el).gridTemplateColumns.split(' ').length,
-          fits:cards.every((c,i)=>box(c).right<=innerWidth+1&&tiles[i].right<=copy[i].left&&copy[i].right<=box(c).right),
-          sameTile:tiles.every(t=>Math.abs(t.width-tiles[0].width)<1&&Math.abs(t.height-t.width)<1),
+          // Prestige cards stack the photo over copy; the earlier industrial
+          // catalogue placed a square thumbnail next to copy.
+          fits:cards.every((c,i)=>{
+            const card=box(c),tile=tiles[i],label=copy[i];
+            return card.left>=-2&&card.right<=innerWidth+2&&tile.left>=card.left-2&&
+              tile.right<=card.right+2&&label.left>=card.left-2&&label.right<=card.right+2&&
+              tile.bottom<=label.top+2;
+          }),
+          sameTile:tiles.every(t=>t.height>80&&t.width>80&&Math.abs(t.width-tiles[0].width)<1&&Math.abs(t.height-tiles[0].height)<1),
           height:Math.max(...cards.map(c=>box(c).height)), pageWidth:document.documentElement.scrollWidth,
-          columnsAligned:cards.every(c=>getComputedStyle(c).display==='grid')
+          columnsAligned:cards.every(c=>{const style=getComputedStyle(c);return style.display==='flex'&&style.flexDirection==='column'})
         };
       });
       const brandOptions=await page.locator('#shop-brand option').evaluateAll(options=>options.filter(option=>option.value!=='all').map(option=>option.value));
@@ -58,7 +65,7 @@ async function checkBrandCards(browser,base){
         console.error('MIR 320 overflow source: '+JSON.stringify({width,scrollWidth:layout.pageWidth,offender}));
       }
       assert.ok(layout.pageWidth<=width+2,'Pas de débordement horizontal à '+width);
-      if(width<=430)assert.ok(layout.height<=145,'Cartes compactes à '+width+' : '+layout.height);
+      if(width<=430)assert.ok(layout.height>=180&&layout.height<=650,'Cartes Prestige complètes, sans hauteur démesurée à '+width+' : '+layout.height);
       const kaycan=cards.filter({has:page.getByRole('heading',{name:'Kaycan',exact:true})});
       assert.match(await kaycan.locator('img').getAttribute('src'),/kaycan-soffit-installed/);
       const jdp=cards.filter({has:page.getByRole('heading',{name:'JDP / Juste du Pin',exact:true})});

@@ -40,6 +40,9 @@ const snapshot=()=>{const section=document.querySelector('.mir-app-drawing'),fra
     await page.locator('[data-field-catalogue=fold]').click();
     await page.waitForFunction(()=>document.querySelector('#field-drawing-frame')?.contentDocument?.documentElement.dataset.fieldDrawing==='true');
     await Promise.race([wasHeld,new Promise((_,reject)=>setTimeout(()=>reject(new Error('Deferred editor script was not requested within 10 seconds.')),10000))]);
+    // Head parser requests deferred JS before the old intro exists in DOM.
+    // Require that exact old public title to exist before checking invisibility.
+    await page.waitForFunction(()=>!!document.querySelector('#field-drawing-frame')?.contentDocument?.querySelector('.production-intro'),null,{timeout:10000});
     const whileHeld=await page.evaluate(snapshot);
     assert.equal(held,1,'the deferred editor bootstrap was actually delayed');checks++;
     assert.deepEqual(whileHeld.tabs,['Magasin','Pliages']);checks++;
