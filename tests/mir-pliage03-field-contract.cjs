@@ -38,7 +38,7 @@ function mounting({ready=true}={}){
   addEventListener(){},
   querySelector:key=>key==='#production-drawing'?{}:key.includes('mir-pliage03.css')||key.includes('mir-field-trace.css')?{sheet:{}}:null,
   defaultView:win};
- const frame={dataset:{},style:{},attrs:attributes,isConnected:true,
+ const frame={dataset:{},style:{},attrs:attributes,isConnected:true,contentDocument:doc,contentWindow:win,
   closest:()=>section,
   getBoundingClientRect:()=>({top:100,left:0,height:300,width:390}),
   getAttribute:key=>key==='src'?'production.html?mode=client&source=store&kind=profile':attributes[key],
