@@ -119,6 +119,7 @@ async function main(){
           // Prestige intentionally uses only logo and signature in the footer.
           // The classic client shell keeps its five footer destinations.
           footer:box?.width>0&&box.left>=0&&box.right<=innerWidth&&(prestige?footerNavCount===0:footerNavCount===5),
+          privatePortal:(()=>{const main=document.querySelector('#portal-main'),nav=document.querySelector('#portal-navigation'),shell=document.querySelector('.portal-shell'),footer=document.querySelector('footer.portal-footer');return !!(main&&nav&&shell&&footer&&document.documentElement.scrollWidth<=innerWidth+2);})(),
           heroFits:!hero||(content.top>=frame.top&&content.bottom<=frame.bottom&&content.left>=frame.left&&content.right<=frame.right),
           logo:!!logo,estimate:(()=>{
             if(prestige){
@@ -139,7 +140,8 @@ async function main(){
       assert.equal(result.accent,result.prestige?'#bda889':'#348511',name+' '+size.id+': approved accent for the actual public shell');
       assert.equal(result.paper,'#fafaf7',name+' '+size.id+': fond');
       assert.ok(result.compact||result.estimate,name+' '+size.id+': bouton Estimation masqué ou hors écran');
-      assert.ok(result.footer,name+' '+size.id+': pied de page commun absent ou hors écran');
+      if(name==='chantier')assert.ok(result.privatePortal,name+' '+size.id+': espace chantier ou navigation privée absent/hors écran');
+      else assert.ok(result.footer,name+' '+size.id+': pied de page public absent ou hors écran');
       assert.ok(result.heroFits,name+' '+size.id+': texte ou bouton du hero rogné');
       if(harmony){assert.match(await sharedMenu.locator('.mir-home-estimate').getAttribute('href'),/estimation\.html$/);await page.keyboard.press('Escape');assert.equal(await sharedMenu.isVisible(),false);}
       if(['boutique','produit','selection','pliage','plan'].includes(name)){
