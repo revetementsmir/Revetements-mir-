@@ -120,6 +120,7 @@ jobs:
           mir_check node tests/mir-punch-approved-browser.cjs
           mir_check node tests/mir-field-choice-refresh-browser.cjs
           mir_check node tests/mir-field-drawing-refresh-browser.cjs
+          mir_check node tests/mir-field-drawing-loader-browser.cjs
           mir_check node tests/mir-team-enrollment-integration.cjs
           mir_check node mobile/tools/test-enrollment-web.cjs
           mir_check node tests/mir-team-invitation-email.cjs
@@ -151,6 +152,7 @@ jobs:
             artifacts/mir-environments/
             artifacts/mir-responsive-atelier/
             artifacts/mir-annotations/
+            artifacts/field-drawing-loader/
   android-test:
     # Delivery gate for this exact reviewed revision, not a boundary against a
     # collaborator who is allowed to change the workflow itself.

@@ -1193,7 +1193,7 @@
     return `<section class="field-store-page mir-app-c02">
       <header class="field-store-title mir-app-heading"><div><p class="mir-app-eyebrow">MATÉRIEL ET PLIAGES</p><h1>Commande</h1></div></header>
       <section id="employee-browse" aria-label="Choisir le matériel">
-        <nav class="mir-app-segments" aria-label="Type de commande"><button type="button" data-field-catalogue="material" aria-pressed="true">Magasin</button><button type="button" data-field-catalogue="fold" aria-pressed="false">Pliages</button><button type="button" data-field-draw aria-pressed="false">Dessin</button></nav>
+        <nav class="mir-app-segments" aria-label="Type de commande"><button type="button" data-field-catalogue="material" aria-pressed="true">Magasin</button><button type="button" data-field-catalogue="fold" aria-pressed="false">Pliages</button></nav>
         <div class="mir-app-search-row"><label class="search-field field-store-search"><span class="sr-only">Rechercher un article</span>${icon('search')}<input id="catalogue-search" type="search" placeholder="Rechercher un article" value="${esc(query)}"></label><button type="button" class="mir-app-filter-button" data-field-store-filters aria-label="Catégories et favoris" aria-haspopup="dialog" aria-controls="portal-dialog">${icon('menu')}</button></div>
         <div class="field-store-results"><div class="mir-app-results-heading"><h2>Articles</h2><p id="catalogue-count" aria-live="polite"></p></div><div id="catalogue-grid"></div></div>
         <div class="mir-app-store-tools"><nav class="field-store-pages" aria-label="Pages du catalogue"><button type="button" data-field-page="previous" aria-label="Page précédente">←</button><span data-field-page-label></span><button type="button" data-field-page="next" aria-label="Page suivante">→</button></nav><button type="button" class="mir-app-orders-link" data-view="orders">${icon('plan')} Mes commandes ${icon('arrow')}</button></div>
@@ -1243,30 +1243,133 @@
     return template.innerHTML;
   }
   function fieldSecondaryMarkup(html,kind){const t=document.createElement('template');t.innerHTML=html;const f=t.content.querySelector('form[id$="-draft-form"]');if(!f)return html;f.dataset.preserveDraft='true';const holder=f.closest('details');if(holder){holder.open=false;holder.querySelector('summary').textContent=kind==='expense'?'Ajouter une dépense':'Demander un congé ou une absence';}if(kind==='expense'){const receipt=document.createElement('label');receipt.innerHTML='Photo du reçu (facultative au brouillon)<input name="receipt" type="file" accept="image/jpeg,image/png,application/pdf" capture="environment">';f.prepend(receipt);const extra=document.createElement('details');extra.className='field-form-details';extra.innerHTML='<summary>Détails de la dépense</summary>';for(const name of ['expenseDate','categoryCode','amountMode','note']){const label=f.querySelector('[name='+name+']')?.closest('label');if(label)extra.append(label);}f.querySelector('button')?.before(extra);const job=f.querySelector('[name=jobId]');if(job)for(const option of job.options){option.toggleAttribute('selected',option.value===currentJobId());}}else{f.querySelector('[name=endDate]')?.closest('label').setAttribute('data-absence-end','');for(const name of ['startTime','endTime'])f.querySelector('[name='+name+']')?.closest('label').setAttribute('data-absence-partial','');}return t.innerHTML;}
-  window.MIRFieldDrawingContext=()=>terrainRole()&&view==='draw'&&actorId?{personal:true,ownerId:actorId,jobId:currentJobId(),presentation:'pliage03',entry:ui.fieldDrawingEntry||'models',entryRequestId:ui.fieldDrawingRequest||''}:null;
+  window.MIRFieldDrawingContext=()=>terrainRole()&&view==='draw'&&actorId?{personal:true,ownerId:actorId,jobId:currentJobId(),presentation:'pliage03',entry:ui.fieldDrawingEntry||'choice',entryRequestId:ui.fieldDrawingRequest||''}:null;
   function canKeepFieldDrawing(changed){const frame=$('#field-drawing-frame'),job=frame?.dataset.fieldJob||'';return !changed&&terrainRole()&&view==='draw'&&frame?.dataset.fieldActor===actorId&&frame.dataset.fieldRole===mode&&job===currentJobId()&&(!job||jobsForActor().some(j=>j.id===job&&j.closed!==true));}
   function mountFieldDrawing(frame){
-    frame.dataset.mounted='true';frame.dataset.fieldActor=actorId;frame.dataset.fieldRole=mode;frame.dataset.fieldJob=currentJobId();frame.dataset.fieldRequest=ui.fieldDrawingRequest||'';
-    frame.addEventListener('load',()=>{
-      const nav=$('#portal-navigation');frame.style.height=Math.max(240,(nav?.getBoundingClientRect().top||innerHeight)-frame.getBoundingClientRect().top-12)+'px';
-      const doc=frame.contentDocument;if(!doc)return;
-      doc.documentElement.dataset.fieldDrawing='true';
-      const controls=doc.createElement('link');controls.rel='stylesheet';controls.href='mir-field-controls.css';doc.head.append(controls);
-      const choices=doc.createElement('script');choices.src='mir-field-controls.js';choices.onload=()=>doc.defaultView.MIRFieldChoices?.upgrade();doc.head.append(choices);
-      if(ui.fieldDrawingEdit?.requestId===frame.dataset.fieldRequest){
-        const pending=ui.fieldDrawingEdit;
-        const edit=()=>{
-          if(ui.fieldDrawingEdit!==pending)return;
-          const sameScope=frame.isConnected&&view==='draw'&&terrainRole()&&pending.ownerId===actorId&&pending.ownerId===frame.dataset.fieldActor&&pending.jobId===currentJobId()&&pending.jobId===frame.dataset.fieldJob&&pending.role===mode&&pending.role===frame.dataset.fieldRole&&pending.requestId===ui.fieldDrawingRequest&&pending.requestId===frame.dataset.fieldRequest;
-          delete ui.fieldDrawingEdit;if(!sameScope)return;
-          const ok=doc.defaultView.MIRProductionWorkspace?.editFieldOrderItem?.(pending.id,{quantity:pending.quantity});if(!ok)toast('Ce pliage ne peut plus être modifié dans ce chantier.');
-        };
-        if(doc.defaultView.MIRProductionWorkspace)edit();else doc.defaultView.addEventListener('mir-production-ready',edit,{once:true});
+    const section=frame.closest('.mir-app-drawing');
+    const overlay=section?.querySelector('[data-field-drawing-status]');
+    const message=overlay?.querySelector('[data-field-drawing-message]');
+    const retry=overlay?.querySelector('[data-field-drawing-retry]');
+    if(!section||!overlay||!message||!retry)return;
+    frame.dataset.mounted='true';
+    frame.dataset.fieldActor=actorId;
+    frame.dataset.fieldRole=mode;
+    frame.dataset.fieldJob=currentJobId();
+    frame.dataset.fieldRequest=ui.fieldDrawingRequest||'';
+    let generation=0,deadline=0,disposed=false;
+    const sameScope=()=>!disposed&&frame.isConnected&&canKeepFieldDrawing(false)&&frame.dataset.fieldRequest===(ui.fieldDrawingRequest||'');
+    function layout(){
+      if(!frame.isConnected)return;
+      const nav=$('#portal-navigation');
+      const target=Math.max(240,(nav?.getBoundingClientRect().top||innerHeight)-frame.getBoundingClientRect().top-12);
+      if(Math.abs(frame.getBoundingClientRect().height-target)>2)frame.style.height=target+'px';
+      const area=frame.getBoundingClientRect(),host=section.getBoundingClientRect();
+      overlay.style.top=Math.max(0,area.top-host.top)+'px';
+      overlay.style.left=Math.max(0,area.left-host.left)+'px';
+      overlay.style.width=Math.max(0,area.width)+'px';
+      overlay.style.height=Math.max(0,area.height)+'px';
+    }
+    function show(status,detail){
+      section.dataset.fieldDrawingState=status;
+      overlay.dataset.fieldDrawingStatus=status;
+      overlay.hidden=status==='ready';
+      message.textContent=detail||'Chargement de Pliages…';
+      retry.hidden=status!=='error';
+      frame.inert=status!=='ready';
+      if(status==='ready'){frame.removeAttribute('aria-hidden');frame.style.visibility='visible';}
+      else{frame.setAttribute('aria-hidden','true');frame.style.visibility='hidden';}
+      layout();
+    }
+    function fail(detail,token){
+      if(token!==generation||!sameScope()||section.dataset.fieldDrawingState!=='loading')return;
+      clearTimeout(deadline);
+      show('error',detail||'Impossible de charger les Pliages. Réessayez.');
+    }
+    function beginLoad(){
+      generation++;
+      clearTimeout(deadline);
+      show('loading','Chargement de Pliages…');
+      const token=generation;
+      deadline=setTimeout(()=>fail('Le configurateur prend trop de temps à charger. Réessayez.',token),20000);
+    }
+    function onLoad(){
+      const token=generation;
+      if(!sameScope()||section.dataset.fieldDrawingState!=='loading')return;
+      let doc,win;
+      try{doc=frame.contentDocument;win=frame.contentWindow;}catch(_){fail('Le configurateur n’est pas accessible depuis ce chantier.',token);return;}
+      if(!doc||!win)return;
+      if(!doc.location.pathname.endsWith('/production.html'))return;
+      if(doc.documentElement.dataset.fieldDrawing!=='true'){
+        fail('Le configurateur ne reconnaît pas la session chantier. Réessayez.',token);return;
       }
-
-      const style=doc.createElement('style');style.textContent='html[data-field-drawing] body :is(#mir-harmony-header,.workshop-banner,.production-header,.mir-client-return,.mir-client-signature,.mir-signature-footer,.mir-unified-client-shortcut,.client-entry-return,footer){display:none!important}html[data-field-drawing],html[data-field-drawing] body{min-height:0!important;margin:0!important}';doc.head.append(style);
-      doc.addEventListener('click',event=>{const link=event.target.closest('a[href]');if(!link)return;const url=new URL(link.href,location.href);if(url.origin===location.origin&&url.pathname.endsWith('/chantier.html')&&url.searchParams.get('view')==='orders'){event.preventDefault();setView('catalogue');reviewingOrder=true;renderCart();}},true);
+      if(doc.documentElement.dataset.mirFieldStartup==='error'){
+        fail('Le configurateur n’a pas démarré. Réessayez.',token);return;
+      }
+      let cssReady=false,choicesReady=false;
+      const complete=()=>{
+        if(token!==generation||!sameScope()||section.dataset.fieldDrawingState!=='loading')return;
+        if(doc.documentElement.dataset.mirFieldStartup==='error'){
+          fail('Le configurateur n’a pas démarré. Réessayez.',token);return;
+        }
+        if(!cssReady||!choicesReady||
+          doc.documentElement.dataset.mirFieldStartup!=='ready'||
+          doc.documentElement.dataset.mirProductionReady!=='true'||
+          !doc.querySelector('link[href*="mir-pliage03.css"]')?.sheet||
+          !doc.querySelector('link[href*="mir-field-trace.css"]')?.sheet||
+          !win.MIRProductionWorkspace||typeof win.MIRFieldChoices?.upgrade!=='function'||
+          !doc.querySelector('#production-drawing'))return;
+        try{win.MIRFieldChoices.upgrade();}
+        catch(_){fail('Les contrôles du configurateur ne sont pas prêts.',token);return;}
+        if(ui.fieldDrawingEdit?.requestId===frame.dataset.fieldRequest){
+          const pending=ui.fieldDrawingEdit;
+          const valid=sameScope()&&pending.ownerId===actorId&&pending.ownerId===frame.dataset.fieldActor&&pending.jobId===currentJobId()&&pending.jobId===frame.dataset.fieldJob&&pending.role===mode&&pending.role===frame.dataset.fieldRole;
+          delete ui.fieldDrawingEdit;
+          if(valid&&!win.MIRProductionWorkspace.editFieldOrderItem?.(pending.id,{quantity:pending.quantity})){
+            toast('Ce pliage ne peut plus être modifié dans ce chantier.');
+          }
+        }
+        clearTimeout(deadline);
+        show('ready','Pliages prêts.');
+      };
+      win.addEventListener('mir-production-ready',complete,{once:true});
+      win.addEventListener('mir-production-error',()=>fail('Le configurateur n’a pas démarré. Réessayez.',token),{once:true});
+      const style=doc.createElement('style');
+      style.textContent='html[data-field-drawing] body :is(#mir-harmony-header,.workshop-banner,.production-header,.production-intro,.mir-client-return,.mir-client-signature,.mir-signature-footer,.mir-unified-client-shortcut,.client-entry-return,footer){display:none!important}html[data-field-drawing],html[data-field-drawing] body{min-height:0!important;margin:0!important}';
+      const controls=doc.createElement('link');
+      controls.rel='stylesheet';controls.href='mir-field-controls.css';
+      controls.onload=()=>{if(token===generation){cssReady=!!controls.sheet;complete();}};
+      controls.onerror=()=>fail('Les styles du configurateur ne sont pas disponibles.',token);
+      const choices=doc.createElement('script');
+      choices.src='mir-field-controls.js';
+      choices.onload=()=>{if(token===generation){choicesReady=typeof win.MIRFieldChoices?.upgrade==='function';if(!choicesReady)fail('Les contrôles du configurateur ne sont pas disponibles.',token);else complete();}};
+      choices.onerror=()=>fail('Les contrôles du configurateur ne sont pas disponibles.',token);
+      doc.head.append(style,controls,choices);
+      doc.addEventListener('click',event=>{
+        const link=event.target.closest('a[href]');if(!link)return;
+        const url=new URL(link.href,location.href);
+        if(url.origin===location.origin&&url.pathname.endsWith('/chantier.html')&&url.searchParams.get('view')==='orders'){
+          event.preventDefault();setView('catalogue');reviewingOrder=true;renderCart();
+        }
+      },true);
+      complete();
+    }
+    frame.addEventListener('load',onLoad);
+    retry.addEventListener('click',()=>{
+      if(section.dataset.fieldDrawingState!=='error'||!sameScope())return;
+      beginLoad();
+      const next=new URL(frame.getAttribute('src'),location.href);
+      next.searchParams.set('_field_retry',String(generation));
+      frame.src=next.href;
     });
+    const resize=()=>layout();
+    window.addEventListener('resize',resize);
+    const observer=new MutationObserver(()=>{
+      if(frame.isConnected)return;
+      disposed=true;clearTimeout(deadline);window.removeEventListener('resize',resize);observer.disconnect();
+    });
+    observer.observe($('#portal-content'),{childList:true});
+    beginLoad();
+    requestAnimationFrame(layout);
   }
 
   function authorizedFieldJobs(){const allowed=new Set(jobsForActor().map(job=>job.id));return(state.jobs||[]).filter(job=>allowed.has(job.id));}
@@ -1361,7 +1464,7 @@
     const group=['command','draw','catalogue','orders','material'].includes(view)?'command':['punch','punch-hours'].includes(view)?'punch':view==='messages'?'messages':['more','account','expenses','absences','lead-team','settings','notifications'].includes(view)?'more':'day';
     const nav=$('#portal-navigation');document.body.append(nav);nav.className='field-bottom';nav.setAttribute('aria-label','Navigation chantier');nav.innerHTML=[['day','house','Accueil'],['command','cart','Commande'],['punch','clock','Punch'],['messages','message','Messages'],['more','menu','Plus']].map(([key,glyph,label])=>`<button type="button" data-view="${key}" aria-current="${key===group?'page':'false'}">${icon(glyph)}<span>${label}</span></button>`).join('');$('#account-bar').hidden=true;requestAnimationFrame(fitFieldNavigation);
   }
-  function renderFieldView(){const result=window.MIRFieldViews?.render(fieldContext());if(result!==null&&result!==undefined)return view==='job'?result.replace('</section><!--field-end-->',fieldIssueRows(fieldDossier||{})+'</section>'):result;if(view==='draw')return `<section class="field-drawing mir-app-drawing"><header class="mir-app-heading"><p class="mir-app-eyebrow">MATÉRIEL ET PLIAGES</p><h1>Commande</h1></header><nav class="mir-app-segments" aria-label="Type de commande"><button type="button" data-field-catalogue="material" aria-pressed="false">Magasin</button><button type="button" data-field-catalogue="fold" aria-pressed="${ui.fieldDrawingEntry!=='draw'}">Pliages</button><button type="button" data-field-draw aria-pressed="${ui.fieldDrawingEntry==='draw'}">Dessin</button></nav><iframe id="field-drawing-frame" title="Pliage sur mesure — modèle, mesures, finition et panier" src="production.html?mode=client&source=store&kind=profile"></iframe></section>`;if(view==='catalogue')return fieldCatalogueMarkup();if(view==='orders')return '<div class=mir-app-order-actions><button type=button class="button secondary" data-view=material>Matériel et livraisons '+icon('arrow')+'</button></div>'+renderOrders(false);if(view==='messages')return renderMessages();if(view==='punch-hours')return renderFieldHours();if(view==='settings')return renderFieldSettings();if(view==='notifications')return renderNotifications();if(view==='absences')return fieldSecondaryMarkup(renderAbsences(),'absence');if(view==='expenses')return fieldSecondaryMarkup(renderExpenses(),'expense');if(view==='material')return renderMaterial();if(view==='plans'||view==='photos')return renderFieldDocuments();if(view==='lead-team')return state.lead?.selectedJobId===fieldJob()?.id?renderLead():'<section class="field-section"><h1>Équipe et présences</h1><p role="status">'+esc(ui.fieldLeadError||'Chargement de l’équipe du chantier choisi…')+'</p></section>';return '';}
+  function renderFieldView(){const result=window.MIRFieldViews?.render(fieldContext());if(result!==null&&result!==undefined)return view==='job'?result.replace('</section><!--field-end-->',fieldIssueRows(fieldDossier||{})+'</section>'):result;if(view==='draw')return `<section class="field-drawing mir-app-drawing"><header class="mir-app-heading"><p class="mir-app-eyebrow">MATÉRIEL ET PLIAGES</p><h1>Commande</h1></header><nav class="mir-app-segments" aria-label="Type de commande"><button type="button" data-field-catalogue="material" aria-pressed="false">Magasin</button><button type="button" data-field-catalogue="fold" aria-pressed="true">Pliages</button></nav><iframe id="field-drawing-frame" title="Pliage sur mesure — modèle, mesures, finition et panier" src="production.html?mode=client&source=store&kind=profile" loading="eager" aria-hidden="true" inert style="visibility:hidden"></iframe><div class="field-drawing-loading" data-field-drawing-status="loading"><p data-field-drawing-message role="status">Chargement de Pliages…</p><button type="button" data-field-drawing-retry hidden>Réessayer</button></div></section>`;if(view==='catalogue')return fieldCatalogueMarkup();if(view==='orders')return '<div class=mir-app-order-actions><button type=button class="button secondary" data-view=material>Matériel et livraisons '+icon('arrow')+'</button></div>'+renderOrders(false);if(view==='messages')return renderMessages();if(view==='punch-hours')return renderFieldHours();if(view==='settings')return renderFieldSettings();if(view==='notifications')return renderNotifications();if(view==='absences')return fieldSecondaryMarkup(renderAbsences(),'absence');if(view==='expenses')return fieldSecondaryMarkup(renderExpenses(),'expense');if(view==='material')return renderMaterial();if(view==='plans'||view==='photos')return renderFieldDocuments();if(view==='lead-team')return state.lead?.selectedJobId===fieldJob()?.id?renderLead():'<section class="field-section"><h1>Équipe et présences</h1><p role="status">'+esc(ui.fieldLeadError||'Chargement de l’équipe du chantier choisi…')+'</p></section>';return '';}
   function fieldIssueRows(dossier){const rows=dossier.fieldIssues||[];return rows.length?`<section class="field-section"><h2>Problèmes et outils</h2>${rows.map(x=>`<article class="field-feed"><small>${esc(state.members.find(m=>m.id===x.reported_by)?.name||'Auteur autorisé')} · ${esc(x.created_at?new Date(x.created_at).toLocaleString('fr-CA'):'')}</small><h3>${esc(x.note)}</h3><p>${esc(({open:'Envoyé',in_progress:'Pris en charge',resolved:'Résolu'})[x.status]||x.status)} · ${esc(({normal:'Peut attendre',urgent:'À traiter aujourd’hui',critical:'Travail bloqué'})[x.urgency]||x.urgency)}</p>${x.photo_path?`<button type="button" class="button secondary" data-internal-photo="${esc(x.photo_path)}">Ouvrir la photo</button>`:''}${x.response?`<p>Réponse : ${esc(x.response)}</p>`:''}${['assistant','boss'].includes(mode)||mode==='warehouse'&&x.details?.kind==='tool'?`<button type="button" class="button secondary" data-field-respond="${esc(x.id)}" data-field-response-job="${esc(dossier.job.id)}">Répondre</button>`:''}</article>`).join('')}</section>`:'';}
 
   async function loadFieldDossier(){const job=fieldJob();if(!job)return;const user=actorId;fieldLoading=true;ui.fieldDossierError='';fieldDossier=null;render();try{const dossier=isDemo()?{job,documents:[],tasks:state.lead?.tasks||[],activity:state.operations?.activity||[],extras:[],reports:[],orders:model.listOrders(state,actorId,{})}:await portalClient.jobDossier(job.id);if(user!==actorId||fieldJob()?.id!==job.id)return;fieldDossier=dossier;}catch(error){ui.fieldDossierError=errorMessage(error);}finally{if(user===actorId){fieldLoading=false;if(['job','plans','photos'].includes(view))render();}}}
@@ -1389,7 +1492,7 @@
     if(button.dataset.fieldProduct){const item=fieldCatalogueItems.get(button.dataset.fieldProduct)||itemById(button.dataset.fieldProduct);if(!item)return true;if(isFold(item)){showFold(item.id);return true;}openDialog('<div class=field-store-detail>'+dialogHeader('MAGASIN',item.name,'Choisissez les options et la quantité.')+productCard(item)+'</div>');const detail=$('.field-store-detail');detail?.querySelector('.product-body h3')?.remove();const visual=detail?.querySelector('.product-visual');if(visual&&!visual.querySelector('img,canvas,.mir-store-siding-sample,[data-mir-stable-siding]'))visual.classList.add('field-product-no-photo');window.MIRFieldChoices?.upgrade();return true;}
     if(button.hasAttribute('data-field-profile')){openDialog(dialogHeader('MON COMPTE',actor()?.name||'Équipe MIR',mode==='chef_equipe'?'Chef d’équipe':'Employé chantier')+`<p>${esc(clientStatus?.user?.email||'')}</p><div class="field-list"><button type="button" class="field-row" data-view="settings">Réglages ${icon('arrow')}</button></div><hr><button type="button" class="button danger full" id="portal-signout">Déconnexion</button>`);return true;}
     if(button.hasAttribute('data-field-cart')){setView('catalogue');reviewingOrder=true;renderCart();return true;}
-    if(button.dataset.fieldCatalogue){delete ui.fieldDrawingEdit;if(button.dataset.fieldCatalogue==='fold'){ui.fieldDrawingEntry='models';ui.fieldDrawingRequest=requestId();setView('draw');}else{ui.fieldCatalogue='material';reviewingOrder=false;setView('catalogue');renderCatalogueGrid();}return true;}
+    if(button.dataset.fieldCatalogue){delete ui.fieldDrawingEdit;if(button.dataset.fieldCatalogue==='fold'){ui.fieldDrawingEntry='choice';ui.fieldDrawingRequest=requestId();setView('draw');}else{ui.fieldCatalogue='material';reviewingOrder=false;setView('catalogue');renderCatalogueGrid();}return true;}
     if(button.hasAttribute('data-field-draw')){delete ui.fieldDrawingEdit;if($('#portal-dialog').open)closeDialog();ui.fieldDrawingEntry='draw';ui.fieldDrawingRequest=requestId();setView('draw');return true;}
     if(button.dataset.fieldRequest){fieldRequest(button.dataset.fieldRequest,button.dataset.fieldJobId||fieldJob()?.id);return true;}
     if(button.dataset.fieldOpenJob){ui.jobs[actorId]=button.dataset.fieldOpenJob;save();setView('job');await loadFieldDossier();return true;}

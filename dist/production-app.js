@@ -3214,11 +3214,13 @@ async function boot(){M=window.MIRProduction;if(!M?.createTemplate)throw new Err
   window.addEventListener('pageshow',event=>{if(event.persisted)void refreshBendTariff();});
  }
  delete document.documentElement.dataset.mirProfileStartup;
+ if(fieldPliage03){document.documentElement.dataset.mirProductionReady='true';document.documentElement.dataset.mirFieldStartup='ready';}
  window.dispatchEvent(new Event('mir-production-ready'));
 }
 document.addEventListener('focusin',event=>{const input=event.target.closest?.('[data-client-bend-angle]');if(!input||!publicPliage03())return;const index=Number(input.dataset.clientBendAngle);if(selectedClientAngle!==index){selectedClientAngle=index;updateDrawing({keepForm:true});}});
 boot().catch(error=>{
  console.error('MIR production',error);
+ if(fieldPliage03){document.documentElement.dataset.mirFieldStartup='error';window.dispatchEvent(new Event('mir-production-error'));}
  if(document.documentElement.dataset.mirProfileStartup){
   document.documentElement.dataset.mirProfileStartup='error';
   $('#client-startup-message').textContent='Le configurateur n’a pas pu démarrer.';
