@@ -123,14 +123,16 @@ async function main(){
           heroFits:!hero||(content.top>=frame.top&&content.bottom<=frame.bottom&&content.left>=frame.left&&content.right<=frame.right),
           logo:!!logo,estimate:(()=>{
             if(prestige){
-              const link=document.querySelector('#mir-prestige-header nav.mir-prestige-nav a[href*="estimation.html"]');
+              const nav=document.querySelector('#mir-prestige-header nav.mir-prestige-nav');
+              const link=nav?.querySelector('a[href*="estimation.html"]');
               if(!link)return false;
               if(innerWidth<=1100){
                 const toggle=document.querySelector('#mir-client-menu-button'),rect=toggle?.getBoundingClientRect();
-                return !!(toggle&&rect?.width>=44&&getComputedStyle(toggle).display!=='none'&&toggle.getAttribute('aria-controls')===link.parentElement.id);
+                return !!(toggle&&rect?.width>=44&&getComputedStyle(toggle).display!=='none'&&toggle.getAttribute('aria-controls')===nav.id);
               }
-              const rect=link.getBoundingClientRect();
-              return rect.width>0&&rect.left>=-2&&rect.right<=innerWidth+2;
+              const visible=element=>{if(!element)return false;const rect=element.getBoundingClientRect(),style=getComputedStyle(element);return rect.width>0&&rect.height>0&&style.display!=='none'&&style.visibility!=='hidden'&&rect.left>=-2&&rect.right<=innerWidth+2;};
+              const action=document.querySelector('#mir-prestige-header .mir-prestige-actions>.mir-home-estimate[href*="estimation.html"]');
+              return visible(link)||visible(action);
             }
             const button=document.querySelector('header.mir-client-header .mir-home-estimate'),rect=button?.getBoundingClientRect();
             return !!(button&&rect?.width>0&&getComputedStyle(button).display!=='none'&&rect.left>=-2&&rect.right<=innerWidth+2);
