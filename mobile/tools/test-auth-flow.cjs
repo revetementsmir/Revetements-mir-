@@ -27,7 +27,7 @@ function harness({role='employee',exchangeError=false,slots=new Map(),team=false
 }
 test('callback and authorize reject ambiguous, injected and foreign URLs',()=>{
  const good=Flow.CALLBACK+'?flow=google&code=code-123';assert.equal(Flow.callback(good).flow,'google');
- for(const url of [good+'&flow=recovery',good+'&code=other',good+'&error=access_denied',good+'#token',good.replace('auth/','auth:443/'),good.replace('mirtest:','https:'),good+'&unknown=x'])assert.equal(Flow.callback(url),null,url);
+ for(const url of [good+'&flow=recovery',good+'&code=other',good+'&error=access_denied',good+'#token',good.replace('auth/','auth:443/'),good.replace('mirtestpreview:','https:'),good.replace('mirtestpreview:','mirtest:'),good+'&unknown=x'])assert.equal(Flow.callback(url),null,url);
  const auth=Flow.PROJECT+'/auth/v1/authorize?provider=google&redirect_to='+encodeURIComponent(Flow.CALLBACK+'?flow=google')+'&code_challenge_method=s256&code_challenge='+'a'.repeat(43);
  assert.equal(Flow.authorize(auth),true);for(const url of [auth+'&provider=github',auth+'#secret',auth.replace(Flow.PROJECT,'https://evil.example')])assert.equal(Flow.authorize(url),false);
 });

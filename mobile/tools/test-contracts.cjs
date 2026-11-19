@@ -42,6 +42,24 @@ test('Public estimate implementation is absent from the embedded package',()=>{
  for(const file of fs.readdirSync(path.join(root,'www')).filter(name=>name.endsWith('.html')))assert.doesNotMatch(fs.readFileSync(path.join(root,'www',file),'utf8'),/src="mir-estimate(?:-drafts|-upload)?\.js/);
  const help=fs.readFileSync(path.join(root,'www/mir-help-center.js'),'utf8');assert.doesNotMatch(help,/Comment demander une estimation\?|depuis la page Nous joindre|Comment retrouver mon panier\?/);assert.match(help,/compte équipe/);
 });
+test('Visual verification payload stays out of the APK without removing catalogue images or runtime dependencies',()=>{
+ const dist=path.join(root,'../dist'),www=path.join(root,'www');
+ const proofDirectories=fs.readdirSync(dist,{withFileTypes:true}).filter(entry=>entry.isDirectory()&&entry.name.endsWith('-captures')).map(entry=>entry.name);
+ for(const directory of proofDirectories)assert.equal(fs.existsSync(path.join(www,directory)),false,'QA proof directory must not ship: '+directory);
+ function inspect(directory){
+  for(const entry of fs.readdirSync(directory,{withFileTypes:true})){
+   const file=path.join(directory,entry.name);
+   if(entry.isDirectory()){inspect(file);continue;}
+   if(!/\.(?:html|css|js|mjs|json|svg)$/.test(entry.name))continue;
+   const content=fs.readFileSync(file,'utf8');
+   for(const proof of proofDirectories)assert.equal(content.includes(proof+'/'),false,'Runtime references an excluded proof directory: '+path.relative(www,file));
+  }
+ }
+ inspect(www);
+ for(const file of ['assets/products/allura-panel-traditional.lossless.webp','assets/mir-01.jpg','production-model.js','chantier-app.js','assets/fonts/dm-sans-variable.ttf']){
+  assert.deepEqual(fs.readFileSync(path.join(www,file)),fs.readFileSync(path.join(dist,file)),'Required resource remains unchanged: '+file);
+ }
+});
 for(const role of ['employee','chef','warehouse','assistant','boss'])test(role+' is revalidated by the server before every business RPC',async()=>{
  const h=harness(role);assert.equal((await h.client.rpc('mir_business',{role:'admin'})).error,null);assert.deepEqual(h.calls,['mir_account_snapshot','mir_business']);await h.client.rpc('mir_business');assert.deepEqual(h.calls.slice(-2),['mir_account_snapshot','mir_business']);
 });

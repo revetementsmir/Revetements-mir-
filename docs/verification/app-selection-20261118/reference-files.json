@@ -1,0 +1,60 @@
+{
+  "referenceRevision": "dd5bf49701aea2c3ac5fa46712b9fc94a1acd89e",
+  "files": [
+    {
+      "file": "reference-pr45-chef_equipe-day.png",
+      "bytes": 179049,
+      "sha256": "57161c271e506bd8002658ef5f252c35f5acf624bcbd92f073acfda621309e42",
+      "sourceRevision": "7207c7ae4e31edf12d0472f62522d2dc1a188b3c",
+      "sourceArtifact": "MIR-PR45-android-7207c7ae.zip"
+    },
+    {
+      "file": "reference-pr45-chef_equipe-punch.png",
+      "bytes": 150465,
+      "sha256": "68f2ed48ba4030ae870b8300a3b89e14432a7e0565e71e080abd0603cbd96331",
+      "sourceRevision": "7207c7ae4e31edf12d0472f62522d2dc1a188b3c",
+      "sourceArtifact": "MIR-PR45-android-7207c7ae.zip"
+    },
+    {
+      "file": "reference-pr45-employe-day.png",
+      "bytes": 163835,
+      "sha256": "20988d3a0f7e205630fc70552d598ee0131a9c962d679a842f50e896ca85ad2c",
+      "sourceRevision": "7207c7ae4e31edf12d0472f62522d2dc1a188b3c",
+      "sourceArtifact": "MIR-PR45-android-7207c7ae.zip"
+    },
+    {
+      "file": "reference-pr45-employe-punch.png",
+      "bytes": 150994,
+      "sha256": "263b826d9d2005c62e9be73667fa54e2bebedc2c2c6d92ab6533f77ebd7e85a3",
+      "sourceRevision": "7207c7ae4e31edf12d0472f62522d2dc1a188b3c",
+      "sourceArtifact": "MIR-PR45-android-7207c7ae.zip"
+    },
+    {
+      "file": "dist/index.html",
+      "sha256": "a5746fb8decf5218ef35dd2cdf1c8c72e73b086c701b6b9a74190f22db3afcac",
+      "identicalToReference": true
+    },
+    {
+      "file": "dist/mir-prestige.css",
+      "sha256": "467e53a77cd61024135750c43f1cd4ca6515cf34249c46f9c64721b5d5e1d108",
+      "identicalToReference": true
+    },
+    {
+      "file": "dist/mir-prestige-editorial.css",
+      "sha256": "753ab7a2a7b4851ca626d88dbdc2dd54b04743002591df454012082c8da9f22a",
+      "identicalToReference": true
+    },
+    {
+      "file": "dist/mir-home-desktop-locked.css",
+      "sha256": "3b4634e25ab66c32360e987bfed3c16bb7e0c1b6fc095f223ff758734ec85473",
+      "identicalToReference": true
+    },
+    {
+      "file": "dist/mir-home-approved.css",
+      "sha256": "865d2816f1f71012fc70dbfd569e816b566ee089baa0f326b9d2a7780cf35766",
+      "identicalToReference": true
+    }
+  ],
+  "equivalentLocalRevision": "c4f6b608b7d9229c65dc478e4e1aabfd0f63152d",
+  "tree": "c76a06b5129be29ccae6a42a2d50ea48f1798fc2"
+}

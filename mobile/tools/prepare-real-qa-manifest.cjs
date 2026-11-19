@@ -11,7 +11,7 @@ if(projectRef!=='hxtztkmbfpmzrieccwsg'||marker!=='QA-NATIVE-RUN-'+runId.replaceA
  throw Error('Per-run MIR TEST identities invalid');
 const data=JSON.stringify(manifest);
 if(/email|password|Bearer|sb_secret_|service_role/i.test(data))throw Error('A private credential must not appear in the Android fixture manifest');
-const r=spawnSync('adb',['shell','run-as','ca.revetementsmir.equipe.test','sh','-c',
+const r=spawnSync('adb',['shell','run-as','ca.revetementsmir.equipe.test.preview','sh','-c',
   "'umask 077; mkdir -p files && cat > files/native-qa-run-manifest.json && chmod 600 files/native-qa-run-manifest.json'"],
  {input:data,encoding:'utf8',timeout:15000,maxBuffer:1024*256});
 if(r.status!==0)throw Error('MIR TEST run-specific Android fixture injection refused');

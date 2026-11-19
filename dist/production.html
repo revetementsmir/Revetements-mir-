@@ -6,6 +6,44 @@
   <meta name="robots" content="noindex,nofollow">
   <meta name="theme-color" content="#283f31">
   <title>Pièces sur mesure — L’atelier MIR</title>
+  <!-- The private embedded editor is identified by its same-origin parent capability,
+       never by a URL parameter alone. This runs before any public CSS can paint. -->
+  <script>
+    (() => {
+      const params = new URLSearchParams(location.search);
+      if (params.get('mode') !== 'client' || params.get('source') !== 'store' || params.get('kind') !== 'profile') return;
+      try {
+        if (window.parent === window || window.frameElement?.id !== 'field-drawing-frame' || window.parent.location.origin !== location.origin) return;
+        const context = window.parent.MIRFieldDrawingContext?.();
+        if (context?.personal !== true || context.presentation !== 'pliage03' ||
+            typeof context.ownerId !== 'string' || !context.ownerId.trim()) return;
+        document.documentElement.dataset.fieldDrawing = 'true';
+        document.documentElement.dataset.mirFieldStartup = 'pending';
+      } catch (_) {
+        // A separate origin or an unauthorized parent cannot activate the field shell.
+      }
+    })();
+  </script>
+  <style>
+    html[data-field-drawing="true"],html[data-field-drawing="true"] body{
+      min-height:0!important;margin:0!important;background:#242522!important;color:#f4f1ea!important;
+    }
+    html[data-field-drawing="true"] body{
+      --field-bg:#242522!important;--field-surface:#2d2e2a!important;
+      --field-soft:#353630!important;--field-text:#f4f1ea!important;
+      --field-muted:#c8c5bd!important;--field-border:#55554d!important;
+      --field-accent:#bda889!important;--field-action-text:#242522!important;
+      --field-focus:#dbc7a9!important;--field-selection:#454236!important;
+      --mir-page:#242522!important;--mir-surface:#2d2e2a!important;
+      --mir-text:#f4f1ea!important;--mir-muted:#c8c5bd!important;
+      --mir-border:#55554d!important;--mir-accent:#bda889!important;
+    }
+    html[data-field-drawing="true"] body :is(.workshop-banner,.production-header,.production-intro,
+      #mir-harmony-header,.mir-client-return,.mir-client-signature,.mir-signature-footer,
+      .mir-unified-client-shortcut,.client-entry-return,footer){
+      display:none!important;
+    }
+  </style>
   <script src="mir-settings.js?v=phase8-1"></script>
   <link rel="stylesheet" href="mir-settings.css?v=phase8-1">
   <meta name="description" content="Dessinez vos pliages et configurez vos panneaux métalliques, avec cotes, couleur et dossier de préparation pour l’atelier MIR.">
@@ -88,7 +126,7 @@
   <script defer src="mir-pliage03-en-ca.js?v=03"></script>
   <script defer src="mir-client-i18n.js?v=release-pr41-20261115"></script>
   <link rel="stylesheet" href="mir-prestige-tools.css?v=1">
-<link rel="stylesheet" href="mir-prestige.css?v=client-parcours-20261117"><script defer src="mir-prestige.js?v=client-parcours-20261117"></script><link rel="stylesheet" href="mir-client-pages.css?v=client-parcours-20261117"><script defer src="mir-client-pages.js?v=client-parcours-20261117"></script><link rel="stylesheet" href="mir-pliage-journey.css?v=client-parcours-20261117"><link rel="stylesheet" href="mir-pliage03.css?v=03"></head>
+<link rel="stylesheet" href="mir-prestige.css?v=client-parcours-20261117"><script defer src="mir-prestige.js?v=client-parcours-20261117"></script><link rel="stylesheet" href="mir-client-pages.css?v=client-parcours-20261117"><script defer src="mir-client-pages.js?v=client-parcours-20261117"></script><link rel="stylesheet" href="mir-pliage-journey.css?v=client-parcours-20261117"><link rel="stylesheet" href="mir-pliage03.css?v=04"><link rel="stylesheet" href="mir-field-trace.css?v=2"></head>
 <body>
   <a class="skip-link" href="#production-main">Aller au configurateur</a>
   <div class="workshop-banner"><span><i aria-hidden="true"></i> Un dessin précis. Une finition à votre mesure.</span><span>Dossier local · validation par l’atelier</span></div>

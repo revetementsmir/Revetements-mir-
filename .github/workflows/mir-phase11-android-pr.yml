@@ -1,9 +1,11 @@
 name: MIR Phase 11 — Android privé TEST
 on:
   pull_request:
-    paths: ['mobile/**', 'dist/**', 'tests/**', 'docs/verification/phase11-android/**', '.github/workflows/mir-phase11-android-pr.yml']
+    paths: ['mobile/**', 'dist/**', 'tests/**', 'supabase/**', 'docs/verification/phase11-android/**', '.github/workflows/mir-phase11-android-pr.yml']
 permissions:
   contents: read
+env:
+  MIR_TEST_GOOGLE_ENABLED: ${{ vars.MIR_TEST_GOOGLE_ENABLED || 'false' }}
 jobs:
   chromium-and-regressions:
     runs-on: ubuntu-latest
@@ -11,60 +13,141 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 4
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-      - name: Adapter web embarqué et non-régressions sans serveur
+      - name: Préparer les ressources embarquées et la référence visuelle
+        id: web-adapter
+        env:
+          MIR_CHROMIUM_BIN: /usr/bin/google-chrome
+          NODE_PATH: ./mobile/node_modules
+          MIR_APP_REFERENCE_SHA: dd5bf49701aea2c3ac5fa46712b9fc94a1acd89e
+          MIR_FIELD_PLIAGE_OUT: ${{ github.workspace }}/artifacts/pliage03-field
+        run: |
+          cd mobile && npm ci && npm run sync && cd ..
+          if ! git cat-file -e "${MIR_APP_REFERENCE_SHA}^{commit}" 2>/dev/null; then
+            git fetch --no-tags --depth=1 origin "$MIR_APP_REFERENCE_SHA"
+          fi
+      # Fail early on an actual Pliages defect; the full browser, security and
+      # Android suites still run on passing release candidates.
+      - name: Contrôle rapide Pliages et chargement — avant la longue recette
+        id: field-quick
         env:
           MIR_CHROMIUM_BIN: /usr/bin/google-chrome
           NODE_PATH: ./mobile/node_modules
         run: |
-          cd mobile && npm ci && npm run sync && cd ..
-          node mobile/tools/test-contracts.cjs
-          node mobile/tools/test-native-screen-proofs.cjs
-          node mobile/tools/test-native-readiness.cjs
-          node mobile/tools/test-native-drawing-target.cjs
-          node mobile/tools/test-android-ci-environment.cjs
-          node --test mobile/tools/test-auth-flow.cjs tests/mir-team-enrollment-service.cjs tests/mir-team-session-queue.cjs
-          npm ci --prefix tools/database
-          node tests/mir-team-invitations-postgres.cjs
-          node tests/mir-field-postgres.cjs
-          node tests/mir-field-cart.cjs
-          node tests/mir-field-profile.cjs
-          node tests/mir-field-redesign-browser.cjs
-          node --test tests/mir-samsung-contracts.cjs
-          node tests/mir-samsung-fixture.cjs
-          node tests/mir-pr39-native-fixture.cjs
-          node tests/mir-pr39-native-chef-fixture.cjs
-          node --check mobile/tools/prepare-real-qa-manifest.cjs
-          node --test mobile/tools/test-pr39-native-fixture.cjs mobile/tools/test-native-qa-fixture.cjs
-          node tests/mir-native-qa-sql-guards.cjs
-          node tests/mir-punch-receipts-postgres.cjs
-          node tests/mir-punch-receipts-client.cjs
-          node tests/mir-teams-hours-postgres.cjs
-          node tests/mir-teams-hours-client.cjs
-          node tests/mir-teams-hours-browser.cjs
-          node tests/mir-samsung-ui.cjs
-          node tests/mir-punch-approved-browser.cjs
-          node tests/mir-field-choice-refresh-browser.cjs
+          node tests/mir-pliage03-field-contract.cjs
+          node --test tests/mir-field-catalogue-context.cjs
+          node tests/mir-field-drawing-loader-browser.cjs
+          node tests/mir-pliage03-field-browser.cjs
           node tests/mir-field-drawing-refresh-browser.cjs
-          node tests/mir-team-enrollment-integration.cjs
-          node mobile/tools/test-enrollment-web.cjs
-          node tests/mir-team-invitation-email.cjs
-          node mobile/tools/test-invitation-email-web.cjs
-          node mobile/tools/test-compat.cjs
-          node mobile/tools/test-web.cjs
-          node mobile/tools/test-pdf-web.cjs
-          node mobile/tools/test-device-checks.cjs
-          node tests/mir-phase10-bending.cjs
-          node tests/mir-phase10-management.cjs
-          node tests/mir-technical-dimensions.cjs
-          node tests/mir-account-session.cjs
-          node tests/mir-test-environment.cjs
-          node tests/mir-test-production-browser.cjs
-          node tests/mir-responsive-atelier-browser.cjs
-          node tests/mir-annotation-browser.cjs
-          git diff --check
+      - name: Connexion native 08 — formulaire, Google et récupération
+        env:
+          MIR_CHROMIUM_BIN: /usr/bin/google-chrome
+          NODE_PATH: ./mobile/node_modules
+        run: node mobile/tools/test-web.cjs
+      - name: Conserver les captures de la connexion
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: phase11-login08-proof
+          path: artifacts/phase11/web/
+      - name: Capturer le Pliage livré avant les changements
+        continue-on-error: true
+        env:
+          MIR_CHROMIUM_BIN: /usr/bin/google-chrome
+          NODE_PATH: ${{ github.workspace }}/mobile/node_modules
+          MIR_FIELD_PLIAGE_OUT: ${{ github.workspace }}/artifacts/pliage03-field-before
+        run: |
+          MIR_BEFORE_SHA=13bc983d2a9aaac55cd0bbde3b5672058f9ce5ea
+          if ! git cat-file -e "${MIR_BEFORE_SHA}^{commit}" 2>/dev/null; then
+            git fetch --no-tags --depth=1 origin "$MIR_BEFORE_SHA"
+          fi
+          git worktree add --detach "$RUNNER_TEMP/mir-field-before" "$MIR_BEFORE_SHA"
+          node "$RUNNER_TEMP/mir-field-before/tests/mir-pliage03-field-browser.cjs"
+      - name: Refonte de l’application et parcours Pliage en navigateur
+        env:
+          MIR_CHROMIUM_BIN: /usr/bin/google-chrome
+          NODE_PATH: ./mobile/node_modules
+          MIR_APP_REFERENCE_SHA: dd5bf49701aea2c3ac5fa46712b9fc94a1acd89e
+          MIR_FIELD_PLIAGE_OUT: ${{ github.workspace }}/artifacts/pliage03-field
+        run: |
+          result=0
+          node tests/mir-app-selection-browser.cjs || result=1
+          node tests/mir-field-stepper-browser.cjs || result=1
+          node tests/mir-pliage03-field-contract.cjs || result=1
+          node --test tests/mir-field-pliage-measurements.cjs || result=1
+          node --test tests/mir-field-horizontal-labels.cjs tests/mir-field-trace-controls.cjs tests/mir-field-review-labels.cjs || result=1
+          node --test tests/mir-field-catalogue-context.cjs || result=1
+          node --test tests/mir-temporary-jobs-client.cjs tests/mir-temporary-jobs-metadata.cjs || result=1
+          node tests/mir-temporary-jobs-browser.cjs || result=1
+          exit "$result"
+      - name: Conserver immédiatement les preuves du thème et du Pliage
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: phase11-app-theme-proof
+          path: |
+            artifacts/app-selection/
+            artifacts/pliage03-field/
+            artifacts/pliage03-field-before/
+            artifacts/field-stepper/
+            artifacts/temporary-jobs/browser/
+      - name: Non-régressions existantes sans serveur
+        if: ${{ !cancelled() && steps.web-adapter.outcome == 'success' && steps.field-quick.outcome == 'success' }}
+        env:
+          MIR_CHROMIUM_BIN: /usr/bin/google-chrome
+          NODE_PATH: ./mobile/node_modules
+        run: |
+          mir_check_status=0
+          mir_check() { "$@" || { mir_check_status=1; printf 'MIR_CHECK_FAILED %s\n' "$*"; }; }
+          mir_check node mobile/tools/test-contracts.cjs
+          mir_check node mobile/tools/test-native-screen-proofs.cjs
+          mir_check node --test mobile/tools/test-preview-signing.cjs
+          mir_check node mobile/tools/test-native-readiness.cjs
+          mir_check node mobile/tools/test-native-drawing-target.cjs
+          mir_check node mobile/tools/test-android-ci-environment.cjs
+          mir_check node --test mobile/tools/test-auth-flow.cjs tests/mir-team-enrollment-service.cjs tests/mir-team-session-queue.cjs
+          npm ci --prefix tools/database
+          mir_check node tests/mir-temporary-jobs-postgres.cjs
+          mir_check node tests/mir-team-invitations-postgres.cjs
+          mir_check node tests/mir-field-postgres.cjs
+          mir_check node tests/mir-field-cart.cjs
+          mir_check node tests/mir-field-profile.cjs
+          mir_check node tests/mir-field-redesign-browser.cjs
+          mir_check node --test tests/mir-samsung-contracts.cjs
+          mir_check node tests/mir-samsung-fixture.cjs
+          mir_check node tests/mir-pr39-native-fixture.cjs
+          mir_check node tests/mir-pr39-native-chef-fixture.cjs
+          mir_check node --check mobile/tools/prepare-real-qa-manifest.cjs
+          mir_check node --test mobile/tools/test-pr39-native-fixture.cjs mobile/tools/test-native-qa-fixture.cjs
+          mir_check node tests/mir-native-qa-sql-guards.cjs
+          mir_check node tests/mir-punch-receipts-postgres.cjs
+          mir_check node tests/mir-punch-receipts-client.cjs
+          mir_check node tests/mir-teams-hours-postgres.cjs
+          mir_check node tests/mir-teams-hours-client.cjs
+          mir_check node tests/mir-teams-hours-browser.cjs
+          mir_check node tests/mir-samsung-ui.cjs
+          mir_check node tests/mir-punch-approved-browser.cjs
+          mir_check node tests/mir-field-choice-refresh-browser.cjs
+          mir_check node tests/mir-team-enrollment-integration.cjs
+          mir_check node mobile/tools/test-enrollment-web.cjs
+          mir_check node tests/mir-team-invitation-email.cjs
+          mir_check node mobile/tools/test-invitation-email-web.cjs
+          mir_check node mobile/tools/test-compat.cjs
+          mir_check node mobile/tools/test-pdf-web.cjs
+          mir_check node mobile/tools/test-device-checks.cjs
+          mir_check node tests/mir-phase10-bending.cjs
+          mir_check node tests/mir-phase10-management.cjs
+          mir_check node tests/mir-technical-dimensions.cjs
+          mir_check node tests/mir-account-session.cjs
+          mir_check node tests/mir-test-environment.cjs
+          mir_check node tests/mir-test-production-browser.cjs
+          mir_check node tests/mir-responsive-atelier-browser.cjs
+          mir_check node tests/mir-annotation-browser.cjs
+          mir_check git diff --check
+          exit "$mir_check_status"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -79,7 +162,19 @@ jobs:
             artifacts/mir-environments/
             artifacts/mir-responsive-atelier/
             artifacts/mir-annotations/
+            artifacts/field-drawing-loader/
   android-test:
+    # Delivery gate for this exact reviewed revision, not a boundary against a
+    # collaborator who is allowed to change the workflow itself.
+    if: >-
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      vars.MIR_PREVIEW_SIGNING_APPROVED_SHA != '' &&
+      github.event.pull_request.head.sha == vars.MIR_PREVIEW_SIGNING_APPROVED_SHA
+    env:
+      MIR_PREVIEW_SOURCE_SHA: ${{ github.event.pull_request.head.sha }}
+      MIR_PREVIEW_SOURCE_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
+      MIR_PREVIEW_SIGNING_APPROVED_SHA: ${{ vars.MIR_PREVIEW_SIGNING_APPROVED_SHA }}
+      MIR_PREVIEW_CERT_SHA256: ${{ vars.MIR_PREVIEW_CERT_SHA256 }}
     # All PRs share exactly two MIR TEST QA logins: serialize remote fixtures.
     concurrency:
       group: mir-native-qa-shared-${{ github.repository }}
@@ -114,19 +209,34 @@ jobs:
           node tools/prepare-android-tests.cjs
           node tools/test-contracts.cjs
           node tools/test-activity-lifecycle.cjs
+      - name: Importer la clé durable de MIR TEST Aperçu pour le SHA revu
+        env:
+          MIR_PREVIEW_KEYSTORE_BASE64: ${{ secrets.MIR_PREVIEW_KEYSTORE_BASE64 }}
+          MIR_PREVIEW_KEYSTORE_PASSWORD: ${{ secrets.MIR_PREVIEW_KEYSTORE_PASSWORD }}
+          MIR_PREVIEW_KEY_ALIAS: ${{ secrets.MIR_PREVIEW_KEY_ALIAS }}
+          MIR_PREVIEW_KEY_PASSWORD: ${{ secrets.MIR_PREVIEW_KEY_PASSWORD }}
+        run: node mobile/tools/preview-signing.cjs import
       - name: Compiler APK, tests et analyse Android stricte
+        env:
+          MIR_PREVIEW_KEYSTORE_PASSWORD: ${{ secrets.MIR_PREVIEW_KEYSTORE_PASSWORD }}
+          MIR_PREVIEW_KEY_ALIAS: ${{ secrets.MIR_PREVIEW_KEY_ALIAS }}
+          MIR_PREVIEW_KEY_PASSWORD: ${{ secrets.MIR_PREVIEW_KEY_PASSWORD }}
         working-directory: mobile/android
         run: |
-          ./gradlew :app:assembleDebug :app:assembleDebugAndroidTest :app:testDebugUnitTest :app:lintDebug --no-daemon
-          cp app/build/outputs/apk/debug/app-debug.apk "$RUNNER_TEMP/mir-version-130001.apk"
-          MIR_ANDROID_VERSION_CODE=130002 ./gradlew :app:assembleDebug --no-daemon
+          ./gradlew :app:assembleDebug :app:assembleDebugAndroidTest :app:testDebugUnitTest :app:lintDebug --no-daemon --no-configuration-cache
+          cp app/build/outputs/apk/debug/app-debug.apk "$RUNNER_TEMP/mir-version-130009.apk"
+          MIR_ANDROID_VERSION_CODE=130010 ./gradlew :app:assembleDebug --no-daemon --no-configuration-cache
           mkdir -p ../../artifacts/phase11
-          cp app/build/outputs/apk/debug/app-debug.apk ../../artifacts/phase11/MIR-TEST-debug.apk
           cd ../..
-          sha256sum artifacts/phase11/MIR-TEST-debug.apk > artifacts/phase11/SHA256SUMS
+          node mobile/tools/verify-preview-signing.cjs "$RUNNER_TEMP/mir-version-130009.apk" mobile/android/app/build/outputs/apk/debug/app-debug.apk mobile/android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk artifacts/phase11/preview-signing.json
+          cp mobile/android/app/build/outputs/apk/debug/app-debug.apk artifacts/phase11/MIR-TEST-Apercu.apk
+          sha256sum artifacts/phase11/MIR-TEST-Apercu.apk > artifacts/phase11/SHA256SUMS
           git rev-parse HEAD > artifacts/phase11/source-sha.txt
           echo '${{ github.event.pull_request.head.sha }}' > artifacts/phase11/pr-head-sha.txt
           echo '${{ github.event.pull_request.base.sha }}' > artifacts/phase11/base-sha.txt
+      - name: Retirer la clé privée avant la recette et les archives
+        if: always()
+        run: node mobile/tools/preview-signing.cjs clean
       - name: Permettre KVM au runner éphémère
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
@@ -163,23 +273,30 @@ jobs:
           }
           trap finish EXIT
           timeout --foreground 180s mobile/tools/android-ci-environment.sh start
-          adb install "$RUNNER_TEMP/mir-version-130001.apk"
+          adb install "$RUNNER_TEMP/mir-version-130009.apk"
           adb install mobile/android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
           mobile/tools/run-instrumentation.sh
           cp artifacts/phase11/instrumentation.txt artifacts/phase11/webview-tests.txt
           node mobile/tools/prepare-real-roles.cjs
           mobile/tools/run-instrumentation.sh 'ca.revetementsmir.equipe.test.MirUpgradeTest#prepareUpdate'
           cp artifacts/phase11/instrumentation.txt artifacts/phase11/upgrade-prepare.txt
-          adb install -r artifacts/phase11/MIR-TEST-debug.apk
+          adb install -r artifacts/phase11/MIR-TEST-Apercu.apk
           mobile/tools/run-instrumentation.sh 'ca.revetementsmir.equipe.test.MirUpgradeTest#verifyUpdate'
           cp artifacts/phase11/instrumentation.txt artifacts/phase11/upgrade-verify.txt
           # Allocate new TEST-only UUIDs/lease AFTER upgrades, just before dependent tests.
           node mobile/tools/native-qa-fixture.cjs start
           node mobile/tools/prepare-real-qa-manifest.cjs
           node mobile/tools/verify-pr39-native-fixture.cjs
+          # Samsung-like CSS display: about 393 x 851, before native bars and
+          # the real app header/tabs/footer reduce the embedded drawing frame.
+          # Keep the eight native tests and two upgrade checks at their original size.
+          adb shell wm size 1080x2340
+          adb shell wm density 440
+          adb shell wm size > artifacts/phase11/system/roles-display-size.txt
+          adb shell wm density > artifacts/phase11/system/roles-display-density.txt
           mobile/tools/run-instrumentation.sh 'ca.revetementsmir.equipe.test.MirRealRolesTest'
           cp artifacts/phase11/instrumentation.txt artifacts/phase11/real-roles.txt
-          adb pull /sdcard/Android/data/ca.revetementsmir.equipe.test/files/phase11-proof artifacts/phase11/
+          adb pull /sdcard/Android/data/ca.revetementsmir.equipe.test.preview/files/phase11-proof artifacts/phase11/
       - name: Garantie de nettoyage MIR TEST après réussite, refus ou échec
         if: always()
         env:
@@ -189,7 +306,7 @@ jobs:
           MIR_SANDBOX_BOSS_EMAIL: ${{ secrets.MIR_SANDBOX_BOSS_EMAIL }}
           MIR_SANDBOX_BOSS_PASSWORD: ${{ secrets.MIR_SANDBOX_BOSS_PASSWORD }}
         run: node mobile/tools/native-qa-fixture.cjs finish
-      - name: Empreinte de l’APK de recette — signature debug uniquement
+      - name: Empreinte de l’APK Aperçu — signature durable vérifiée
         run: |
           sha256sum -c artifacts/phase11/SHA256SUMS
           cat artifacts/phase11/SHA256SUMS

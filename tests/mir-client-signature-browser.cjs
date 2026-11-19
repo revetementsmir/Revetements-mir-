@@ -25,7 +25,7 @@ async function checkBrandCards(browser,base){
     const errors=[];
     page.on('pageerror',error=>errors.push(error.message));
     try{
-      await page.goto(base+'/boutique.html#collections',{waitUntil:'domcontentloaded'});
+      await page.goto(base+'/boutique.html?view=brands#collections',{waitUntil:'domcontentloaded'});
       const grid=page.locator('#shop-brand-directory');
       const cards=grid.locator('.brand-collection-card');
       await cards.first().waitFor({state:'visible'});
@@ -37,10 +37,17 @@ async function checkBrandCards(browser,base){
         const copy=cards.map(c=>box(c.querySelector('.brand-collection-copy')));
         return {
           count:cards.length, columns:getComputedStyle(el).gridTemplateColumns.split(' ').length,
-          fits:cards.every((c,i)=>box(c).right<=innerWidth+1&&tiles[i].right<=copy[i].left&&copy[i].right<=box(c).right),
-          sameTile:tiles.every(t=>Math.abs(t.width-tiles[0].width)<1&&Math.abs(t.height-t.width)<1),
+          // Prestige cards stack the photo over copy; the earlier industrial
+          // catalogue placed a square thumbnail next to copy.
+          fits:cards.every((c,i)=>{
+            const card=box(c),tile=tiles[i],label=copy[i];
+            return card.left>=-2&&card.right<=innerWidth+2&&tile.left>=card.left-2&&
+              tile.right<=card.right+2&&label.left>=card.left-2&&label.right<=card.right+2&&
+              tile.bottom<=label.top+2;
+          }),
+          sameTile:tiles.every(t=>t.height>80&&t.width>80&&Math.abs(t.width-tiles[0].width)<1&&Math.abs(t.height-tiles[0].height)<1),
           height:Math.max(...cards.map(c=>box(c).height)), pageWidth:document.documentElement.scrollWidth,
-          columnsAligned:cards.every(c=>getComputedStyle(c).display==='grid')
+          columnsAligned:cards.every(c=>{const style=getComputedStyle(c);return style.display==='flex'&&style.flexDirection==='column'})
         };
       });
       const brandOptions=await page.locator('#shop-brand option').evaluateAll(options=>options.filter(option=>option.value!=='all').map(option=>option.value));
@@ -58,11 +65,13 @@ async function checkBrandCards(browser,base){
         console.error('MIR 320 overflow source: '+JSON.stringify({width,scrollWidth:layout.pageWidth,offender}));
       }
       assert.ok(layout.pageWidth<=width+2,'Pas de débordement horizontal à '+width);
-      if(width<=430)assert.ok(layout.height<=145,'Cartes compactes à '+width+' : '+layout.height);
+      if(width<=430)assert.ok(layout.height>=180&&layout.height<=650,'Cartes Prestige complètes, sans hauteur démesurée à '+width+' : '+layout.height);
       const kaycan=cards.filter({has:page.getByRole('heading',{name:'Kaycan',exact:true})});
-      assert.match(await kaycan.locator('img').getAttribute('src'),/kaycan-soffit-installed/);
+      const kaycanImage=kaycan.locator('img');
+      assert.match(await kaycanImage.getAttribute('src'),/\/assets\/(?:catalogue-swatches|products)\/kaycan-[a-z0-9._-]+\.(?:webp|png|jpe?g)$/i,'Kaycan keeps a real local branded image');
+      assert.equal(await kaycanImage.evaluate(img=>img.naturalWidth>0&&img.naturalHeight>0),true,'Kaycan photo decodes');
       const jdp=cards.filter({has:page.getByRole('heading',{name:'JDP / Juste du Pin',exact:true})});
-      assert.equal(await jdp.locator('.brand-collection-image').getAttribute('data-framing'),'sample-crop');
+      assert.equal(await jdp.locator('img').evaluate(img=>img.naturalWidth>0&&img.naturalHeight>0),true,'JDP local photo decodes instead of an obsolete framing flag');
       if([390,1024,1440,2560].includes(width)){
         await cards.first().scrollIntoViewIfNeeded();
         await page.screenshot({path:path.resolve(__dirname,'../artifacts/mir-boutique-fabricants-'+width+'x'+height+'.png')});
@@ -102,22 +111,39 @@ async function main(){
         const box=footer?.getBoundingClientRect();
         const hero=document.querySelector('.shop-hero'),copy=hero?.querySelector('.shop-hero-copy');
         const frame=hero?.getBoundingClientRect(),content=copy?.getBoundingClientRect();
-        return {compact:innerWidth<=1100&&!!document.querySelector('header[data-mir-public-shell]'),theme:document.body.classList.contains('mir-signature'),css,
+        const prestige=document.body.classList.contains('mir-prestige');
+        const footerNavCount=footer?.querySelectorAll('nav a').length||0;
+        return {compact:innerWidth<=1100&&!!document.querySelector('header[data-mir-public-shell]'),theme:document.body.classList.contains('mir-signature'),css,prestige,
           accent:getComputedStyle(document.body).getPropertyValue('--mir-accent').trim(),
           paper:getComputedStyle(document.body).getPropertyValue('--mir-surface').trim(),
-          footer:box?.width>0&&box.left>=0&&box.right<=innerWidth&&footer.querySelectorAll('nav a').length===5,
+          // Prestige intentionally uses only logo and signature in the footer.
+          // The classic client shell keeps its five footer destinations.
+          footer:box?.width>0&&box.left>=0&&box.right<=innerWidth&&(prestige?footerNavCount===0:footerNavCount===5),
+          privatePortal:(()=>{const main=document.querySelector('#portal-main'),nav=document.querySelector('#portal-navigation'),shell=document.querySelector('.portal-shell'),footer=document.querySelector('footer.portal-footer');return !!(main&&nav&&shell&&footer&&document.documentElement.scrollWidth<=innerWidth+2);})(),
           heroFits:!hero||(content.top>=frame.top&&content.bottom<=frame.bottom&&content.left>=frame.left&&content.right<=frame.right),
           logo:!!logo,estimate:(()=>{
-            const b=document.querySelector('header.mir-client-header .mir-home-estimate');
-            const rect=b?.getBoundingClientRect();
-            return !!(b&&rect&&rect.width>0&&getComputedStyle(b).display!=='none'&&rect.left>=-2&&rect.right<=innerWidth+2);
+            if(prestige){
+              const nav=document.querySelector('#mir-prestige-header nav.mir-prestige-nav');
+              const link=nav?.querySelector('a[href*="estimation.html"]');
+              if(!link)return false;
+              if(innerWidth<=1100){
+                const toggle=document.querySelector('#mir-client-menu-button'),rect=toggle?.getBoundingClientRect();
+                return !!(toggle&&rect?.width>=44&&getComputedStyle(toggle).display!=='none'&&toggle.getAttribute('aria-controls')===nav.id);
+              }
+              const visible=element=>{if(!element)return false;const rect=element.getBoundingClientRect(),style=getComputedStyle(element);return rect.width>0&&rect.height>0&&style.display!=='none'&&style.visibility!=='hidden'&&rect.left>=-2&&rect.right<=innerWidth+2;};
+              const action=document.querySelector('#mir-prestige-header .mir-prestige-actions>.mir-home-estimate[href*="estimation.html"]');
+              return visible(link)||visible(action);
+            }
+            const button=document.querySelector('header.mir-client-header .mir-home-estimate'),rect=button?.getBoundingClientRect();
+            return !!(button&&rect?.width>0&&getComputedStyle(button).display!=='none'&&rect.left>=-2&&rect.right<=innerWidth+2);
           })()};
       });
       assert.ok(result.theme&&result.css&&result.logo,name+' '+size.id+': thème ou logo absent');
-      assert.equal(result.accent,'#348511',name+' '+size.id+': accent');
+      assert.equal(result.accent,result.prestige?'#bda889':'#348511',name+' '+size.id+': approved accent for the actual public shell');
       assert.equal(result.paper,'#fafaf7',name+' '+size.id+': fond');
       assert.ok(result.compact||result.estimate,name+' '+size.id+': bouton Estimation masqué ou hors écran');
-      assert.ok(result.footer,name+' '+size.id+': pied de page commun absent ou hors écran');
+      if(name==='chantier')assert.ok(result.privatePortal,name+' '+size.id+': espace chantier ou navigation privée absent/hors écran');
+      else assert.ok(result.footer,name+' '+size.id+': pied de page public absent ou hors écran');
       assert.ok(result.heroFits,name+' '+size.id+': texte ou bouton du hero rogné');
       if(harmony){assert.match(await sharedMenu.locator('.mir-home-estimate').getAttribute('href'),/estimation\.html$/);await page.keyboard.press('Escape');assert.equal(await sharedMenu.isVisible(),false);}
       if(['boutique','produit','selection','pliage','plan'].includes(name)){

@@ -1,14 +1,96 @@
-/* Presentation adapter for the public profile wizard. The production controller
+/* Presentation adapter for the public and explicitly opted-in personal profile wizard. The production controller
  * owns all business values, validation, persistence and cart mutations. */
 (() => {
  'use strict';
  const params=new URLSearchParams(location.search);
- if(params.get('mode')!=='client'||params.get('source')==='store'||window.self!==window.top)return;
+ let field=null;
+ try{if(params.get('source')==='store'&&window.parent!==window)field=window.parent.MIRFieldDrawingContext?.();}catch{}
+ const fieldPliage03=params.get('kind')==='profile'&&field?.personal===true&&typeof field.ownerId==='string'&&field.ownerId.trim().length>0&&field.presentation==='pliage03';
+ const publicClient=params.get('source')!=='store'&&window.self===window.top;
+ if(params.get('mode')!=='client'||!publicClient&&!fieldPliage03)return;
+ if(fieldPliage03){document.documentElement.dataset.fieldPliage03='true';document.body.classList.add('mir-prestige');}
  const $=s=>document.querySelector(s);
  const T=s=>s; // Canonical French source; shared locale observer owns FR/EN roundtrips.
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const put=(node,value)=>{if(node&&node.textContent!==T(value))node.textContent=T(value);};
  let mounted=false;
+ let measurePage=0,measurePageSize=3,measureSignature='',measureStep=1,measureLayout='';
+ let traceFocusFrame=0;
+ function revealFieldTraceInput(){
+  traceFocusFrame=0;
+  const input=document.activeElement,host=$('#drawing-tools');
+  if(!fieldPliage03||!matchMedia('(max-width:959px)').matches||document.body.dataset.clientEntry!=='draw'||!input?.matches('#client-point-x,#client-point-y')||!host?.contains(input)||$('dialog[open]'))return;
+  if(!input.getClientRects().length||!host.clientHeight)return;
+  const box=host.getBoundingClientRect(),target=(input.closest('label')||input).getBoundingClientRect();
+  let top=Math.max(0,box.top+host.clientTop),bottom=Math.min(innerHeight,box.top+host.clientTop+host.clientHeight);
+  for(let parent=host.parentElement;parent;parent=parent.parentElement){
+   if(!/hidden|clip|auto|scroll/.test(getComputedStyle(parent).overflowY))continue;
+   const bounds=parent.getBoundingClientRect();
+   top=Math.max(top,bounds.top+parent.clientTop);bottom=Math.min(bottom,bounds.top+parent.clientTop+parent.clientHeight);
+  }
+  if(bottom<=top)return;
+  const margin=Math.min(8,Math.max(0,(bottom-top-target.height)/2));
+  const delta=target.top<top+margin?target.top-top-margin:target.bottom>bottom-margin?target.bottom-bottom+margin:0;
+  if(Math.abs(delta)>.5)host.scrollTop=Math.max(0,Math.min(host.scrollHeight-host.clientHeight,host.scrollTop+delta));
+ }
+ function queueFieldTraceInput(){
+  if(traceFocusFrame)cancelAnimationFrame(traceFocusFrame);
+  traceFocusFrame=requestAnimationFrame(revealFieldTraceInput);
+ }
+ function measurementIndices(count){
+  const start=Math.min(measurePage*(measurePageSize-1),Math.max(0,count-1));
+  return Array.from({length:Math.max(0,Math.min(measurePageSize,count-start))},(_,index)=>start+index);
+ }
+ function syncFieldMeasurementPages(){
+  if(!fieldPliage03)return;
+  const host=$('#production-dimensions');if(!host)return;
+  const sides=Array.from(host.querySelectorAll('.client-measure-field'));
+  const angles=Array.from(host.querySelectorAll('.client-angle-field'));
+  const mobile=matchMedia('(max-width:959px)').matches;
+  const signature=sides.map(node=>node.querySelector('.letter-label b')?.textContent||'').join('|');
+  if(signature!==measureSignature){measureSignature=signature;measurePage=0;}
+  const focused=document.activeElement,editing=host.contains(focused)&&focused?.tagName==='INPUT';
+  // Do not change the page under an active input when the Android keyboard opens.
+  if(!editing){
+   const font=Math.max(parseFloat(getComputedStyle(document.documentElement).fontSize)||16,parseFloat(sides[0]?getComputedStyle(sides[0]).fontSize:'16')||16);
+   measurePageSize=mobile&&(innerHeight<360||font>20)?2:3;
+  }
+  const count=mobile?Math.max(1,Math.ceil((sides.length-1)/(measurePageSize-1))):1;
+  measurePage=Math.max(0,Math.min(count-1,measurePage));
+  const start=mobile?measurePage*(measurePageSize-1):0,end=mobile?Math.min(sides.length,start+measurePageSize):sides.length;
+  sides.forEach((node,index)=>{node.hidden=index<start||index>=end;node.dataset.fieldMeasureIndex=String(index);});
+  angles.forEach((node,index)=>{node.hidden=index<start||index>=end-1;});
+  host.dataset.fieldMeasurePage=String(measurePage+1);
+  host.dataset.fieldMeasurePageSize=String(measurePageSize);
+  host.dataset.fieldMeasurePageCount=String(count);
+  let nav=host.querySelector('.client-measure-pages');
+  if(!nav&&count>1){
+   nav=document.createElement('nav');nav.className='client-measure-pages';nav.setAttribute('aria-label',T('Pages des mesures et angles'));
+   nav.innerHTML='<button type="button" data-field-measure-page-step="-1" aria-label="'+esc(T('Mesures précédentes'))+'"><span aria-hidden="true">←</span><span>'+esc(T('Précédent'))+'</span></button><span class="client-measure-page-status" role="status" aria-live="polite"><span>'+esc(T('Côtés'))+'</span> <b id="client-measure-page-range"></b><small id="client-measure-page-count"></small></span><button type="button" data-field-measure-page-step="1" aria-label="'+esc(T('Mesures suivantes'))+'"><span>'+esc(T('Suivant'))+'</span><span aria-hidden="true">→</span></button>';
+   host.prepend(nav);
+  }
+  if(nav){
+   nav.hidden=count<=1||measureStep!==2;
+   nav.querySelector('[data-field-measure-page-step="-1"]').disabled=measurePage===0;
+   nav.querySelector('[data-field-measure-page-step="1"]').disabled=measurePage===count-1;
+   $('#client-measure-page-range').textContent=(sides[start]?.querySelector('.letter-label b')?.textContent||'')+'–'+(sides[end-1]?.querySelector('.letter-label b')?.textContent||'');
+   $('#client-measure-page-count').textContent=(measurePage+1)+' / '+count;
+  }
+  const layout=start+':'+end;
+  if(layout!==measureLayout){measureLayout=layout;requestAnimationFrame(()=>window.dispatchEvent(new Event('mir:field-measure-page')));}
+ }
+ if(fieldPliage03){
+  document.addEventListener('click',event=>{
+   const button=event.target.closest?.('[data-field-measure-page-step]');if(!button||button.disabled)return;
+   measurePage+=Number(button.dataset.fieldMeasurePageStep);
+   syncFieldMeasurementPages();
+  });
+  document.addEventListener('focusin',event=>{if(event.target.matches?.('#client-point-x,#client-point-y'))queueFieldTraceInput();});
+  window.addEventListener('resize',()=>{requestAnimationFrame(syncFieldMeasurementPages);queueFieldTraceInput();});
+  window.visualViewport?.addEventListener('resize',queueFieldTraceInput);
+  window.visualViewport?.addEventListener('scroll',queueFieldTraceInput);
+  if(typeof ResizeObserver==='function'&&$('#drawing-tools'))new ResizeObserver(queueFieldTraceInput).observe($('#drawing-tools'));
+ }
  function sync({model,step,entry,product,editing,selectedAngle}){
   if(!document.body.classList.contains('mir-pliage03'))return;
   const workspace=$('.production-workspace'),nav=$('.mir-production-steps');
@@ -16,7 +98,7 @@
    nav.classList.add('mir-pliage03-steps');workspace.prepend(nav);
    nav.after($('#client-entry'));$('.config-card').classList.add('mir-pliage03-config');
    const heading=document.createElement('div');heading.className='mir-pliage03-heading';
-   heading.innerHTML='<p class="eyebrow">PLIAGE SUR MESURE</p><a href="selection.html">Voir mon panier <span aria-hidden="true">↗</span></a>';
+   heading.innerHTML='<p class="eyebrow">PLIAGE SUR MESURE</p><a href="'+(fieldPliage03?'chantier.html?view=orders':'selection.html')+'">Voir mon panier <span aria-hidden="true">↗</span></a>';
    workspace.before(heading);
    $('#client-choose-model .client-entry-icon').innerHTML='<svg viewBox="0 0 120 90" aria-hidden="true"><path d="M32 15V70H95" fill="none" stroke="currentColor" stroke-width="4"/></svg>';
    $('#client-draw-profile .client-entry-icon').innerHTML='<svg viewBox="0 0 120 90" aria-hidden="true"><path d="M28 66L34 45 80 10 92 24 45 61Z M34 45L45 61 M72 17L84 31 M28 66L45 61" fill="none" stroke="currentColor" stroke-width="2.5"/></svg>';
@@ -28,6 +110,7 @@
   put($('#client-entry-intro'),'Commencez par un modèle ou dessinez votre propre moulure.');
   if(step===2){put($('#client-step-hint'),'Chaque angle se règle séparément.');put($('.client-angle-heading h3'),'Angles individuels');}
   if(step===4){put($('#client-step-title'),'Vérifier mon pliage');put($('#client-step-hint'),'Vérifiez vos choix et indiquez la quantité à ajouter au panier.');}
+  measureStep=step;syncFieldMeasurementPages();
   let faceHost=$('#mir-pliage03-faces');if(!faceHost){faceHost=document.createElement('div');faceHost.id='mir-pliage03-faces';$('#production-preview').append(faceHost);}
   const freshFace=$('#production-profile-options>.client-painted-face');
   if(freshFace){faceHost.replaceChildren(freshFace);}
@@ -55,5 +138,5 @@
   }
 
  }
- window.MIRPliage03=Object.freeze({sync});
+ window.MIRPliage03=Object.freeze({sync,measurementIndices});
 })();

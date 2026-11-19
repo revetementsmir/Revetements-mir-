@@ -236,6 +236,7 @@
         if(absencesResponse.error&&!missingRoutine(absencesResponse))throw errorOf(absencesResponse.error);
         if(notificationsResponse.error&&!missingRoutine(notificationsResponse))throw errorOf(notificationsResponse.error);
         const profileRead=config.environment==='test'&&config.fieldExperienceEnabled===true&&['employe','chef_equipe'].includes(operationsResponse.data?.role)?sdk.rpc('mir_field_profile',{org:internalOrg}).then(response=>({response}),error=>({error})):null;
+        const temporaryJobsRead=config.environment==='test'&&config.projectRef==='hxtztkmbfpmzrieccwsg'&&config.fieldExperienceEnabled===true&&['employe','chef_equipe','assistant','boss'].includes(operationsResponse.data?.role)?sdk.rpc('mir_temporary_jobs_snapshot',{org:internalOrg}).then(response=>({response}),error=>({error})):null;
         const punch=punchResponse.error?{enabled:false,settings:{},activeShift:null,week:[],corrections:[],bankBalance:0,unavailable:true}:punchResponse.data;
         const expenses=expensesResponse.error?{unavailable:true,role:null,categories:[],expenses:[]}:expensesResponse.data;
         const absences=absencesResponse.error?{unavailable:true,role:null,requests:[]}:absencesResponse.data;
@@ -254,11 +255,31 @@
           const prices=await sdk.rpc('mir_boutique_price_management',{org:internalOrg});if(prices.error)throw errorOf(prices.error);boutiquePricing=prices.data;
         }
         const profileResult=profileRead?await profileRead:null;
+        const temporaryResult=temporaryJobsRead?await temporaryJobsRead:null;
         if(epoch!==generation||sequence!==readSequence||disposed)return null;
         if(profileResult?.error)throw errorOf(profileResult.error);
         let fieldMembers=data.members;
         if(profileResult){const response=profileResult.response;if(response.error)throw errorOf(response.error);const profile=response.data;if(!profile||profile.id!==user.id||profile.role!==operationsResponse.data.role||profile.name!==null&&typeof profile.name!=='string')fail('RESPONSE_UNCERTAIN','Le profil chantier reçu ne correspond pas au compte vérifié.');if(profile.name?.trim())fieldMembers=data.members.map(member=>member.id===user.id?{...member,name:profile.name.trim()}:member);}
-        const snapshot = checkedSnapshot({...data,members:fieldMembers,operations:operationsResponse.data,messaging:messagingResponse.data,lead,boss,logistics,management,boutiquePricing,punch,expenses,absences,notifications}, user.id);
+        let temporaryJobs={available:false,canCreate:false,canComplete:false,teamId:null,jobs:[]},jobs=data.jobs;
+        if(temporaryResult){
+          if(temporaryResult.error)throw errorOf(temporaryResult.error);
+          const response=temporaryResult.response;
+          if(response.error&&!missingRoutine(response))throw errorOf(response.error);
+          if(!response.error){
+            const value=response.data;
+            if(!value||typeof value.canCreate!=='boolean'||typeof value.canComplete!=='boolean'||!Array.isArray(value.jobs)||value.jobs.some(job=>!validTemporaryJob(job)))fail('RESPONSE_UNCERTAIN','Les chantiers temporaires reçus ne peuvent pas être vérifiés.');
+            temporaryJobs={...clone(value),available:true};
+            const merged=new Map(jobs.map(job=>[job.id,job]));
+            for(const job of value.jobs)merged.set(job.id,{...merged.get(job.id),...job});
+            jobs=[...merged.values()];
+            if(management&&Array.isArray(management.jobs)){
+              const managed=new Map(management.jobs.map(job=>[job.id,job]));
+              for(const job of value.jobs)managed.set(job.id,{...managed.get(job.id),...job});
+              management={...management,jobs:[...managed.values()]};
+            }
+          }
+        }
+        const snapshot = checkedSnapshot({...data,jobs,members:fieldMembers,operations:operationsResponse.data,messaging:messagingResponse.data,lead,boss,logistics,management,boutiquePricing,punch,expenses,absences,notifications,temporaryJobs}, user.id);
         emit({ phase: 'ready', snapshot, error: null }, 'refresh');
         return snapshot;
       } catch (error) {
@@ -587,10 +608,84 @@
     async function internalPhotoURL(path){requireReady();if(String(path).split('/')[1]==='message')return chatFileURL(path);const {data,error}=await sdk.storage.from('mir-internal').createSignedUrl(path,300);if(error||!data?.signedUrl)throw errorOf(error||{},'Cette photo ne peut pas être ouverte.');return data.signedUrl;}
     async function jobDossier(jobId,pageBefore=null,pageSize=20){
       requireReady();if(!internalOrg||!UUID.test(jobId||''))fail('JOB_INVALID','Ce chantier ne peut pas être ouvert.');
+      const epoch=generation,actor=status.user.id;
       const {data,error}=await sdk.rpc('mir_job_dossier_snapshot',{org:internalOrg,job:jobId,page_size:Math.min(50,Math.max(1,Number(pageSize)||20)),page_before:pageBefore||null});
-      if(error)throw errorOf(error);if(!data?.job||data.job.id!==jobId)fail('RESPONSE_UNCERTAIN','Le dossier chantier reçu ne peut pas être vérifié.');if(config.environment==='test'&&config.fieldExperienceEnabled===true){const extra=await sdk.rpc('mir_field_job_snapshot',{org:internalOrg,job:jobId});if(extra.error)throw errorOf(extra.error);if(extra.data?.jobId!==jobId)fail('RESPONSE_UNCERTAIN','Le suivi du chantier reçu ne peut pas être vérifié.');data.fieldIssues=extra.data.issues||[];if(extra.data.job?.id===jobId)data.job={...data.job,...extra.data.job};}return data;
+      if(error)throw errorOf(error);if(!data?.job||data.job.id!==jobId)fail('RESPONSE_UNCERTAIN','Le dossier chantier reçu ne peut pas être vérifié.');if(config.environment==='test'&&config.fieldExperienceEnabled===true){const extra=await sdk.rpc('mir_field_job_snapshot',{org:internalOrg,job:jobId});if(extra.error)throw errorOf(extra.error);if(extra.data?.jobId!==jobId)fail('RESPONSE_UNCERTAIN','Le suivi du chantier reçu ne peut pas être vérifié.');data.fieldIssues=extra.data.issues||[];if(extra.data.job?.id===jobId)data.job={...data.job,...extra.data.job};}
+      if(epoch!==generation||status.user?.id!==actor)fail('SESSION_CHANGED','La session a changé. Rouvrez le dossier avec votre compte.');
+      const current=status.snapshot?.temporaryJobs?.jobs?.find(job=>job.id===jobId);
+      if(current&&(!Number.isSafeInteger(data.job.revision)||data.job.revision<=current.revision))data.job={...data.job,...current};
+      return data;
     }
     async function fieldIssueDecide(issueId,decision,response,requestId=uuid()){requireReady();if(config.environment!=='test'||!internalOrg||!UUID.test(issueId||''))fail('ACCESS_DENIED','Traitement indisponible.');const {data,error}=await sdk.rpc('mir_field_issue_decide',{org:internalOrg,issue:issueId,decision,response,request_id:requestId});if(error)throw errorOf(error);if(!data?.ok)fail('RESPONSE_UNCERTAIN','La réponse reste à confirmer.');return data;}
+    function validTemporaryJob(job){
+      return !!job&&UUID.test(job.id||'')&&typeof job.name==='string'&&typeof job.temporary==='boolean'&&['pending_details','complete'].includes(job.detailsStatus)&&Number.isSafeInteger(job.revision)&&job.revision>0&&Array.isArray(job.assignedMemberIds)&&job.assignedMemberIds.every(id=>UUID.test(id));
+    }
+    function temporaryJobGuard(create){
+      requireReady();
+      const role=status.snapshot?.operations?.role;
+      if(config.environment!=='test'||config.projectRef!=='hxtztkmbfpmzrieccwsg'||config.fieldExperienceEnabled!==true||!internalOrg||!status.snapshot?.temporaryJobs?.available||(create?role!=='chef_equipe'||status.snapshot.temporaryJobs.canCreate!==true:!['assistant','boss'].includes(role)||status.snapshot.temporaryJobs.canComplete!==true))fail('ACCESS_DENIED',create?'La création d’un chantier temporaire requiert un chef d’équipe autorisé.':'La fiche doit être complétée par le bureau.');
+      return{epoch:generation,actor:status.user.id,org:internalOrg};
+    }
+    function sameTemporaryJobContext(guard){return guard.epoch===generation&&guard.actor===status.user?.id&&guard.org===internalOrg&&status.phase==='ready';}
+    const temporaryJobPending=new Map();
+    function temporaryIntentStore(guard){
+      let store;
+      try{store=options.temporaryJobStorage||globalThis.localStorage;}catch(_){}
+      if(!store?.getItem||!store?.setItem)fail('STORAGE_REQUIRED','Autorisez le stockage de l’appareil pour reprendre cette création après une coupure.');
+      return{store,key:`mir_temporary_jobs_intents_v1_${config.projectRef}_${guard.org}_${guard.actor}`};
+    }
+    function readTemporaryIntents(guard){
+      const{store,key}=temporaryIntentStore(guard);
+      try{const rows=JSON.parse(store.getItem(key)||'[]');if(!Array.isArray(rows)||rows.some(row=>!UUID.test(row?.requestId||'')||typeof row.create!=='boolean'||!row.payload||typeof row.payload!=='object'))throw Error();return rows;}
+      catch(_){fail('STORAGE_REQUIRED','Les demandes de chantier en attente ne peuvent pas être relues. Conservez la saisie.');}
+    }
+    function writeTemporaryIntents(guard,rows){
+      const{store,key}=temporaryIntentStore(guard),saved=JSON.stringify(rows);
+      try{store.setItem(key,saved);if(store.getItem(key)!==saved)throw Error();}
+      catch(_){fail('STORAGE_REQUIRED','Le suivi de la demande ne peut pas être conservé sur l’appareil. Vérifiez la fiche avant de réessayer.');}
+    }
+    async function temporaryJobCommand(create,job,payload,requestId=uuid()){
+      const guard=temporaryJobGuard(create);
+      if(globalThis.navigator?.onLine===false)fail('NETWORK_UNCERTAIN','Connectez-vous à Internet pour enregistrer ce chantier.',{definitive:false,needsRetry:true});
+      if(!UUID.test(requestId||'')||!create&&!UUID.test(job||''))fail('REQUEST_INVALID','La demande de chantier ne peut pas être préparée.');
+      const fields=create?['name','address','city','note']:['number','name','address','city','phone','clientName'];
+      const clean=Object.fromEntries(fields.filter(key=>Object.hasOwn(payload||{},key)).map(key=>[key,String(payload[key]??'').trim()]));
+      if(!clean.name||clean.name.length>160||(clean.address||'').length>300)fail('JOB_INVALID','Indiquez un nom ou repère de chantier valide.');
+      if(!create){
+        clean.expectedRevision=Number(payload?.expectedRevision);
+        if(!clean.number||!clean.address||!Number.isSafeInteger(clean.expectedRevision)||clean.expectedRevision<1)fail('JOB_INVALID','Le numéro, le nom et l’adresse sont requis pour compléter cette fiche.');
+        if(payload?.teamId){if(!UUID.test(payload.teamId))fail('JOB_INVALID','Choisissez une équipe autorisée.');clean.teamId=payload.teamId;}
+      }
+      const signature=fingerprint([create,job,clean]),key=fingerprint([guard.epoch,guard.actor,guard.org,create,job,clean]);
+      let intent=temporaryJobPending.get(key);
+      if(intent?.promise)return intent.promise;
+      if(!intent){
+        const rows=readTemporaryIntents(guard);
+        const pending=rows.find(row=>fingerprint([row.create,row.job,row.payload])===signature);
+        if(!pending&&rows.some(row=>row.requestId===requestId))fail('REQUEST_CONFLICT','Cette demande attend déjà confirmation avec une autre saisie. Reprenez la saisie initiale ou vérifiez la fiche avant de recommencer.');
+        if(!pending&&rows.length>=25)fail('PENDING_REQUESTS','Plusieurs demandes de chantier attendent confirmation. Reprenez-les avant d’en créer une autre.');
+        intent=pending?{requestId:pending.requestId}:{requestId};
+        if(!pending)writeTemporaryIntents(guard,[...rows,{requestId:intent.requestId,create,job,payload:clean}]);
+        temporaryJobPending.set(key,intent);
+      }
+      intent.promise=(async()=>{
+        const args={org:guard.org,request_id:intent.requestId,payload:clean,...(create?{}:{job})};
+        const response=intent.receipt?{data:intent.receipt}:await sdk.rpc(create?'mir_lead_temporary_job':'mir_temporary_job_complete',args),{data,error}=response;
+        if(!sameTemporaryJobContext(guard))fail('SESSION_CHANGED','La session a changé. Vérifiez la fiche avec le compte d’origine.');
+        if(error)throw errorOf(error);
+        if(data?.ok!==true||!validTemporaryJob(data.job)||data.jobId!==data.job.id||!create&&data.jobId!==job||data.job.temporary!==create)fail('RESPONSE_UNCERTAIN','La confirmation du chantier manque. Réessayez la même demande.',{definitive:false,needsRetry:true});
+        intent.receipt=data;
+        await refresh();
+        if(!sameTemporaryJobContext(guard))fail('SESSION_CHANGED','La session a changé. Vérifiez la fiche avec le compte d’origine.');
+        if(!status.snapshot.jobs.some(row=>row.id===data.jobId))fail('RESPONSE_UNCERTAIN','Chantier enregistré; son accès reste à actualiser. Réessayez la même demande.',{definitive:false,needsRetry:true});
+        writeTemporaryIntents(guard,readTemporaryIntents(guard).filter(row=>row.requestId!==intent.requestId||fingerprint([row.create,row.job,row.payload])!==signature));
+        temporaryJobPending.delete(key);
+        return data;
+      })();
+      try{return await intent.promise;}catch(error){if(!intent.receipt&&sameTemporaryJobContext(guard)&&error instanceof PortalError&&error.definitive&&error.code!=='RESPONSE_UNCERTAIN'){writeTemporaryIntents(guard,readTemporaryIntents(guard).filter(row=>row.requestId!==intent.requestId||fingerprint([row.create,row.job,row.payload])!==signature));temporaryJobPending.delete(key);}throw error;}finally{intent.promise=null;}
+    }
+    async function createTemporaryJob(payload,requestId){return temporaryJobCommand(true,null,payload,requestId);}
+    async function completeTemporaryJob(job,payload,requestId){return temporaryJobCommand(false,job,payload,requestId);}
     async function fieldAction(jobId,kind,payload,requestId=uuid()){
       requireReady();if(config.environment!=='test')fail('FIELD_DISABLED','Le suivi chantier attend sa configuration serveur.');if(!internalOrg||!UUID.test(jobId||'')||!UUID.test(requestId||'')||!['photo','issue','tool'].includes(kind))fail('FIELD_INVALID','Cette demande chantier est invalide.');
       const epoch=generation,{data,error}=await sdk.rpc('mir_field_action',{org:internalOrg,job:jobId,request_id:requestId,kind,payload});if(error)throw errorOf(error);
@@ -762,7 +857,7 @@
       listeners.clear();
     }
     return Object.freeze({ config, start, refresh, sendEmail, signInGoogle, signInPassword,activateInvitation,signUpClient,resetPassword,resendConfirmation,setPassword,saveAddress,removeAddress,completeCallback, signOut, command, retry,
-      acceptInvitation, previewInvitation, listInvitations, fieldAction, fieldIssueDecide, downloadPlan, openConversation, uploadInternal, internalPhotoURL, jobDossier, jobDocumentURL, leadAction, leadJob, bossAction, logisticsAction, adminLogisticsAction, managementAction, boutiquePriceAction, punchAction, syncPunchQueue, punchCorrection, punchAdmin, punchJournal, punchPersonalHistory, punchManagementSnapshot, punchManagementPreview, punchManagementAction, timeBankRequest, submitOrder, syncOrderDraftQueue, setOrderShortcut, syncOrderShortcutQueue, expenseSaveDraft, syncExpenseDrafts, expenseUploadReceipt, expenseSubmit, expenseDecide, expenseReceiptURL, absenceSaveDraft, syncAbsenceDrafts, absenceUploadAttachment, absenceSubmit, absenceDecide, absenceCancel, absenceAttachmentURL, notificationCenter, notificationState, notificationPreferences, harmonySettings, syncHarmonySettings, dispose,
+      acceptInvitation, previewInvitation, listInvitations, fieldAction, fieldIssueDecide, createTemporaryJob, completeTemporaryJob, downloadPlan, openConversation, uploadInternal, internalPhotoURL, jobDossier, jobDocumentURL, leadAction, leadJob, bossAction, logisticsAction, adminLogisticsAction, managementAction, boutiquePriceAction, punchAction, syncPunchQueue, punchCorrection, punchAdmin, punchJournal, punchPersonalHistory, punchManagementSnapshot, punchManagementPreview, punchManagementAction, timeBankRequest, submitOrder, syncOrderDraftQueue, setOrderShortcut, syncOrderShortcutQueue, expenseSaveDraft, syncExpenseDrafts, expenseUploadReceipt, expenseSubmit, expenseDecide, expenseReceiptURL, absenceSaveDraft, syncAbsenceDrafts, absenceUploadAttachment, absenceSubmit, absenceDecide, absenceCancel, absenceAttachmentURL, notificationCenter, notificationState, notificationPreferences, harmonySettings, syncHarmonySettings, dispose,
       chatConversations, chatMessages, chatSearch, validateMessageAttachment, ackChatMessage, chatFileURL, chatPhotoURL,
       helpFAQ, supportSnapshot, supportAction, supportUpload, supportFileURL,
       getStatus: () => ({ ...status }), subscribe: listener => { listeners.add(listener); return () => listeners.delete(listener); }

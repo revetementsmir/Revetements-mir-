@@ -11,8 +11,12 @@ const shortPanel=matchMedia('(max-height: 520px) and (min-aspect-ratio: 3/2)');
 // This selects a local catalogue only; it is not authentication or authorization.
 const catalogueChannel=params.get('source')==='store'?'store':'client';
 const fieldDrawingContext=(()=>{try{return client&&catalogueChannel==='store'&&window.parent!==window?window.parent.MIRFieldDrawingContext?.():null;}catch(_){return null;}})();
-const fieldPersonal=fieldDrawingContext?.personal===true&&typeof fieldDrawingContext.ownerId==='string';
-const KEYS={templates:'mir_production_templates_v1',requests:'mir_production_requests_v1',draft:!client?'mir_production_admin_dossier_v1':catalogueChannel==='store'?(fieldPersonal?'mir_production_employee_dossier_v1_'+fieldDrawingContext.ownerId+'_'+(fieldDrawingContext.jobId||'unassigned'):'mir_production_employee_dossier_v1'):'mir_production_client_dossier_v1'};
+const fieldPersonal=fieldDrawingContext?.personal===true&&typeof fieldDrawingContext.ownerId==='string'&&fieldDrawingContext.ownerId.trim().length>0;
+// The chantier parent opts into presentation only. Store catalogues, template
+// permissions and the personal order remain owned by their existing controllers.
+const fieldPliage03=fieldPersonal&&params.get('kind')==='profile'&&fieldDrawingContext.presentation==='pliage03';
+const fieldActiveScope=fieldPersonal?encodeURIComponent(fieldDrawingContext.ownerId)+':'+encodeURIComponent(fieldDrawingContext.jobId||'unassigned'):'';
+const KEYS={templates:'mir_production_templates_v1',requests:'mir_production_requests_v1',draft:!client?'mir_production_admin_dossier_v1':catalogueChannel==='store'?(fieldPersonal?'mir_production_employee_dossier_v1_'+fieldDrawingContext.ownerId+'_'+(fieldDrawingContext.jobId||'unassigned'):'mir_production_employee_dossier_v1'):'mir_production_client_dossier_v1',activeProfile:fieldPersonal?'mir_production_employee_active_profile_v1_'+fieldActiveScope:catalogueChannel==='store'?'mir_production_store_active_profile_v1':'mir_client_active_profile_v1'};
 const unitValue=(mm,unit)=>unit==='mm'?mm:mm/25.4;
 const fmt=value=>finite(value)?String(Math.round(value*10000)/10000):'';
 const uid=()=>globalThis.crypto?.randomUUID?.()||Date.now().toString(36)+'-'+Math.random().toString(36).slice(2);
@@ -25,6 +29,7 @@ let rightAngleSnap=true;
 let freeformRedo=[];
 const traceHeights=[6,8,10,12,14];
 let traceHeight=14,traceGridDivisor=4;
+let fieldTraceExpanded=false;
 let activeDefaultLocks={},M,materials=[],ral={colors:[]},draft,kind=client||params.get('kind')==='panel'?'panel':'profile',view='face',workflow='configure',authoring=false,editingTemplateId=null,editingItemId=null,selectedTemplate=null,templates=[],requests=[],order,tool='select',snap=true,drawPoints=[],drawTransform=null,drag=null,orbit=-35,pitch=23,zoom=1,viewPan={x:0,y:0},pointers=new Map(),busy=false,colorSystem='manufacturer',colorId='',materialId='',colorQuery='',toastTimer,suppressClick=false;
 let clientStep=1,clientUnlocked=1,clientProfileSelected=false,clientWizardPlaces=[],clientEntry='choice';
 let clientDraftReady=false,legacyQuickId=null;
@@ -60,7 +65,7 @@ function applyStoreColorLock(){
 const profiles={l:{name:'Pliage en L',dimensions:{A:3,B:2}},j:{name:'Pliage en J',dimensions:{A:1,B:3,C:1}},z:{name:'Pliage en Z',dimensions:{A:2,B:4,C:2}},beam5:{name:'Cache-poutre · 5 côtés',dimensions:{A:1,B:6,C:8,D:6,E:1}},omega:{name:'Oméga',dimensions:{A:1,B:2,C:4,D:2,E:1}},custom:{name:'Profil personnalisé',segments:[{label:'A',length:4},{label:'B',length:3},{label:'C',length:2}],bends:[{mode:'interior',angle:90,direction:'left'},{mode:'interior',angle:90,direction:'right'}],startAngle:0},...window.MIRBendingPresets?.catalog(),j_soffite:{name:'J à soffite · 12 pi',template:'j',mirProfileId:'j_soffite',dimensions:{A:1,B:3,C:1}}};
 const phase10ProfileIds=new Set((window.MIRBendingPresets?.VARIANTS||[]).map(({id})=>id));
 const shapes=[['rectangle','Rectangle'],['square','Carré'],['right-triangle','Triangle rectangle'],['triangle','Triangle à sommet'],['roof-slope','Panneau haut rampant X/12'],['trapezoid','Trapèze'],['parallelogram','Parallélogramme'],['pointed','Côté en pointe']];
-function store(key,value){try{localStorage.setItem(key,JSON.stringify(value));if(key===KEYS.draft)window.dispatchEvent(new CustomEvent('mir:workshop-saved'));if(client&&catalogueChannel!=='store'&&[KEYS.draft,'mir_client_active_profile_v1'].includes(key)){const label=document.querySelector('.workshop-banner span:last-child');if(label)label.textContent=(key===KEYS.draft?'Dossier':'Tracé')+' enregistré sur cet appareil';if(clientProfileWizard()){let status=$('#client-local-save');if(!status){status=document.createElement('p');status.id='client-local-save';status.className='field-hint';status.setAttribute('role','status');$('#client-step-hint')?.after(status);}status.textContent='Enregistré';status.title='Enregistré sur cet appareil';status.setAttribute('aria-label','Enregistré sur cet appareil');status.dataset.clientSaveState='saved';}}return true;}catch{const status=$('#client-local-save');if(status){status.textContent='Sauvegarde locale indisponible · exportez votre dossier';status.dataset.clientSaveState='error';status.removeAttribute('aria-label');}toast('La sauvegarde locale est indisponible. Exportez votre dossier JSON.');return false;}}
+function store(key,value){try{localStorage.setItem(key,JSON.stringify(value));if(key===KEYS.draft)window.dispatchEvent(new CustomEvent('mir:workshop-saved'));if(client&&(catalogueChannel!=='store'||fieldPliage03)&&[KEYS.draft,KEYS.activeProfile].includes(key)){const label=document.querySelector('.workshop-banner span:last-child');if(label)label.textContent=(key===KEYS.draft?'Dossier':'Tracé')+' enregistré sur cet appareil';if(clientProfileWizard()){let status=$('#client-local-save');if(!status){status=document.createElement('p');status.id='client-local-save';status.className='field-hint';status.setAttribute('role','status');$('#client-step-hint')?.after(status);}status.textContent='Enregistré';status.title='Enregistré sur cet appareil';status.setAttribute('aria-label','Enregistré sur cet appareil');status.dataset.clientSaveState='saved';}}return true;}catch{const status=$('#client-local-save');if(status){status.textContent='Sauvegarde locale indisponible · exportez votre dossier';status.dataset.clientSaveState='error';status.removeAttribute('aria-label');}toast('La sauvegarde locale est indisponible. Exportez votre dossier JSON.');return false;}}
 function persist(){store(KEYS.draft,{version:1,order});}
 function toast(text,{quiet=false}={}){$('#production-toast').textContent=text;$('#production-toast').classList.toggle('visible',!quiet);clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#production-toast').classList.remove('visible'),4400);}
 function closeDialog(){pendingPOAfterSave=null;$('#production-dialog').close();}
@@ -181,19 +186,40 @@ function clientProfileBends(){
  if(draft.template==='custom')return draft.bends||[];
  return (M.TEMPLATES[draft.template]?.turns||[]).map(turn=>({mode:'interior',angle:180-Math.abs(turn),direction:turn>0?'left':'right'}));
 }
+function normalizeFieldBendAngles(bends){
+ if(!fieldPliage03||!Array.isArray(bends))return;
+ for(const bend of bends){
+  if(!bend||bend.mode==='hem'||bend.angle===''||bend.angle===null||bend.angle===undefined)continue;
+  const angle=Number(String(bend.angle).replace(',','.'));
+  const interior=bend.mode==='signed'?180-Math.abs(angle):angle;
+  // Invalid/incomplete entries stay invalid. Do not silently create a repli
+  // or change its direction when rounding an ordinary angle.
+  if(!Number.isFinite(interior)||interior<=0||interior>180)continue;
+  const rounded=Math.max(1,Math.round(interior));
+  if(bend.mode==='signed'&&rounded===180&&angle!==0)bend.direction=angle<0?'right':'left';
+  bend.angle=bend.mode==='signed'?(rounded===180?0:(180-rounded)*(angle<0?-1:1)):rounded;
+ }
+}
+function normalizeFieldProfileAngles(){
+ if(!fieldPliage03||kind!=='profile'||!draft)return;
+ if(draft.template==='custom')normalizeFieldBendAngles(draft.bends);
+ normalizeFieldBendAngles(clientModelAngles);
+}
 function rememberClientAngles(force=false){
  if(!clientProfileWizard())return;
  const bends=clientProfileBends();
  if(force||!Array.isArray(clientModelAngles)||clientModelAngles.length!==bends.length){
   const source=selectedTemplate?.kind==='profile'&&selectedTemplate.topology?.bends;
   clientModelAngles=copy(Array.isArray(source)&&source.length===bends.length?source:bends);
+  if(tool!=='draw')normalizeFieldBendAngles(clientModelAngles);
  }
 }
 function clientInteriorAngle(bend){
  if(bend?.mode==='hem')return 180;
  if(bend?.angle===''||bend?.angle===null||bend?.angle===undefined)return '';
  const angle=Number(String(bend.angle).replace(',','.'));
- return Number.isFinite(angle)?bend.mode==='signed'?180-Math.abs(angle):angle:'';
+ const interior=bend.mode==='signed'?180-Math.abs(angle):angle;
+ return Number.isFinite(interior)?fieldPliage03?Math.round(interior):interior:'';
 }
 function editableClientBends(){
  if(draft.template==='custom')return draft.bends;
@@ -233,7 +259,7 @@ function renderClientMeasurements(){
  const sides=segments.map((segment,index)=>`<label class="client-measure-field"><span class="letter-label"><b>${esc(segment.label)}</b><span>${esc(segment.name||'Côté '+segment.label)}</span><small>${unit}</small></span><input ${draft.template==='custom'?`data-segment-length="${index}"`:`data-measure="${esc(segment.label)}"`} type="text" inputmode="text" value="${esc(segment.length??'')}" placeholder="ex. ${unit==='po'?'2¼':'57,15'}" aria-label="Côté ${esc(segment.label)} — ${esc(segment.name||'mesure')} (${unit})"></label>`).join('');
  const angles=bends.map((bend,index)=>{
   const label=segments[index].label+'–'+segments[index+1].label,hem=bend.mode==='hem',value=clientInteriorAngle(bend);
-  return `<div class="client-angle-field${hem?' client-hem-angle':''}" data-angle-index="${index}"><label><span>${publicPliage03()?'Angle ':''}${esc(label)} <small>${hem?'Repli':'°'}</small></span><input data-client-bend-angle="${index}" type="number" min="0.001" max="180" step="any" value="${esc(value)}" aria-label="${hem?'Retour écrasé':'Angle intérieur'} ${esc(label)} en degrés"${hem?' readonly aria-readonly="true" title="Repli 180° conservé du modèle"':''}></label>${publicPliage03()&&!hem?`<div class="client-angle-nudges"><button type="button" data-client-angle-nudge="${index}" data-delta="-1" aria-label="Diminuer l’angle ${esc(label)}">−</button><button type="button" data-client-angle-nudge="${index}" data-delta="1" aria-label="Augmenter l’angle ${esc(label)}">+</button></div>`:''}</div>`;
+  return `<div class="client-angle-field${hem?' client-hem-angle':''}" data-angle-index="${index}"><label><span>${publicPliage03()?'Angle ':''}${esc(label)} <small>${hem?'Repli':'°'}</small></span><input data-client-bend-angle="${index}" type="number"${fieldPliage03?' inputmode="numeric" min="1" max="180" step="1"':' min="0.001" max="180" step="any"'} value="${esc(value)}" aria-label="${hem?'Retour écrasé':'Angle intérieur'} ${esc(label)} en degrés"${hem?' readonly aria-readonly="true" title="Repli 180° conservé du modèle"':''}></label>${publicPliage03()&&!fieldPliage03&&!hem?`<div class="client-angle-nudges"><button type="button" data-client-angle-nudge="${index}" data-delta="-1" aria-label="Diminuer l’angle ${esc(label)}">−</button><button type="button" data-client-angle-nudge="${index}" data-delta="1" aria-label="Augmenter l’angle ${esc(label)}">+</button></div>`:''}</div>`;
  }).join('');
  return `<div class="client-measures-grid" data-client-side-count="${segments.length}">${sides}</div><section class="client-angle-controls" aria-label="Angles de votre modèle"><div class="client-angle-heading"><h3>Angles du modèle</h3><button type="button" id="client-reset-model-angles" class="plain-button">Rétablir les angles</button>${bends.some(bend=>bend.mode==='hem')?'<button type="button" id="client-hem-options" class="plain-button">Options des replis</button>':''}</div><div class="client-angles-grid" data-client-angle-count="${bends.length}">${angles}</div></section>`;
 }
@@ -506,13 +532,45 @@ function drawingModel(){const actual=build();if(actual.valid)return {model:actua
   if(preview.valid)return {model:preview,illustrative:true};
  }const example=selectedTemplate&&M.templatePreview(selectedTemplate);return {model:example?.ok?example.model:build(sampleSpec(kind,kind==='profile'?draft.template:draft.shape)),illustrative:true};}
 function traceGridStepMM(unit=draft.unit){return unit==='mm'?1:25.4/traceGridDivisor;}
-function traceGridSVG(unit){
+function fieldTraceViewport(){
+ const compact=matchMedia('(max-width:600px)').matches,width=compact?440:800;
+ const stage=$('#production-drawing'),w=stage?.clientWidth,h=stage?.clientHeight;
+ // A fixed logical width keeps the projection uniform. A taller canvas adds
+ // usable drawing room above and below instead of letterboxing the same SVG.
+ const height=w>0&&h>0?width*h/w:520;
+ return {x:compact?100:0,y:(520-height)/2,width,height};
+}
+function fieldTraceProjection(points,viewport,tr=null){
+ if(!points.length)return tr;
+ // Reserve space for the side labels, hem returns and touch handles as well
+ // as the profile itself. This changes only the screen projection.
+ const margin=72,xs=points.map(p=>p[0]),ys=points.map(p=>p[1]);
+ const minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);
+ if(tr&&tr.ox+minX*tr.scale>=viewport.x+margin&&tr.ox+maxX*tr.scale<=viewport.x+viewport.width-margin&&tr.oy-maxY*tr.scale>=viewport.y+margin&&tr.oy-minY*tr.scale<=viewport.y+viewport.height-margin)return tr;
+ const scale=Math.min(tr?.scale??Infinity,Math.max(1,viewport.width-2*margin)/Math.max(.001,maxX-minX),Math.max(1,viewport.height-2*margin)/Math.max(.001,maxY-minY));
+ const cx=(minX+maxX)/2,cy=(minY+maxY)/2,halfW=(maxX-minX)*scale/2,halfH=(maxY-minY)*scale/2;
+ const centerX=tr?Math.max(viewport.x+margin+halfW,Math.min(viewport.x+viewport.width-margin-halfW,tr.ox+cx*scale)):viewport.x+viewport.width/2;
+ const centerY=tr?Math.max(viewport.y+margin+halfH,Math.min(viewport.y+viewport.height-margin-halfH,tr.oy-cy*scale)):viewport.y+viewport.height/2;
+ return {scale,ox:centerX-cx*scale,oy:centerY+cy*scale};
+}
+function refreshFieldTraceCanvas(){
+ if(!fieldPliage03||!canDrawProfile()||drag)return;
+ if(drawTransform&&drawPoints.length){
+  const model=build(),origin=drawPoints[0];
+  const points=model.valid&&model.pointsMM.length===drawPoints.length?model.pointsMM.map(([x,y])=>[x+origin[0],y+origin[1]]):drawPoints;
+  drawTransform=fieldTraceProjection(points,fieldTraceViewport(),drawTransform);
+ }
+ const shown=drawingModel();
+ $('#production-drawing').innerHTML=diagramSVG(shown.model,{illustrative:shown.illustrative});
+}
+function traceGridSVG(unit,viewport){
  if(!snap||!drawTransform)return '';
  const {scale,ox,oy}=drawTransform;
  const spacing=traceGridStepMM(unit)*scale,step=fmt(spacing);
  if(clientProfileWizard()){
   const major=fmt(spacing*(unit==='mm'?10:traceGridDivisor));
-  return `<defs><pattern id="mir-trace-minor" width="${step}" height="${step}" x="${fmt(ox)}" y="${fmt(oy)}" patternUnits="userSpaceOnUse"><path d="M${step} 0H0V${step}" fill="none" stroke="#a8b5ad" stroke-opacity=".75"/></pattern><pattern id="mir-trace-major" width="${major}" height="${major}" x="${fmt(ox)}" y="${fmt(oy)}" patternUnits="userSpaceOnUse"><path d="M${major} 0H0V${major}" fill="none" stroke="#71877c" stroke-opacity=".75" stroke-width="1.3"/></pattern></defs><g aria-hidden="true" pointer-events="none"><rect width="800" height="520" fill="#fff"/><rect width="800" height="520" fill="url(#mir-trace-minor)"/><rect width="800" height="520" fill="url(#mir-trace-major)"/></g>`;
+  const bounds=viewport?`x="${fmt(viewport.x)}" y="${fmt(viewport.y)}" width="${fmt(viewport.width)}" height="${fmt(viewport.height)}"`:'width="800" height="520"';
+  return `<defs><pattern id="mir-trace-minor" width="${step}" height="${step}" x="${fmt(ox)}" y="${fmt(oy)}" patternUnits="userSpaceOnUse"><path d="M${step} 0H0V${step}" fill="none" stroke="#a8b5ad" stroke-opacity=".75"/></pattern><pattern id="mir-trace-major" width="${major}" height="${major}" x="${fmt(ox)}" y="${fmt(oy)}" patternUnits="userSpaceOnUse"><path d="M${major} 0H0V${major}" fill="none" stroke="#71877c" stroke-opacity=".75" stroke-width="1.3"/></pattern></defs><g aria-hidden="true" pointer-events="none"><rect ${bounds} fill="#fff"/><rect ${bounds} fill="url(#mir-trace-minor)"/><rect ${bounds} fill="url(#mir-trace-major)"/></g>`;
  }
  return `<defs><pattern id="mir-trace-grid" width="${step}" height="${step}" x="${fmt(ox)}" y="${fmt(oy)}" patternUnits="userSpaceOnUse"><path d="M${step} 0H0V${step}" fill="none" stroke="#c3cebc" stroke-opacity=".58" stroke-width="1"/></pattern></defs><g aria-hidden="true" pointer-events="none"><rect width="800" height="520" fill="#fcfcf8"/><rect width="800" height="520" fill="url(#mir-trace-grid)"/></g>`;
 }
@@ -525,12 +583,12 @@ function bendAngleLabel(bend){
   // La rotation du tracé n'est PAS l'angle intérieur entre deux côtés.
   // Exemple : rotation de 30° => angle intérieur réel de 150°.
   const turn=Number(bend.angle);
-  return Number.isFinite(turn)?fmt(180-Math.abs(turn))+'°':'À préciser';
+  return Number.isFinite(turn)?fmt(fieldPliage03?Math.round(180-Math.abs(turn)):180-Math.abs(turn))+'°':'À préciser';
  }
  const angle=Number(bend?.angle);
- return Number.isFinite(angle)?fmt(angle)+'°':'À préciser';
+ return Number.isFinite(angle)?fmt(fieldPliage03?Math.round(angle):angle)+'°':'À préciser';
 }
-function profileAnglesOverlay(model,{segments,folds},labels,handles,[leftEdge,rightEdge]){
+function profileAnglesOverlay(model,{segments,folds},labels,handles,[leftEdge,rightEdge],[topEdge,bottomEdge]=[0,520]){
  const pointBounds=[...folds,...handles].map(([x,y])=>[x,y,9,9]);
  return (model.bends||[]).map((bend,i)=>{
   if(!bend||bend.mode==='hem'||!segments[i]||!segments[i+1])return '';
@@ -549,7 +607,7 @@ function profileAnglesOverlay(model,{segments,folds},labels,handles,[leftEdge,ri
   const visualLabel=fmt(Math.round(Number.parseFloat(label)*100)/100)+'°';
   const halfWidth=visualLabel.length*4.6+3,halfHeight=11;
   const clear=([x,y])=>{
-   if(x<leftEdge+halfWidth+4||x>rightEdge-halfWidth-4||y<halfHeight+4||y>516-halfHeight)return false;
+   if(x<leftEdge+halfWidth+4||x>rightEdge-halfWidth-4||y<topEdge+halfHeight+4||y>bottomEdge-4-halfHeight)return false;
    if(labels.some(([px,py,w,h])=>Math.abs(x-px)<halfWidth+w+4&&Math.abs(y-py)<halfHeight+h+4))return false;
    if(pointBounds.some(([px,py,w,h])=>Math.abs(x-px)<halfWidth+w&&Math.abs(y-py)<halfHeight+h))return false;
    // A scaled distance leaves clearance around the text and the thick profile stroke.
@@ -584,7 +642,9 @@ function profileAnglesOverlay(model,{segments,folds},labels,handles,[leftEdge,ri
 function publicProfileDiagramContent(model,mapped,options={}){
  if(!publicPliage03()||!window.MIRPliageSurfaces)return M.profileDiagramContent(model,mapped,options);
  const section=M.profileSectionPath(mapped,options.bends||model.bends||[]);
- let base=M.profileDiagramContent(model,mapped,{...options,section,illustrative:true});
+ // Public illustrations retain their original presentation. The chantier
+ // preview also shows the entered dimensions without duplicating painted marks.
+ let base=M.profileDiagramContent(model,mapped,{...options,section,illustrative:true,showMeasurements:fieldPliage03&&!options.illustrative&&options.showMeasurements!==false&&tool==='select',hemSideMarkers:fieldPliage03,horizontalMeasurements:fieldPliage03&&tool==='select'});
  // This blue offset identifies the physical left/right surface; it is not a
  // product colour, a new profile, nor a fabricated bending radius.
  if(model.coloredFace?.side&&tool!=='draw'){
@@ -613,20 +673,66 @@ function compactClientProfileSVG(model,{illustrative=false,painted=false,width:g
   labels.push('<g class="client-compact-side" data-marker-label="'+esc(label)+'"><path d="M'+mid.map(fmt).join(',')+'L'+p.map(fmt).join(',')+'" stroke="#8a8b80" stroke-width=".7"/><rect x="'+fmt(p[0]-10)+'" y="'+fmt(p[1]-10)+'" width="20" height="20" rx="3" fill="#ece8df"/><text x="'+fmt(p[0])+'" y="'+fmt(p[1]+4.5)+'" text-anchor="middle" font-size="13" font-weight="600" fill="#242522">'+esc(label)+'</text></g>');
  }
  // Render the existing physical model; only the screen projection and labels are compact.
- const profile=publicProfileDiagramContent(model,mapped,{markers:false,illustrative:!painted,highContrast:true,horizontalBounds:[0,width],verticalBounds:[0,height]})
+ const profile=publicProfileDiagramContent(model,mapped,{markers:false,illustrative:!painted,showMeasurements:false,highContrast:true,horizontalBounds:[0,width],verticalBounds:[0,height]})
   .replace('stroke-width="9"','stroke-width="4"')
   .replace(/(<path[^>]*stroke="#dfe8e3"[^>]*stroke-width=")4"/,(_,prefix)=>prefix+'1.5"');
  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+width+' '+height+'" role="img" aria-label="'+esc(model.name)+'"><title>'+esc(model.name)+(illustrative?' — proportions du modèle, cotes à saisir':' — cotes de la pièce')+'</title>'+profile+(publicPliage03()&&painted?'':labels.join(''))+'</svg>';
 }
+function fieldProfileDiagramSVG(model,{illustrative=false}={}){
+ const host=$('#production-drawing'),width=Math.max(240,Math.round(host.clientWidth||innerWidth-32)),height=Math.max(140,Math.round(host.clientHeight||220));
+ const points=model.pointsMM||[];if(points.length<2)return '';
+ const xs=points.map(point=>point[0]),ys=points.map(point=>point[1]),minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);
+ // Keep SVG units equal to CSS pixels. Start with a larger drawing and reserve
+ // extra annotation space only on the side that needs it, without shrinking text.
+ const project=([top,bottom])=>{
+  const scale=Math.min(Math.max(24,width-144)/Math.max(1,maxX-minX),Math.max(24,height-top-bottom)/Math.max(1,maxY-minY));
+  const tr={scale,ox:width/2-(minX+maxX)*scale/2,oy:(height+top-bottom)/2+(minY+maxY)*scale/2};
+  return {tr,mapped:points.map(point=>pointOnView(point,tr))};
+ };
+ const markerIndices=clientStep===4?model.segments.map((_,index)=>index):window.MIRPliage03?.measurementIndices?.(model.segments.length)||model.segments.map((_,index)=>index).slice(0,3);
+ const shownAngles={...model,bends:(model.bends||[]).map((bend,index)=>markerIndices.includes(index)&&markerIndices.includes(index+1)?bend:null)};
+ const options={bends:model.bends||[],markerModel:model,markerIndices,markers:true,illustrative,paintedMarker:'star',highContrast:true,horizontalBounds:[0,width],verticalBounds:[0,height],angleOverlay:(section,labels,handles)=>profileAnglesOverlay(shownAngles,section,labels,handles,[0,width],[0,height])};
+ let content,accepted,legend='';
+ for(const margins of [[12,12],[12,24],[24,12],[12,52],[52,12],[12,62],[62,12],[55,65]]){
+  const projection=project(margins);
+  try{content=publicProfileDiagramContent(model,projection.mapped,options);accepted=projection;break;}
+  catch(error){if(!String(error.message||'').startsWith('Cotation technique sans espace'))throw error;}
+ }
+ if(!accepted){
+  // Dense profiles retain their side labels and an explicit measured legend;
+  // no entered dimension is silently removed or replaced by a sample value.
+  const projection=project([55,65]);
+  content=publicProfileDiagramContent(model,projection.mapped,{...options,showMeasurements:false,angleOverlay:undefined});
+  accepted=projection;
+  if(!illustrative){
+   const cell=(width-16)/Math.max(1,markerIndices.length);
+   legend='<g class="mir-field-dimension-legend"><rect x="4" y="'+(height-28)+'" width="'+(width-8)+'" height="26" rx="5" fill="#252624"/>'+markerIndices.map((index,position)=>'<text x="'+fmt(8+cell*(position+.5))+'" y="'+(height-14)+'" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#f2efe6">'+esc(model.segments[index].label+' · '+M.formatMeasurement(model.segments[index].lengthMM,model.unit))+'</text>').join('')+'</g>';
+  }
+ }
+ drawTransform=accepted.tr;
+ if(!illustrative&&clientStep===2)content=content.replace(/<g class="profile-side-marker" data-marker-label="([^"]+)"[^>]*>/g,(match,label)=>{
+  const index=model.segments.findIndex(segment=>segment.label===label);
+  return index>=0&&profileMeasureInput(index,label)?match.replace(/\s+pointer-events="none"/,'').replace(/\s+aria-hidden="true"/,'').replace(/>$/,` data-edit-profile-measure="${index}" role="button" tabindex="0" aria-label="Modifier la cote ${esc(label)}" style="cursor:pointer">`):match;
+ });
+ let output=content+legend;
+ if(clientStep===4){
+  drawTransform={scale:accepted.tr.scale*zoom,ox:width/2+(accepted.tr.ox-width/2)*zoom+viewPan.x,oy:height/2+(accepted.tr.oy-height/2)*zoom+viewPan.y};
+  output=`<g class="mir-field-review-projection" transform="translate(${fmt(viewPan.x)} ${fmt(viewPan.y)}) translate(${width/2} ${height/2}) scale(${fmt(zoom)}) translate(${-width/2} ${-height/2})">${output}</g>`;
+ }
+ return `<svg xmlns="http://www.w3.org/2000/svg" class="mir-field-measured-profile" viewBox="0 0 ${width} ${height}" role="group" aria-label="${esc(model.name)} — ${illustrative?'proportions illustratives':'cotes de la pièce finie'}" data-measurement-presentation="${legend?'legend':illustrative?'illustrative':'dimensions'}"><title>${esc(model.name)} — ${illustrative?'proportions illustratives, sans cotes de fabrication':markerIndices.map(index=>model.segments[index].label+' : '+M.formatMeasurement(model.segments[index].lengthMM,model.unit)).join(' ; ')}</title>${output}</svg>`;
+}
 function diagramSVG(model,{illustrative=false,small=false,interactive=true}={}){
+ if(fieldPliage03&&[2,4].includes(clientStep)&&model.kind==='profile'&&interactive&&!small&&tool==='select')return fieldProfileDiagramSVG(model,{illustrative});
  if(clientProfileWizard()&&!publicPliage03()&&model.kind==='profile'&&interactive&&!small&&clientStep===2&&innerWidth<780&&tool==='select')return compactClientProfileSVG(model,{illustrative});
  if(model.kind==='panel'&&window.MIRProductionVolume)return panelDiagramSVG(model,{illustrative,small,interactive});
  const freehand=interactive&&tool==='draw'&&model.kind==='profile';
- const grid=freehand?traceGridSVG(model.unit):'';
+ const traceViewport=fieldPliage03&&freehand?fieldTraceViewport():null;
+ const grid=freehand?traceGridSVG(model.unit,traceViewport):'';
  const publicProfile=clientProfileWizard()&&model.kind==='profile';
  const compactTrace=freehand&&publicProfile&&matchMedia('(max-width:600px)').matches;
  const horizontalBounds=compactTrace?[100,540]:[0,800];
- const [left,right]=horizontalBounds,viewBox=left+' 0 '+(right-left)+' 520';
+ const [left,right]=horizontalBounds,verticalBounds=traceViewport?[traceViewport.y,traceViewport.y+traceViewport.height]:[0,520];
+ const viewBox=traceViewport?[traceViewport.x,traceViewport.y,traceViewport.width,traceViewport.height].map(fmt).join(' '):left+' 0 '+(right-left)+' 520';
  const points=freehand?(drawPoints.length>=3&&model.pointsMM.length===drawPoints.length
   ?model.pointsMM.map(([x,y])=>[x+drawPoints[0][0],y+drawPoints[0][1]]):drawPoints):model.pointsMM||[];if(!points.length)return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}">${grid}<text x="${(left+right)/2}" y="250" text-anchor="middle" font-family="Arial" font-size="${compactTrace?13:19}" fill="#7b8b6c">${clientProfileWizard()?esc(clientTracePrompt()):'Glisse pour tracer le premier côté.'}</text></svg>`;
  const tr=(tool==='draw'||drag?.type==='point')&&drawTransform?drawTransform:fitModel({...model,pointsMM:points});
@@ -635,8 +741,37 @@ function diagramSVG(model,{illustrative=false,small=false,interactive=true}={}){
  if(interactive&&!drag)drawTransform=tr;
  const mapped=points.map(p=>pointOnView(p,tr)),polygon=model.kind==='panel',pointString=mapped.map(p=>p.map(fmt).join(',')).join(' '),hex=/^#[0-9a-f]{6}$/i.test(model.finish?.hex||'')?model.finish.hex:'#dce5d4';let output=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}" role="group" aria-label="${esc(model.name)} — ${illustrative?'illustration du modèle':'cotes de la pièce finie'}" font-family="Arial,sans-serif"><title>${esc(model.name)} — ${illustrative?'proportions illustratives, sans cotes de fabrication':'dimensions de la pièce finie'}</title>${grid}`;
  if(polygon)output+=`<polygon points="${pointString}" fill="${hex}" fill-opacity=".65" stroke="#546b4a" stroke-width="2"/>`;else {
- output+=publicProfileDiagramContent(model,mapped,{bends:freehand&&drawPoints.length<3?[]:model.bends||[],markers:!small,markerModel:freehand||publicProfile?{segments:model.segments?.map(({label})=>({label}))}:model,paintedMarker:publicProfile?'star':'stripe',highContrast:publicProfile,handles:tool==='draw'||tool==='edit'?mapped:[],illustrative:illustrative||(interactive&&tool!=='select'),togglePaintedFace:interactive&&!small&&tool==='select'&&!illustrative&&(!clientProfileWizard()||clientStep===3),
-  horizontalBounds,angleOverlay:!small&&(!illustrative||publicProfile)?(section,labels,handles)=>profileAnglesOverlay(model,section,labels,handles,horizontalBounds):undefined});
+ const profileOptions={bends:freehand&&drawPoints.length<3?[]:model.bends||[],
+  // The field's select-stage measurements and review use fieldProfileDiagramSVG.
+  // On other field select stages this secondary canvas can be hidden or tiny;
+  // placing technical side markers there causes "Cotation technique sans espace".
+  // Keep markers in actual trace/edit mode, never alter points or entered cotes.
+  markers:!small&&(!fieldPliage03||tool==='draw'||tool==='edit'),markerModel:freehand||publicProfile&&(!fieldPliage03||illustrative)?{segments:model.segments?.map(({label})=>({label}))}:model,paintedMarker:publicProfile?'star':'stripe',highContrast:publicProfile,handles:tool==='draw'||tool==='edit'?mapped:[],illustrative:illustrative||(interactive&&tool!=='select'),togglePaintedFace:interactive&&!small&&tool==='select'&&!illustrative&&(!clientProfileWizard()||clientStep===3),
+  horizontalBounds,verticalBounds,showMeasurements:fieldPliage03?false:undefined,angleOverlay:!small&&(!illustrative||publicProfile)?(section,labels,handles)=>profileAnglesOverlay(model,section,labels,handles,horizontalBounds,verticalBounds):undefined};
+   try{output+=publicProfileDiagramContent(model,mapped,profileOptions);}
+   catch(error){
+     // Only the field freehand surface has a compact grid that can shrink when
+     // its reference scale changes. Preserve the original model/points/bends;
+     // draw a readable indexed legend if the collision-avoiding side-marker
+     // placement has no room. Other public/workshop errors still propagate.
+     if(!fieldPliage03||!freehand||!String(error?.message||'').startsWith('Cotation technique sans espace'))throw error;
+     output+=publicProfileDiagramContent(model,mapped,{...profileOptions,markers:false,showMeasurements:false});
+     const segments=(model.segments||[]).slice(0,Math.max(0,mapped.length-1));
+     if(segments.length){
+       const cols=Math.min(3,segments.length),rows=Math.ceil(segments.length/cols),cell=(right-left)/cols;
+       const panelHeight=rows*23+12,panelTop=verticalBounds[1]-panelHeight-5;
+       output+='<g class="mir-field-trace-label-fallback" aria-label="Cotes du tracé" pointer-events="none">';
+       output+='<rect x="'+fmt(left+3)+'" y="'+fmt(panelTop)+'" width="'+fmt(right-left-6)+'" height="'+fmt(panelHeight)+'" rx="4" fill="#242522" fill-opacity="0.96"/>';
+       for(const [index,segment] of segments.entries()){
+         const col=index%cols,row=Math.floor(index/cols),label=segment.label||String.fromCharCode(65+index);
+         const length=Number.isFinite(segment.lengthMM)?M.formatMeasurement(segment.lengthMM,model.unit):'';
+         const textValue=label+(length?' · '+length:'');
+         const x=left+cell*(col+.5),y=panelTop+17+row*23;
+         output+='<text x="'+fmt(x)+'" y="'+fmt(y)+'" text-anchor="middle" font-size="13" font-weight="600" fill="#f4f1ea">'+esc(textValue)+'</text>';
+       }
+       output+='</g>';
+     }
+   }
  }
  const count=polygon?points.length:Math.max(0,points.length-1);for(let i=0;i<count;i++){const a=mapped[i],b=mapped[(i+1)%mapped.length],delta=[b[0]-a[0],b[1]-a[1]],len=Math.hypot(...delta)||1,mid=[(a[0]+b[0])/2,(a[1]+b[1])/2],normal=[-delta[1]/len,delta[0]/len];if(polygon){const edge=model.edges?.[i],bottom=edge?.id===model.bottomEdgeId;if(bottom&&!illustrative)output+=`<line x1="${fmt(a[0])}" y1="${fmt(a[1])}" x2="${fmt(b[0])}" y2="${fmt(b[1])}" stroke="${model.perforation?.enabled?'#26758d':'#54863f'}" stroke-width="6"${model.perforation?.enabled?' stroke-dasharray="11 6"':''}/>`;output+=`<g${interactive&&edge&&!authoring?` data-select-bottom="${esc(edge.id)}" role="button" tabindex="0" aria-label="Choisir ${esc(edge.name)} comme bas"`:''}><circle cx="${fmt(mid[0])}" cy="${fmt(mid[1])}" r="13" fill="#fff" stroke="#b2c4a1"/><text x="${fmt(mid[0])}" y="${fmt(mid[1]+4.5)}" text-anchor="middle" font-size="13" fill="#4f6c3c">${i+1}</text></g>`;}
  }
@@ -797,7 +932,39 @@ function volumeSVG(model,{illustrative=false}={}){
  if(model.kind==='panel')out+=`<polyline points="${[...front,front[0]].map(pixel).map(p=>p.map(fmt).join(',')).join(' ')}" fill="none" stroke="#4b6440" stroke-width="2.5"/>`;
  out+=`<text x="400" y="482" text-anchor="middle" font-size="13" fill="#7c8e6b">${esc(illustrative?'Proportions du modèle · aucune cote de fabrication renseignée':model.kind==='profile'?'Longueur : '+M.formatMeasurement(model.lengthMM,model.unit):'Projection C : '+M.formatMeasurement(model.reliefMM,model.unit)+' · lips cotés séparément')}</text></svg>`;return out;
 }
+function setFieldTraceExpanded(expanded,{focus=false}={}){
+ if(!fieldPliage03)return;
+ const previous=fieldTraceExpanded;
+ fieldTraceExpanded=!!expanded&&canDrawProfile();
+ document.body.dataset.fieldTraceExpanded=String(fieldTraceExpanded);
+ const button=$('#field-trace-expand');
+ if(button){
+  button.textContent=fieldTraceExpanded?'Réduire':'Agrandir';
+  button.setAttribute('aria-expanded',String(fieldTraceExpanded));
+  button.setAttribute('aria-label',fieldTraceExpanded?'Réduire le tableau de traçage':'Agrandir le tableau de traçage');
+  if(focus)button.focus({preventScroll:true});
+ }
+ if(previous!==fieldTraceExpanded)requestAnimationFrame(refreshFieldTraceCanvas);
+ // This is a layout change inside the employee iframe only. SVG projection,
+ // points and draft dimensions stay untouched; Android keeps its system bars.
+}
+function syncFieldTraceToolbar(){
+ if(!fieldPliage03)return;
+ let toolbar=$('#field-trace-toolbar');
+ if(!canDrawProfile()){
+  toolbar?.remove();setFieldTraceExpanded(false);return;
+ }
+ if(!toolbar){
+  toolbar=document.createElement('div');toolbar.id='field-trace-toolbar';
+  toolbar.setAttribute('role','group');toolbar.setAttribute('aria-label','Affichage du tableau de traçage');
+  toolbar.innerHTML='<label for="trace-height">Échelle<select id="trace-height" aria-label="Échelle de référence en pouces">'+traceHeights.map(height=>'<option value="'+height+'">'+height+' po</option>').join('')+'</select></label><button type="button" id="field-trace-expand" aria-controls="production-drawing" aria-expanded="false">Agrandir</button>';
+  $('#production-preview').insertBefore(toolbar,$('#production-preview>.mir-panel-synced-views')||$('#production-drawing'));
+ }
+ toolbar.querySelector('#trace-height').value=String(traceHeight);
+ setFieldTraceExpanded(fieldTraceExpanded);
+}
 function renderTools(){
+ syncFieldTraceToolbar();
  const el=$('#drawing-tools');
  if(kind==='panel'){
   el.hidden=!!editingItemId;
@@ -815,6 +982,10 @@ function renderTools(){
  const drawing=tool==='draw';
  if(clientProfileWizard()){
   const instruction=!drawPoints.length?clientTracePrompt():drawPoints.length<3?'Placez au moins trois points pour créer deux côtés.':build().valid?'Ajoutez un côté ou terminez le dessin.':'Annulez le dernier point et réessayez.';
+  if(fieldPliage03){
+   el.innerHTML=`<div class="client-trace-actions" role="group" aria-label="Actions du tracé"><button type="button" data-drawing-undo${!drawPoints.length?' disabled':''}>Annuler le dernier point</button><button type="button" id="client-new-trace"${!drawPoints.length?' disabled':''}>Recommencer</button><button type="button" class="draw-primary" data-draw-tool="draw"${drawPoints.length<3||!build().valid?' disabled':''} aria-label="Suivant — terminer le dessin">Suivant</button></div><p class="client-trace-help" role="status">${esc(instruction)}</p>`;
+   return;
+  }
   el.innerHTML=`<p class="client-trace-help">${esc(instruction)}</p>${!drawPoints.length?'<button type="button" id="client-example-l">Essayer un L en trois points</button>':''}<details class="client-keyboard-trace"><summary>Saisir les points au clavier</summary><p>Coordonnées absolues en ${draft.unit==='mm'?'mm':'po'} : X vers la droite, Y vers le haut.</p><label>X<input id="client-point-x" inputmode="decimal" value="0"></label><label>Y<input id="client-point-y" inputmode="decimal" value="0"></label><button type="button" id="client-keyboard-point">Ajouter ce point</button></details><button type="button" id="client-new-trace">Nouveau tracé</button><label class="client-trace-scale">Échelle de la grille<select id="trace-height">${traceHeights.map(height=>`<option value="${height}"${height===traceHeight?' selected':''}>${height} po de haut</option>`).join('')}</select></label><button type="button" data-drawing-undo${!drawPoints.length?' disabled':''}>Annuler le point</button><button type="button" class="draw-primary" data-draw-tool="draw"${drawPoints.length<3||!build().valid?' disabled':''} aria-label="Suivant — terminer le dessin">Suivant</button>`;
   return;
  }
@@ -908,7 +1079,9 @@ function syncPieceNameField(){
   input.value=['Profil dessiné','Profil personnalisé','Profil libre'].includes(name)?'':name;
  }
 }
-const publicPliage03=()=>clientProfileWizard()&&catalogueChannel==='client'&&!fieldDrawingContext&&window.self===window.top;
+// Keep the public client exactly as before and opt in only the authenticated
+// personal chantier wrapper. A standalone store or another iframe stays legacy.
+const publicPliage03=()=>clientProfileWizard()&&(fieldPliage03||catalogueChannel==='client'&&!fieldDrawingContext&&window.self===window.top);
 let selectedClientAngle=-1;
 const clientStages=[
  {title:'Choisissez votre moulure',hint:'Sélectionnez un modèle ci-dessous ou dessinez votre propre profil.',action:'Passer aux mesures'},
@@ -1028,7 +1201,7 @@ function renderClientWizard(model,blockJ){
  }
  const next=$('#client-step-next');
  $('#client-step-back').hidden=clientStep===1||clientStep===2&&!!editingItemId&&!clientEditableTrace();
- $('#client-step-back').textContent=clientStep===2&&!selectedTemplate&&draft.template==='custom'?'Modifier le tracé':'Retour';
+ $('#client-step-back').textContent=fieldPliage03?(clientStep===2?(!selectedTemplate&&draft.template==='custom'?'Retour au tracé':'Retour au modèle'):clientStep===3?'Retour aux mesures':'Retour à la finition'):clientStep===2&&!selectedTemplate&&draft.template==='custom'?'Modifier le tracé':'Retour';
  const status=$('#client-step-status'),message=issues[clientStep]||'';
  if(status.textContent!==message)status.textContent=message;
  next.disabled=Boolean(message)||busy||clientStep===4&&$('#add-production-piece').disabled;
@@ -1043,6 +1216,12 @@ function goClientStep(step,{confirm=false}={}){
  const issues=clientStepIssues(build(),blockJ);
  if(step>clientUnlocked&&(!confirm||step!==clientStep+1))return;
  if(Array.from({length:step-1},(_,i)=>issues[i+1]).some(Boolean))return;
+ if(fieldPliage03&&step===2){
+  // Commit whole degrees on entering measurements, never during canvas taps
+  // or responsive redraws. Existing lengths and authored points are retained.
+  if(tool==='draw')tool='select';
+  normalizeFieldProfileAngles();renderDimensions();
+ }
  clientStep=step;if(step===1)clientEntry='choice';
  clientUnlocked=Math.max(clientUnlocked,step);
  if(step===2||step===3){view='face';zoom=1;viewPan={x:0,y:0};}
@@ -1053,7 +1232,7 @@ function goClientStep(step,{confirm=false}={}){
  $('#client-step-title').scrollIntoView({block:'nearest'});
 }
 function updateDrawing({keepForm=false}={}){
- if(clientProfileWizard()&&draft&&order&&clientDraftReady)store('mir_client_active_profile_v1',{version:1,journeyVersion:2,draft,drawPoints,clientStep,clientUnlocked,clientProfileSelected,clientEntry,tool,colorSystem,colorId,materialId,selectedTemplate,clientModelAngles,legacyQuickId,editingItemId});
+ if(clientProfileWizard()&&draft&&order&&clientDraftReady)store(KEYS.activeProfile,{version:1,journeyVersion:2,draft,drawPoints,clientStep,clientUnlocked,clientProfileSelected,clientEntry,tool,colorSystem,colorId,materialId,selectedTemplate,clientModelAngles,legacyQuickId,editingItemId});
  document.body.dataset.panelSketch=String(kind==='panel'&&tool==='panel-trace');
  syncPieceNameField();
  renderFractionPickers();
@@ -1070,7 +1249,7 @@ function updateDrawing({keepForm=false}={}){
  const geometryErrors=mesh&&!mesh.valid?mesh.errors:[];
  const waiting=clientProfileWizard()&&!clientProfileSelected&&tool!=='draw';
  $('#drawing-title').textContent=waiting?'Aperçu de la moulure':authoring?'Modèle · '+(draft.name||actual.name):draft.name||actual.name;
- const stage=$('#production-drawing');if(tool!=='draw'||view!=='face')closeMobileTrace();stage.dataset.tool=tool;stage.dataset.view=view;stage.dataset.kind=kind;stage.style.touchAction=tool==='panel-trace'||canDrawProfile()||view==='volume'||(!client&&kind==='profile')?'none':'';$('#trace-readout').hidden=!canDrawProfile();
+ const stage=$('#production-drawing');if(tool!=='draw'||view!=='face')closeMobileTrace();stage.dataset.tool=tool;stage.dataset.view=view;stage.dataset.kind=kind;stage.style.touchAction=tool==='panel-trace'||canDrawProfile()||view==='volume'||(!client&&kind==='profile')?'none':'';$('#trace-readout').hidden=fieldPliage03||!canDrawProfile();
  stage.innerHTML=tool==='panel-trace'&&kind==='panel'?window.MIRPanelSketch.svg(panelSketchPoints,panelSketchHover):
   waiting?'<div class="drawing-hint">Choisissez une moulure pour voir son profil ici.</div>':
   view==='volume'?volumeSVG(shown.model,{illustrative:shown.illustrative}):diagramSVG(shown.model,{illustrative:shown.illustrative});
@@ -1605,6 +1784,16 @@ function offerProfileImport(confirmedPO=false){
  }catch(error){toast(error.message);}
 }
 function restoreSelection(item){const selection=item.selection||{};colorSystem=selection.colorSystem||({manufacturer:'manufacturer',ral:'ral',custom:'special'}[item.spec.finish?.selectionType])||((item.spec.finish||{}).system==='RAL Classic'?'ral':item.spec.finish?.manufacturer||/^Nuancier /i.test(item.spec.finish?.system||'')?'manufacturer':item.spec.finish?.special?'special':'manufacturer');materialId=selection.materialId||materials.find(m=>m.brand===item.spec.finish?.manufacturer)?.id||'';colorId=selection.colorId||'';if(!colorId&&colorSystem==='ral')colorId=ral.colors.find(c=>c.code===item.spec.finish?.code)?.id||'';if(!colorId&&colorSystem==='manufacturer')colorId=(chosenMaterial()?.colors||[]).find(c=>(c.code||c.name)===item.spec.finish?.code)?.id||'';}
+function editFieldOrderItem(id,options={}){
+ if(!fieldPliage03||!clientProfileWizard()||!order.items.some(row=>row.id===id&&row.kind==='profile'))return false;
+ const quantity=options?.quantity===undefined?null:Number(options.quantity);
+ if(quantity!==null&&(!Number.isSafeInteger(quantity)||quantity<1||quantity>100000))return false;
+ editPiece(id);
+ // The app cart may hold a newer quantity. Only the active draft changes here;
+ // the personal dossier and common cart are revised when the user saves it.
+ if(quantity!==null){draft.quantity=quantity;renderFormMetadata();updateDrawing({keepForm:true});}
+ return true;
+}
 function editPiece(id){panelDirectUndo=[];panelDirectRedo=[];const item=order.items.find(row=>row.id===id);if(!item)return;jException=null;activeStoreColorLock=!!(client&&catalogueChannel==='store'&&item.selection?.storeColorMode==='fixed');workflow='configure';authoring=false;editingTemplateId=null;editingItemId=id;activeDefaultLocks={};kind=item.kind;draft=copy(item.spec);preservedPanelMetadata=kind==='panel'?{id,finish:copy(draft.finish||{}),material:copy(draft.material||{})}:null;if(item.stockProfileType)draft.mirProfileId=item.stockProfileType;selectedTemplate=item.snapshot?.templateSnapshot||null;clientModelAngles=Array.isArray(item.clientAngleDefaults||item.snapshot?.values?.clientAngleDefaults)?copy(item.clientAngleDefaults||item.snapshot.values.clientAngleDefaults):null;restoreClientProfileMetadata(item);restoreSelection(item);tool='select';view='face';if(clientProfileWizard()){
  if(!publicProfileMaterials.includes(draft.material?.type)){
   draft.material={type:'',thickness:'',gauge:''};
@@ -1618,6 +1807,7 @@ function editPiece(id){panelDirectUndo=[];panelDirectRedo=[];const item=order.it
  clientProfileSelected=true;
  clientStep=clientUnlocked=2;
  draft.length=draft.length||unitValue(120*25.4,draft.unit);
+ normalizeFieldProfileAngles();
  }render();$('.production-workspace').scrollIntoView({behavior:'smooth',block:'start'});toast(`${id} : la correction sera enregistrée comme une nouvelle révision.`);}
 function reconcilePanelStageDOM(){
  // Les moulures doivent garder le dessin DIRECTEMENT dans la carte, comme
@@ -1677,6 +1867,7 @@ workflow='configure';authoring=false;editingTemplateId=null;editingItemId=null;s
  draft.material.type='';
  materialId='';
  }
+normalizeFieldProfileAngles();
 activeStoreColorLock=!!storeColorResult.locked;
 if(activeStoreColorLock){
  draft.material.type=storeColorResult.metalType;
@@ -1918,8 +2109,8 @@ function drawDragPreview(segment, gesture){
  svg.querySelector('[data-trace-preview]')?.remove();
  if(!segment)return;
  const [x,y]=pointOnView(gesture.start,drawTransform),[ex,ey]=pointOnView(segment.point,drawTransform);
- const scale=Math.max(1,Math.min(2.2,800/svg.clientWidth));
- const label=(x,y,value,halo=6)=>`<text x="${fmt(x)}" y="${fmt(y)}" text-anchor="middle" dominant-baseline="central" font-size="${fmt(17*scale)}" font-weight="700" fill="#603b20" stroke="#fff5e3" stroke-width="${fmt(halo*scale)}" stroke-linejoin="round" paint-order="stroke">${esc(value)}</text>`;
+ const scale=Math.max(1,Math.min(2.2,(fieldPliage03?svg.viewBox?.baseVal?.width||440:800)/svg.clientWidth));
+ const label=(x,y,value,halo=6)=>`<text class="mir-field-live-measure" x="${fmt(x)}" y="${fmt(y)}" text-anchor="middle" dominant-baseline="central" font-size="${fmt(17*scale)}" font-weight="700" fill="#603b20" stroke="#fff5e3" stroke-width="${fmt(halo*scale)}" stroke-linejoin="round" paint-order="stroke">${esc(value)}</text>`;
  const size=Math.hypot(ex-x,ey-y), outgoing=Math.atan2(ey-y,ex-x);
  const normal=[-Math.sin(outgoing),Math.cos(outgoing)];
  // La cote suit le côté sans recouvrir le trait, les badges B/C ou l'angle.
@@ -1938,7 +2129,7 @@ function drawDragPreview(segment, gesture){
   const r=Math.min(38*scale,size*.36), mid=incoming+sweep/2;
   const ray=(direction,distance)=>[x+Math.cos(direction)*distance,y+Math.sin(direction)*distance];
   const [ax,ay]=ray(mid,r+9*scale);
-  angle=`<path d="M ${ray(incoming,r).map(fmt).join(' ')} A ${fmt(r)} ${fmt(r)} 0 0 ${sweep>=0?1:0} ${ray(outgoing,r).map(fmt).join(' ')}" fill="none" stroke="#9c5a22" stroke-width="2"/>`+label(ax,ay,segment.angle+'°',2.5);
+  angle=`<path d="M ${ray(incoming,r).map(fmt).join(' ')} A ${fmt(r)} ${fmt(r)} 0 0 ${sweep>=0?1:0} ${ray(outgoing,r).map(fmt).join(' ')}" fill="none" stroke="#9c5a22" stroke-width="2"/>`+label(ax,ay,(fieldPliage03?Math.round(segment.angle):segment.angle)+'°',2.5);
  }
  const line=`<line x1="${fmt(x)}" y1="${fmt(y)}" x2="${fmt(ex)}" y2="${fmt(ey)}" stroke="#9c5a22" stroke-width="3" stroke-dasharray="8 6" vector-effect="non-scaling-stroke"/>`;
  const guide=segment.guide?pointOnView(segment.guide,drawTransform):null;
@@ -2372,11 +2563,13 @@ function toggleProfilePaintedFace(){
  updateDrawing();
 }
 function closeMobileTrace(){
+ if(fieldPliage03)setFieldTraceExpanded(false);
  const card=$('.drawing-card');
  card.classList.remove('mobile-trace');
  if(document.fullscreenElement===card)document.exitFullscreen().catch(()=>{});
 }
 async function openMobileTrace(card){
+ if(fieldPliage03){setFieldTraceExpanded(true);return;}
  card.classList.add('mobile-trace');
  try{
   await card.requestFullscreen?.();
@@ -2448,7 +2641,16 @@ function resumeClientTrace(){
  const model=build();
  if(model.valid){const origin=drawPoints[0]||[0,0];drawPoints=model.pointsMM.map(([x,y])=>[x+origin[0],y+origin[1]]);}
  clientStep=1;clientEntry='draw';tool='draw';view='face';
- renderDimensions();updateDrawing();focusClientEntry('#production-drawing');
+ renderDimensions();
+ if(fieldPliage03&&model.valid){
+  // Commit the trace layout before reading its viewport: the previous
+  // measurements canvas can be much shorter. Fit before the first SVG render,
+  // including annotation space, rather than waiting for a resize callback.
+  document.body.dataset.clientStage='1';document.body.dataset.clientTrace='true';
+  renderClientEntry(true);syncFieldTraceToolbar();
+  drawTransform=fieldTraceProjection(drawPoints,fieldTraceViewport());
+ }
+ updateDrawing();focusClientEntry('#production-drawing');
 }
 function startProfileDrawing({fullscreen=true}={}){
  freeformRedo=[];selectedTemplate=null;
@@ -2529,6 +2731,7 @@ function applyPanelDirect(){
  panelDirectUndo.push(copy(draft));panelDirectRedo=[];draft=next;panelDirectEdit=null;closeDialog();renderDimensions();renderPanelOptions();updateDrawing();toast('Cote appliquée au dessin. Enregistrez la pièce pour mettre à jour le dossier.',{quiet:true});
 }
 function handleClick(event){if(event.target.closest('[data-toggle-painted-face]'))return toggleProfilePaintedFace();const button=event.target.closest('button,[data-select-bottom],[data-edit-panel-measure],[data-edit-panel-edge],[data-edit-profile-measure]');if(!button)return;const d=button.dataset;
+ if(fieldPliage03&&button.id==='field-trace-expand'){setFieldTraceExpanded(!fieldTraceExpanded,{focus:true});return;}
  if(kind==='panel'&&(button.id==='panel-flat'||button.id==='panel-no-folds')){
   if(button.id==='panel-flat'){const input=$('[data-measure="relief"]');if(input?.readOnly)return;draft.relief='0';}
   else{if($('#panel-lip')?.readOnly)return;draft.lip='0';draft.lips=Object.fromEntries(Object.keys(draft.lips||{}).map(id=>[id,'0']));}
@@ -2568,11 +2771,13 @@ function handleClick(event){if(event.target.closest('[data-toggle-painted-face]'
    const segments=clientProfileSegments();
    const options=clientProfileBends().map((bend,index)=>bend.mode==='hem'?'<option value="'+index+'">'+esc(segments[index].label+'–'+segments[index+1].label)+' · Repli 180°</option>':'').join('');
    if(!options)return;
-   dialog('Ouvrir un repli du modèle','Le repli à 180° est conservé tant que vous ne choisissez pas explicitement un angle ouvert. La modification concerne cette pièce.', '<label>Repli à modifier<select id="client-hem-index">'+options+'</select></label><label>Nouvel angle intérieur (°)<input id="client-hem-interior" type="number" min="0.001" max="180" step="any" value="90"></label><div class="dialog-actions"><button type="button" class="secondary-button" data-close-production-dialog>Conserver le repli</button><button type="button" class="primary-button" id="client-open-model-hem">Appliquer l’angle ouvert</button></div>');
+   dialog('Ouvrir un repli du modèle','Le repli à 180° est conservé tant que vous ne choisissez pas explicitement un angle ouvert. La modification concerne cette pièce.', '<label>Repli à modifier<select id="client-hem-index">'+options+'</select></label><label>Nouvel angle intérieur (°)<input id="client-hem-interior" type="number"'+(fieldPliage03?' inputmode="numeric" min="1" max="180" step="1"':' min="0.001" max="180" step="any"')+' value="90"></label><div class="dialog-actions"><button type="button" class="secondary-button" data-close-production-dialog>Conserver le repli</button><button type="button" class="primary-button" id="client-open-model-hem">Appliquer l’angle ouvert</button></div>');
    return;
   }
   if(button.id==='client-open-model-hem'){
-   const index=Number($('#client-hem-index')?.value),angle=Number($('#client-hem-interior')?.value),bends=clientProfileBends();
+   const index=Number($('#client-hem-index')?.value),bends=clientProfileBends();
+   let angle=Number($('#client-hem-interior')?.value);
+   if(fieldPliage03&&Number.isFinite(angle)&&angle>0&&angle<=180)angle=Math.max(1,Math.round(angle));
    if(!Number.isInteger(index)||bends[index]?.mode!=='hem'||!Number.isFinite(angle)||angle<=0||angle>180)return messageError('Entrez un angle intérieur supérieur à 0° et inférieur ou égal à 180°.');
    rememberClientAngles();
    const editable=editableClientBends(),direction=clientBendDirection(editable[index],index);
@@ -2584,9 +2789,13 @@ function handleClick(event){if(event.target.closest('[data-toggle-painted-face]'
   if(publicPliage03()&&d.clientAngleNudge!==undefined){const input=$(`[data-client-bend-angle="${d.clientAngleNudge}"]`);if(!input||input.readOnly)return;const current=input.value===''?NaN:Number(input.value);if(!Number.isFinite(current)){input.focus();return;}input.value=String(Number((current+Number(d.delta)).toFixed(6)));selectedClientAngle=Number(d.clientAngleNudge);input.dispatchEvent(new Event('input',{bubbles:true}));input.focus({preventScroll:true});return;}
   if(d.clientStep)return goClientStep(Number(d.clientStep));
   if(button.id==='client-step-back'){if(clientStep===2&&!selectedTemplate&&draft.template==='custom')return resumeClientTrace();return goClientStep(clientStep-1);}
-  if(button.id==='client-new-trace'){choose('profile','custom');startProfileDrawing({fullscreen:false});return;}
+  if(button.id==='client-new-trace'){
+   if(fieldPliage03&&drawPoints.length)return dialog('Recommencer ce tracé ?','Le tracé en cours sera effacé. Les pièces déjà ajoutées à votre commande sont conservées.','<div class="dialog-actions"><button type="button" class="secondary-button" data-close-production-dialog>Garder mon tracé</button><button type="button" class="primary-button" id="confirm-client-new-trace">Recommencer le tracé</button></div>');
+   choose('profile','custom');startProfileDrawing({fullscreen:false});return;
+  }
+  if(button.id==='confirm-client-new-trace'&&fieldPliage03){closeDialog();choose('profile','custom');startProfileDrawing({fullscreen:false});focusClientEntry('#production-drawing');return;}
   if(button.id==='client-example-l'){appendTracePoint([50.8,50.8]);appendTracePoint([152.4,50.8]);appendTracePoint([152.4,127]);return;}
-  if(button.id==='client-keyboard-point'){const x=M.parseMeasurement($('#client-point-x').value,draft.unit),y=M.parseMeasurement($('#client-point-y').value,draft.unit);if(!x.ok||!y.ok)return toast('Entrez deux coordonnées valides.');appendTracePoint([x.mm,y.mm]);const editor=$('.client-keyboard-trace');if(editor){editor.open=true;$('#client-point-x').value=String(x.value);$('#client-point-y').value=String(y.value);$('#client-point-x').focus();$('#client-point-x').select();}return;}
+  if(button.id==='client-keyboard-point'){const x=M.parseMeasurement($('#client-point-x').value,draft.unit),y=M.parseMeasurement($('#client-point-y').value,draft.unit);if(!x.ok||!y.ok)return toast('Entrez deux coordonnées valides.');appendTracePoint([x.mm,y.mm]);const editor=$('.client-keyboard-trace');if(editor){editor.open=true;if(fieldPliage03&&$('.client-trace-options'))$('.client-trace-options').open=true;$('#client-point-x').value=String(x.value);$('#client-point-y').value=String(y.value);if(!fieldPliage03||!document.querySelector('dialog[open]')){$('#client-point-x').focus(fieldPliage03?{preventScroll:true}:undefined);$('#client-point-x').select();}}return;}
   if(button.id==='client-step-next')return clientStep===4?addPiece():goClientStep(clientStep+1,{confirm:true});
   if(d.clientFace&&clientStep===3){
    draft.coloredFace={side:d.clientFace,segmentId:window.MIRBendingPresets?.preferredFaceSegment?.(draft)||draft.coloredFace?.segmentId||build().segments[0]?.label||'A'};
@@ -2747,12 +2956,18 @@ function handleInput(event){const e=event.target,d=e.dataset;
   updateDrawing({keepForm:true});
   return;
  }
+ if(fieldPliage03&&e.id==='client-hem-interior'){
+  if(e.value!==''){const angle=Number(e.value);if(Number.isFinite(angle))e.value=String(angle>0&&angle<=180?Math.max(1,Math.round(angle)):Math.round(angle));}
+  return;
+ }
  if(d.clientBendAngle!==undefined&&clientProfileWizard()){
   const index=Number(d.clientBendAngle),current=clientProfileBends()[index];
   selectedClientAngle=index;
   if(!current||current.mode==='hem')return;
   rememberClientAngles();
-  const bends=editableClientBends(),source=clientModelAngles[index],angle=e.value===''?'':Number(e.value.replace(',','.'));
+  const bends=editableClientBends(),source=clientModelAngles[index];
+  let angle=e.value===''?'':Number(e.value.replace(',','.'));
+  if(fieldPliage03&&Number.isFinite(angle)){angle=angle>0&&angle<=180?Math.max(1,Math.round(angle)):Math.round(angle);e.value=String(angle);}
   if(source?.mode!=='hem'&&angle!==''&&angle===clientInteriorAngle(source))bends[index]=copy(source);
   else if(bends[index].mode==='signed')bends[index].angle=angle===''?'':(180-angle)*(clientBendDirection(bends[index],index)==='left'?1:-1);
   else bends[index].angle=angle;
@@ -2927,7 +3142,7 @@ function handleSubmit(event){
  if(nextPOAction==='existing')existingPOChoice();
  if(nextPOAction==='new')createNewPOFromCurrent();
 }
-function handleKey(event){const direct=event.target.closest('[data-edit-panel-measure],[data-edit-panel-edge],[data-edit-profile-measure]');if(direct&&['Enter',' '].includes(event.key)){event.preventDefault();direct.dispatchEvent(new MouseEvent('click',{bubbles:true}));return;}if(event.target.matches('[data-toggle-painted-face]')&&['Enter',' '].includes(event.key)){event.preventDefault();toggleProfilePaintedFace();$('[data-toggle-painted-face]')?.focus();return;}if(event.target.id==='production-drawing'&&(kind==='panel'||(!client&&kind==='profile'&&tool!=='draw'))){if(['+','=','-','0','ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key)){event.preventDefault();if(event.key==='+'||event.key==='=')setZoom(zoom*1.2);else if(event.key==='-')setZoom(zoom/1.2);else if(event.key==='0'){zoom=1;orbit=-35;pitch=23;updateDrawing();}else if(view==='volume'){if(event.key==='ArrowLeft')orbit-=10;if(event.key==='ArrowRight')orbit+=10;if(event.key==='ArrowUp')pitch=Math.min(85,pitch+10);if(event.key==='ArrowDown')pitch=Math.max(-85,pitch-10);updateDrawing();}return;}}const point=event.target.closest('[data-draw-point]');if(point&&tool==='edit'&&!client&&!editingItemId&&['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key)){event.preventDefault();const model=build();if(!model.valid)return;const points=copy(model.pointsMM),i=Number(point.dataset.drawPoint),step=draft.unit==='mm'?(event.shiftKey?10:1):(event.shiftKey?25.4:25.4/16);if(event.key==='ArrowLeft')points[i][0]-=step;if(event.key==='ArrowRight')points[i][0]+=step;if(event.key==='ArrowUp')points[i][1]+=step;if(event.key==='ArrowDown')points[i][1]-=step;const spec=toCustom(points);if(spec){draft=spec;renderDimensions();updateDrawing();$(`[data-draw-point="${i}"]`)?.focus();}}const edge=event.target.closest('[data-select-bottom]');if(edge&&['Enter',' '].includes(event.key)){event.preventDefault();edge.dispatchEvent(new MouseEvent('click',{bubbles:true}));}}
+function handleKey(event){if(fieldPliage03&&fieldTraceExpanded&&event.key==='Escape'&&!document.querySelector('dialog[open]')){event.preventDefault();setFieldTraceExpanded(false,{focus:true});return;}const direct=event.target.closest('[data-edit-panel-measure],[data-edit-panel-edge],[data-edit-profile-measure]');if(direct&&['Enter',' '].includes(event.key)){event.preventDefault();direct.dispatchEvent(new MouseEvent('click',{bubbles:true}));return;}if(event.target.matches('[data-toggle-painted-face]')&&['Enter',' '].includes(event.key)){event.preventDefault();toggleProfilePaintedFace();$('[data-toggle-painted-face]')?.focus();return;}if(event.target.id==='production-drawing'&&(kind==='panel'||(!client&&kind==='profile'&&tool!=='draw'))){if(['+','=','-','0','ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key)){event.preventDefault();if(event.key==='+'||event.key==='=')setZoom(zoom*1.2);else if(event.key==='-')setZoom(zoom/1.2);else if(event.key==='0'){zoom=1;orbit=-35;pitch=23;updateDrawing();}else if(view==='volume'){if(event.key==='ArrowLeft')orbit-=10;if(event.key==='ArrowRight')orbit+=10;if(event.key==='ArrowUp')pitch=Math.min(85,pitch+10);if(event.key==='ArrowDown')pitch=Math.max(-85,pitch-10);updateDrawing();}return;}}const point=event.target.closest('[data-draw-point]');if(point&&tool==='edit'&&!client&&!editingItemId&&['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key)){event.preventDefault();const model=build();if(!model.valid)return;const points=copy(model.pointsMM),i=Number(point.dataset.drawPoint),step=draft.unit==='mm'?(event.shiftKey?10:1):(event.shiftKey?25.4:25.4/16);if(event.key==='ArrowLeft')points[i][0]-=step;if(event.key==='ArrowRight')points[i][0]+=step;if(event.key==='ArrowUp')points[i][1]+=step;if(event.key==='ArrowDown')points[i][1]-=step;const spec=toCustom(points);if(spec){draft=spec;renderDimensions();updateDrawing();$(`[data-draw-point="${i}"]`)?.focus();}}const edge=event.target.closest('[data-select-bottom]');if(edge&&['Enter',' '].includes(event.key)){event.preventDefault();edge.dispatchEvent(new MouseEvent('click',{bubbles:true}));}}
 async function boot(){M=window.MIRProduction;if(!M?.createTemplate)throw new Error('Le moteur de modèles n’est pas disponible.');if(!window.MIRBendingLengths?.check)throw new Error('Les longueurs de vente MIR sont indisponibles.');const fetched=await Promise.allSettled([fetch('catalogue-fd6866b49d21.json').then(r=>{if(!r.ok)throw new Error('catalogue');return r.json();}),fetch('ral-classic.json').then(r=>{if(!r.ok)throw new Error('nuancier RAL');return r.json();})]);if(fetched[0].status==='fulfilled'){const raw=fetched[0].value;const catalogue=Array.isArray(raw)?raw:raw.materials||[];materials=window.MIRBendingFinishes.catalogue(catalogue);}if(fetched[1].status==='fulfilled'&&Array.isArray(fetched[1].value.colors))ral=fetched[1].value;
  const unico=window.MIRUnico;if(unico)for(const palette of unico.palettes){const usable=palette.colors.filter(c=>!c.publishedGauges||c.publishedGauges.some(g=>[18,20,22].includes(g)));if(!usable.length)continue;materials.push({id:'unico-palette-'+palette.id,brand:'Unico',name:'U-P1 · '+palette.label,architecturalPanel:true,metalType:palette.materialId,family:palette.materialId,allowedGauges:palette.id==='signature'?[22]:null,sourceUrl:palette.sourceUrl,colors:usable.map(c=>({...c,availabilityNote:c.uP1Compatibility.note+' Écran indicatif.'}))});}materialId=materials[0]?.id||'';
  reloadLocalTemplates();const savedRequests=read(KEYS.requests,{version:1,requests:[]});requests=Array.isArray(savedRequests.requests)?savedRequests.requests.filter(request=>request?.id&&Array.isArray(request.items)&&request.items.every(item=>item.spec&&item.snapshot?.schema==='mir-production-instance-1')):[];
@@ -2957,14 +3172,33 @@ async function boot(){M=window.MIRProduction;if(!M?.createTemplate)throw new Err
  },true);
  modal.addEventListener('close',()=>{modalPressed=backdropPressed=false;forwardedLabelControl=null;});
  choose(kind,kind==='panel'?'rectangle':'l');const requestedMaterial=params.get('material');if(kind==='panel'&&['unico-up1-acier','unico-up1-aluminium'].includes(requestedMaterial)){const type=requestedMaterial.endsWith('aluminium')?'aluminium':'acier';draft.material={type,name:'Unico U-P1 — '+(type==='acier'?'Acier':'Aluminium plié'),productRef:requestedMaterial,thickness:'',thicknessUnit:'mm',gauge:''};materialId=availableMaterials()[0]?.id||'';colorSystem='manufacturer';const requestedColor=params.get('color'),palette=availableMaterials().find(m=>m.colors.some(c=>c.id===requestedColor));if(palette){materialId=palette.id;colorId=requestedColor;}render();}const linked=params.get('template');if(linked&&templates.some(record=>record.id===linked))useSavedTemplate(linked);if(!client&&params.get('view')==='models'){workflow='models';render();}if(!client&&params.get('view')==='requests'){workflow='requests';render();}if(client&&params.get('kind')==='profile'&&!linked)choose('profile','custom');
+ let restoredClientDraft=false;
  if(clientProfileWizard()&&!linked&&!params.get('profile')){
-  const active=read('mir_client_active_profile_v1',null);
+  // No fallback to the public client key: a colleague or another chantier must
+  // never inherit a draft merely because they use the same device.
+  const active=read(KEYS.activeProfile,null);
   if(active?.version===1&&active.draft?.kind==='profile'&&Array.isArray(active.drawPoints)&&(Array.isArray(active.draft.segments)||active.draft.dimensions&&typeof active.draft.dimensions==='object')){
-   editingItemId=order.items.some(item=>item.id===active.editingItemId)?active.editingItemId:null;selectedTemplate=active.selectedTemplate||null;legacyQuickId=active.legacyQuickId||null;draft=copy(active.draft);drawPoints=copy(active.drawPoints);const restoredStage=Number(active.clientStep)||1,restoredUnlocked=Number(active.clientUnlocked)||1;clientStep=active.journeyVersion===2?Math.min(4,Math.max(1,restoredStage)):Math.min(3,Math.max(1,restoredStage));clientUnlocked=active.journeyVersion===2?Math.min(4,Math.max(clientStep,restoredUnlocked)):Math.min(3,Math.max(clientStep,restoredUnlocked));clientModelAngles=Array.isArray(active.clientModelAngles)?copy(active.clientModelAngles):null;clientProfileSelected=!!active.clientProfileSelected;clientEntry=active.clientEntry||'choice';tool=active.tool==='draw'?'draw':'select';colorSystem=active.colorSystem||'manufacturer';colorId=active.colorId||'';materialId=active.materialId||'';render();
+   editingItemId=order.items.some(item=>item.id===active.editingItemId)?active.editingItemId:null;selectedTemplate=active.selectedTemplate||null;legacyQuickId=active.legacyQuickId||null;draft=copy(active.draft);drawPoints=copy(active.drawPoints);const restoredStage=Number(active.clientStep)||1,restoredUnlocked=Number(active.clientUnlocked)||1;clientStep=active.journeyVersion===2?Math.min(4,Math.max(1,restoredStage)):Math.min(3,Math.max(1,restoredStage));clientUnlocked=active.journeyVersion===2?Math.min(4,Math.max(clientStep,restoredUnlocked)):Math.min(3,Math.max(clientStep,restoredUnlocked));clientModelAngles=Array.isArray(active.clientModelAngles)?copy(active.clientModelAngles):null;clientProfileSelected=!!active.clientProfileSelected;clientEntry=active.clientEntry||'choice';tool=active.tool==='draw'?'draw':'select';colorSystem=active.colorSystem||'manufacturer';colorId=active.colorId||'';materialId=active.materialId||'';if(tool!=='draw')normalizeFieldProfileAngles();render();restoredClientDraft=true;
   }
  }
  if(publicPliage03()&&params.get('start')&&!params.get('quick')&&!linked&&!params.get('profile')){clientStep=1;clientEntry=params.get('start')==='models'?'models':'choice';if(params.get('start')==='draw'){if(draft.template==='custom'&&drawPoints.length)resumeClientTrace();else{choose('profile','custom');startProfileDrawing({fullscreen:false});}}render();const entered=new URL(location.href);entered.searchParams.delete('start');history.replaceState(history.state,'',entered.href);params.delete('start');}
+ let fieldEntryApplied=false;
+ if(fieldPliage03&&['choice','models','draw'].includes(fieldDrawingContext.entry)&&!linked&&!params.get('profile')){
+  const requestId=typeof fieldDrawingContext.entryRequestId==='string'?fieldDrawingContext.entryRequestId:'';
+  const entryKey=KEYS.activeProfile+':entry';
+  let enter=!restoredClientDraft;
+  if(requestId){try{enter=sessionStorage.getItem(entryKey)!==requestId;}catch{}}
+  if(enter){
+   clientStep=1;
+   if(['choice','models'].includes(fieldDrawingContext.entry)){clientEntry=fieldDrawingContext.entry;tool='select';}
+   else if(draft.template==='custom'&&drawPoints.length)resumeClientTrace();
+   else{choose('profile','custom');startProfileDrawing({fullscreen:false});}
+   render();fieldEntryApplied=true;
+   if(requestId){try{sessionStorage.setItem(entryKey,requestId);}catch{}}
+  }
+ }
  clientDraftReady=true;
+ if(fieldEntryApplied)updateDrawing();
  if(clientProfileWizard()&&params.get('quick')&&legacyQuickId!==params.get('quick')&&order.items.find(item=>item.id===editingItemId)?.legacyQuickId!==params.get('quick')){
   const quick=read('mir-bending-v1',null),item=quick?.items?.find(row=>row.id===params.get('quick'));
   const migrated=order.items.find(row=>row.legacyQuickId===params.get('quick'));
@@ -2994,18 +3228,28 @@ async function boot(){M=window.MIRProduction;if(!M?.createTemplate)throw new Err
  });
  offerProfileImport();
  if(!client&&params.get('shared-request'))openRequest(params.get('shared-request'));
- window.MIRProductionWorkspace=Object.freeze({version:'1.1.0',storageKeys:{...KEYS},localOnly:true,newPurchaseOrder(){if(client||!switchWorkshopOrder(defaultOrder()))return false;workflow='configure';render();return true;},openPurchaseOrder(po){if(client)return false;if(!po.items?.every(i=>i.spec&&i.snapshot?.schema==='mir-production-instance-1'&&build(i.spec).valid)){toast('Ancien format ou géométrie à vérifier : dessin conservé; exportez le dossier avant une conversion.');return false;}const next={...defaultOrder(),id:'procurement-'+po.id,poNumber:po.poNumber,project:po.job,foreman:po.foreman,date:po.requestedDate,revision:po.revision,notes:po.notes,items:copy(po.items)};if(!switchWorkshopOrder(next))return false;workflow='configure';authoring=false;render();return true;},getEstimationDossier(){return client?copy(order):null;},getLivePreviewState(){return {model:build(),tool,kind,authoring,editingItemId,preview:view,zoom,pan:{...viewPan},drawPointsMM:drawPoints.map(point=>point.slice()),canUndo:kind==='panel'?panelDirectUndo.length>0:freeformCanUndo(),canRedo:kind==='panel'?panelDirectRedo.length>0:freeformRedo.length>0};},saveCurrentPiece:saveWorkspacePiece,setOrderItemQuantity,openContinueMenu,openOrderPanelEditor(id,key,edge){if(client||!order.items.some(row=>row.id===id&&row.kind==='panel'))return false;editPiece(id);if(edge)openPanelEdge(edge);else openPanelMeasure(key);return true;},editOrderItem(id){if(client||!order.items.some(row=>row.id===id))return false;editPiece(id);return true;},finishFreeformTrace(){if(client||kind!=='profile'||authoring||editingItemId)return false;if(!build().valid||(draft.segments||[]).length<2)return false;if(tool==='draw')freeformFinish();return true;},openModelFromCurrent(){if(client||kind!=='profile'||authoring||editingItemId)return false;if(!build().valid){toast('Termine les cotes avant d’enregistrer ce modèle.');return false;}saveTemplateDialog();return true;}});
+ window.MIRProductionWorkspace=Object.freeze({version:'1.1.0',storageKeys:{...KEYS},localOnly:true,newPurchaseOrder(){if(client||!switchWorkshopOrder(defaultOrder()))return false;workflow='configure';render();return true;},openPurchaseOrder(po){if(client)return false;if(!po.items?.every(i=>i.spec&&i.snapshot?.schema==='mir-production-instance-1'&&build(i.spec).valid)){toast('Ancien format ou géométrie à vérifier : dessin conservé; exportez le dossier avant une conversion.');return false;}const next={...defaultOrder(),id:'procurement-'+po.id,poNumber:po.poNumber,project:po.job,foreman:po.foreman,date:po.requestedDate,revision:po.revision,notes:po.notes,items:copy(po.items)};if(!switchWorkshopOrder(next))return false;workflow='configure';authoring=false;render();return true;},getEstimationDossier(){return client?copy(order):null;},getLivePreviewState(){return {model:build(),tool,kind,authoring,editingItemId,preview:view,zoom,pan:{...viewPan},drawPointsMM:drawPoints.map(point=>point.slice()),canUndo:kind==='panel'?panelDirectUndo.length>0:freeformCanUndo(),canRedo:kind==='panel'?panelDirectRedo.length>0:freeformRedo.length>0};},saveCurrentPiece:saveWorkspacePiece,setOrderItemQuantity,openContinueMenu,openOrderPanelEditor(id,key,edge){if(client||!order.items.some(row=>row.id===id&&row.kind==='panel'))return false;editPiece(id);if(edge)openPanelEdge(edge);else openPanelMeasure(key);return true;},editOrderItem(id){if(client||!order.items.some(row=>row.id===id))return false;editPiece(id);return true;},editFieldOrderItem,finishFreeformTrace(){if(client||kind!=='profile'||authoring||editingItemId)return false;if(!build().valid||(draft.segments||[]).length<2)return false;if(tool==='draw')freeformFinish();return true;},openModelFromCurrent(){if(client||kind!=='profile'||authoring||editingItemId)return false;if(!build().valid){toast('Termine les cotes avant d’enregistrer ce modèle.');return false;}saveTemplateDialog();return true;}});
  matchMedia('(max-width:600px)').addEventListener('change',()=>{if(clientProfileWizard()&&tool==='draw'&&!drag)updateDrawing();});
+ if(fieldPliage03){
+  const redrawFieldMeasures=()=>{if(clientStep===2&&tool==='select'&&!drag)updateDrawing({keepForm:true});};
+  window.addEventListener('mir:field-measure-page',redrawFieldMeasures);
+  if(typeof ResizeObserver==='function'){
+   let previewSize='';
+   new ResizeObserver(entries=>{const box=entries[0]?.contentRect;if(!box)return;const size=Math.round(box.width)+':'+Math.round(box.height);if(size===previewSize)return;previewSize=size;requestAnimationFrame(()=>{if(canDrawProfile())refreshFieldTraceCanvas();else redrawFieldMeasures();});}).observe($('#production-drawing'));
+  }
+ }
  if(publicClientDossier()){
   void refreshBendTariff();
   window.addEventListener('pageshow',event=>{if(event.persisted)void refreshBendTariff();});
  }
  delete document.documentElement.dataset.mirProfileStartup;
+ if(fieldPliage03){document.documentElement.dataset.mirProductionReady='true';document.documentElement.dataset.mirFieldStartup='ready';}
  window.dispatchEvent(new Event('mir-production-ready'));
 }
 document.addEventListener('focusin',event=>{const input=event.target.closest?.('[data-client-bend-angle]');if(!input||!publicPliage03())return;const index=Number(input.dataset.clientBendAngle);if(selectedClientAngle!==index){selectedClientAngle=index;updateDrawing({keepForm:true});}});
 boot().catch(error=>{
  console.error('MIR production',error);
+ if(fieldPliage03){document.documentElement.dataset.mirFieldStartup='error';window.dispatchEvent(new Event('mir-production-error'));}
  if(document.documentElement.dataset.mirProfileStartup){
   document.documentElement.dataset.mirProfileStartup='error';
   $('#client-startup-message').textContent='Le configurateur n’a pas pu démarrer.';

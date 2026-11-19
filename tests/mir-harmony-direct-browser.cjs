@@ -28,7 +28,23 @@ assert.equal(layout.dimensionCollision,false,'Dimension labels stay outside the 
 assert.equal(layout.clipped,false,'Dimension labels fit in the drawing');
 await page.locator('#production-drawing').scrollIntoViewIfNeeded();await page.screenshot({path:'artifacts/harmony/after-panel-'+w+'x'+h+'.png'});
 assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'no overflow '+w);
-await page.locator('.mir-harmony-toggle').click();assert.equal(await page.locator('#mir-harmony-menu [data-admin-only]:visible').count(),0);await page.keyboard.press('Escape');assert.equal(await page.locator('.mir-harmony-toggle').getAttribute('aria-expanded'),'false');assert.deepEqual(errors,[]);
+// The public client uses the Prestige navigation, not the private Harmony header.
+await page.locator('#mir-prestige-header').waitFor();
+const publicMenu=page.locator('#mir-client-menu-button'),publicLinks=page.locator('#mir-prestige-header nav.mir-prestige-nav');
+if(w<=1100){
+ assert.equal(await publicMenu.isVisible(),true,'Prestige mobile menu exists '+w);
+ await publicMenu.click();assert.equal(await publicMenu.getAttribute('aria-expanded'),'true');
+ assert.equal(await publicLinks.isVisible(),true,'Public destinations open '+w);
+ assert.ok(await publicLinks.locator('a:visible').count()>0,'Public destinations reachable '+w);
+ assert.equal(await publicLinks.locator('[data-admin-only]:visible').count(),0,'No admin destinations exposed '+w);
+ await page.keyboard.press('Escape');assert.equal(await publicMenu.getAttribute('aria-expanded'),'false');
+ assert.equal(await publicLinks.isVisible(),false,'Escape closes mobile public menu '+w);
+}else{
+ assert.equal(await publicMenu.isVisible(),false,'No redundant desktop hamburger '+w);
+ assert.equal(await publicLinks.isVisible(),true,'Prestige desktop links visible '+w);
+ assert.equal(await publicLinks.locator('[data-admin-only]:visible').count(),0,'No admin links desktop '+w);
+}
+assert.deepEqual(errors,[]);
 console.log('PASS direct A/B/C, fractions, rejection, independent lips, 2D/3D, client navigation '+w+'x'+h);await page.close();
 }
 for(const url of ['production.html','production.html?view=panels','production.html?view=orders','production.html?view=store','calepinage.html','entrepot.html','chantier.html']){

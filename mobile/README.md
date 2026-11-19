@@ -1,3 +1,94 @@
+# MIR TEST Aperçu — connexion mobile 08
+
+Version candidate **0.13.5-test**, codes **130009 → 130010** pour la recette de mise à jour. Elle simplifie le tracé tactile : coordonnées X/Y et options retirées, échelle près de la grille, agrandissement sans perte des points, étapes 1–4 lisibles, degrés entiers et étiquettes horizontales rattachées au bon côté. Elle conserve les mesures compactes et le catalogue allégé du lot précédent. Logo MIR de 245 px (+75 % par rapport à la proposition de 140 px), titre « Connexion équipe MIR » retiré de la connexion normale, formulaire courriel/mot de passe directement visible, bouton Google et palette anthracite/champagne approuvés. Google reste activé comme dans l’APK livré 130006 ; l’affichage du bouton ne prouve pas une authentification réussie. La récupération conserve sa limite TEST existante.
+
+Le chef peut aussi créer un **chantier temporaire** depuis Punch avec un nom ou un repère, puis le sélectionner avant de commencer sa journée. Son équipe réellement affectée peut enregistrer ses propres heures sur ce chantier ; un chef sans équipe reste utilisable seul. L’adjointe ou le boss complète ensuite la même fiche et peut la modifier de nouveau, sans remplacer son identifiant ni ses pointages. Les requêtes en attente survivent au rechargement, avec identité, révision et reçu vérifiés. Cette fonction est limitée à MIR TEST et utilise la migration [temporary-jobs-test](../supabase/test-only/migrations/20261119015520_mir_field_temporary_jobs_test.sql), hors des migrations automatiques de production. Tests SQL, transport et interface se trouvent dans `tests/mir-temporary-jobs-*` ; les comptes et chantiers réels ne sont pas des fixtures de recette.
+
+## Installation séparée autorisée
+
+Frederick a autorisé une application TEST installée **à côté de l’ancienne**, sans la désinstaller ni effacer ses données.
+
+| Identité | Nouvelle lignée Aperçu |
+| --- | --- |
+| Nom Android | `MIR TEST Aperçu` |
+| Application ID | `ca.revetementsmir.equipe.test.preview` |
+| Namespace et classes Java conservés | `ca.revetementsmir.equipe.test` |
+| Callback OAuth | `mirtestpreview://auth/callback` |
+| Callback Google exact | `mirtestpreview://auth/callback?flow=google` |
+| Callback récupération exact | `mirtestpreview://auth/callback?flow=recovery` |
+| Backend exclusif | `hxtztkmbfpmzrieccwsg.supabase.co` |
+| APK vérifié à remettre | `MIR-TEST-Apercu.apk` |
+
+L’ancien paquet `ca.revetementsmir.equipe.test` conserve son stockage et son callback `mirtest`. Aperçu possède son propre stockage Android, coffre de session et FileProvider ; aucune migration de données ni reprise automatique de session n’est effectuée. Les assertions natives vérifient l’identité réellement installée et que l’ancien callback ne résout pas dans Aperçu. Cette recette sur émulateur ne constitue pas une observation du téléphone de Frederick.
+
+Les ressources `dist/` restent embarquées. Le menu **Accueil · Commande · Punch · Messages · Plus**, les accueils et le Punch conservent leur fonctionnement. Le Pliage conserve ses quatre étapes et son modèle métier ; ses mesures, angles et actions sont adaptés à l’espace réel du téléphone. Le choix de chantier est présenté au panier ; le filtre de catégories se trouve dans le bouton à trois barres près de la recherche.
+
+## Signature durable et garde de livraison
+
+La nouvelle lignée doit utiliser une **clé PKCS12 durable détenue par MIR**. Aucun outil de ce dépôt ne crée de clé. Gradle refuse de construire sans configuration de signature ; aucun repli sur une clé debug générée par le runner n’est permis. Le type de build reste `debug` pour les recettes natives ; ce n’est pas une livraison de production.
+
+Configuration GitHub Actions à fournir par un accès autorisé, sans placer de valeur privée dans Git, les journaux ou les artefacts :
+
+| Type | Nom | Usage |
+| --- | --- | --- |
+| Secret | `MIR_PREVIEW_KEYSTORE_BASE64` | Keystore PKCS12 durable, base64 sur une ligne |
+| Secret | `MIR_PREVIEW_KEYSTORE_PASSWORD` | Mot de passe du keystore |
+| Secret | `MIR_PREVIEW_KEY_ALIAS` | Alias de la clé |
+| Secret | `MIR_PREVIEW_KEY_PASSWORD` | Mot de passe de la clé |
+| Variable publique | `MIR_PREVIEW_CERT_SHA256` | Empreinte SHA-256 attendue du certificat, obligatoire |
+| Variable publique | `MIR_PREVIEW_SIGNING_APPROVED_SHA` | SHA exact de la source revue, 40 caractères |
+
+Le 18 novembre 2026, Frederick a explicitement autorisé l’enregistrement d’une clé durable. Une clé PKCS12 RSA 3072 / SHA256withRSA a été créée, puis le keystore et ses paramètres privés ont été enregistrés dans les quatre secrets chiffrés GitHub Actions ci-dessus, dans `revetementsmir/Revetements-mir-`. Leur présence a été confirmée dans l’interface GitHub. La clé privée et les mots de passe ne sont ni dans ce dépôt, ni dans les preuves, ni dans l’APK.
+
+Empreinte publique SHA-256 à conserver pour cette lignée : `a9a24e149a0076935952fd683c272072232e10d7f7e8e2d8f847fec34291417e`. Aucun autre certificat ne doit être utilisé pour une future mise à jour d’Aperçu. La présence des secrets ne constitue pas à elle seule une compilation signée réussie ; la recette ci-dessous vérifie leur utilisation réelle.
+
+Le job Android ne démarre que pour une PR provenant du même dépôt et dont le HEAD correspond exactement à `MIR_PREVIEW_SIGNING_APPROVED_SHA`. L’import relit aussi le HEAD réellement extrait. Une révision différente ou une variable absente entraîne un job ignoré, **pas une recette réussie**. Après chaque modification, la nouvelle révision doit être revue et la variable ajustée par une personne autorisée avant de relancer le workflow. Ce verrou est une garde de livraison ; il ne protège pas contre un collaborateur qui peut lui-même modifier les workflows ou leurs secrets.
+
+`tools/preview-signing.cjs import` place uniquement le keystore dans un sous-répertoire privé du `RUNNER_TEMP`, permissions `0700/0600`. `GITHUB_ENV` reçoit seulement les chemins ; les mots de passe restent limités aux étapes d’import et de compilation. Les caches de configuration Gradle sont désactivés. Une étape `always()` supprime ce fichier avant les tests natifs et les archives.
+
+`tools/verify-preview-signing.cjs` exécute **apksigner verify** sur les APK 130009, 130010 et l’APK d’instrumentation. Il exige une signature v2 valide, un seul signataire, l’empreinte publique attendue et les identités Android prévues. L’APK final n’est copié vers les artefacts qu’après cette vérification. `preview-signing.json` ne contient que des métadonnées publiques, empreintes et résultats. Le rapport natif final recoupe cette preuve avec le SHA du fichier effectivement remis.
+
+La recette **130009 → 130010** vérifie le maintien du stockage d’Aperçu dans un seul runner. L’APK précédemment livré **130008** possède le même identifiant et le même certificat durable ; cette paire de recette ne constitue pas un essai direct de son fichier exact vers 130010. L’ancien APK **130004** utilise un autre identifiant et le certificat historique `d62841b88fd0b0194ef871c5fcc03a2b1e0bc43fc5895308fddf35e9d0a94842`. Aucun remplacement, effacement ou désinstallation de cet ancien paquet n’est prévu.
+
+Pour compiler localement avec une clé déjà provisionnée de façon privée, fournir `MIR_PREVIEW_KEYSTORE_PATH`, `MIR_PREVIEW_KEYSTORE_PASSWORD`, `MIR_PREVIEW_KEY_ALIAS`, `MIR_PREVIEW_KEY_PASSWORD` et `MIR_PREVIEW_CERT_SHA256` dans l’environnement. Ne pas inscrire leurs valeurs dans une commande conservée, le dépôt ou un fichier de preuve. Exécuter la vérification cryptographique avant toute remise. Le pipeline CI constitue la voie de livraison contrôlée.
+
+Installation de la nouvelle application :
+
+```sh
+adb install MIR-TEST-Apercu.apk
+adb shell am start -n ca.revetementsmir.equipe.test.preview/ca.revetementsmir.equipe.test.MainActivity
+```
+
+Une future mise à jour **d’Aperçu uniquement** conserve son applicationId et sa clé durable, augmente le code de version et utilise `adb install -r`. L’application de test d’instrumentation n’est jamais remise comme application utilisateur.
+
+## Barre système Android anthracite
+
+Le fond natif de fenêtre et de lancement utilise `#242522`. `SystemBars` conserve les barres visibles et impose des icônes claires sur ce fond. La gestion Capacitor des marges, des encoches et du clavier reste active ; aucune fausse heure ou batterie n’est dessinée dans la page.
+
+La recette native capture et mesure la vraie barre Android au lancement, en paysage, après recréation, clavier ouvert et après reprise. Elle exige une barre visible, des icônes claires, le contenu sous la barre et un fond anthracite majoritaire. Ces nouvelles preuves doivent être obtenues dans la CI du SHA livré ; aucun essai physique sur le téléphone de Frederick n’est revendiqué.
+
+## Configuration Google — état du 18 novembre 2026
+
+Les deux callbacks exacts du tableau Aperçu ont été enregistrés dans les Redirect URLs de Supabase MIR TEST. Le fournisseur Google et la variable de compilation ont ensuite été activés pour l’APK livré 130006. La preuve native de ce lot confirme le bouton Google actif ; aucune connexion OAuth personnelle complète ni essai physique n’est revendiqué. L’accès par courriel demeure disponible et la récupération conserve sa limite TEST existante.
+
+Le workflow `.github/workflows/mir-phase11-android-pr.yml` transmet la variable de dépôt `MIR_TEST_GOOGLE_ENABLED` aux deux compilations, Chromium et Android ; sa valeur par défaut est la chaîne `false`. Dans chaque job, `npm run sync` appelle `npm run web`, puis `tools/build-web.cjs`, qui inscrit cette capacité dans les ressources embarquées et n’accepte que les chaînes `true` ou `false`.
+
+Conserver cette variable à `true` pour la présente mise à jour. Ce réglage de compilation n’active aucun fournisseur ; le rapport final exige que la preuve native montre encore Google activé et son bouton accessible. Le parcours OAuth personnel complet reste à vérifier avec un compte équipe autorisé. La récupération et les invitations gardent leurs réglages existants.
+
+## Recette native Pliage et catalogue compacts
+
+Les huit contrôles Android et les deux contrôles de mise à jour sont conservés. Avant le test des cinq rôles, le runner règle l’émulateur sur **1080 × 2340 à 440 dpi**, soit environ **393 × 851 points** d’écran avant les barres natives. Les vérifications utilisent le vrai portail, son en-tête, ses onglets, son menu bas et `#field-drawing-frame`, sans imposer de CSS au produit.
+
+Le parcours employé contrôle Annuler, la confirmation de Recommencer et la conservation du panier, puis construit trois côtés avec le clavier Android et choisit un repli. Il vérifie les cotes **5½ / 3 / 1½ po**, les angles **90° / 180°**, la saisie native des cotes et angles, le clavier visible, les repères numériques d’au moins 11 px, C au-dessus du retour et B au-dessous de sa branche, ainsi que le dessin et les cinq champs sans défilement. À une taille de texte Android de 1,5, chaque mesure et chaque angle doit rester accessible par la pagination. Les captures et mesures sont conservées dans les preuves de chaque rôle et revérifiées par `native-screen-proofs.cjs`.
+
+Les catalogues Employé et Chef doivent montrer les onglets, la recherche, le bouton de catégories et le panier d’en-tête ; les anciens champs de chantier et le gros pied de panier ne doivent pas occuper la liste. Cinq articles doivent tenir lorsqu’au moins cinq articles réels sont présents. Au panier, le choix du second chantier QA doit conserver les mêmes lignes de matériel et de pliage, avec leurs quantités et leur contexte source. Aucune commande n’est soumise par cette recette. Aucun article, compte ou chantier fictif supplémentaire n’est ajouté pour remplir ces écrans.
+
+L’iframe personnelle n’ajoute plus un deuxième bandeau natif TEST ni 30 px d’espace au-dessus du dessin. Le parent conserve son retour d’état réseau, et l’iframe conserve une zone d’erreur locale accessible. Les nouvelles preuves doivent être obtenues sur la CI de la révision livrée avant d’annoncer cette recette réussie.
+
+## Historique — identités et preuves antérieures
+
+Les versions et preuves des paragraphes suivants sont historiques. Le paquet personnel Samsung S25 (`ca.revetementsmir.equipe.recette.s25`) possède sa propre identité et sa propre signature; cette compilation standard ne prétend pas le remplacer.
+
 Refonte chantier TEST : **0.13.0-test /130001**, CI de mise à jour130001→130002. Nouvelle interface Employé/Chef activée dans APK TEST, mêmes sources dist ; [intégration et limites](../docs/verification/chantier-redesign/INTEGRATION.md). Recette physique Samsung ouverte. Google/courriels désactivés.
 
 # Android privé MIR — recette uniquement

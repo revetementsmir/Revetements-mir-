@@ -35,8 +35,10 @@ test('Le compte est neutre pour futurs clients et équipe',()=>{
 });
 test('Le visiteur peut entrer sans compte ni action de connexion obligatoire',()=>{
   assert.match(header,/href="boutique\.html"[^>]*>Revêtements<\/a>/);
-  assert.match(hero,/href="realisations\.html"[^>]*>Voir nos réalisations<\/a>/);
-  assert.match(hero,/href="boutique\.html"[^>]*>Voir notre boutique<\/a>/);
+  assert.match(hero,/href="maison\.html"/);
+  assert.match(hero,/href="chantiers\.html"/);
+  assert.match(hero,/class="mir-home-discover" href="#decouvrir">Découvrir tout MIR/);
+  assert.doesNotMatch(hero,/Voir nos réalisations|Voir notre boutique/);
   assert.match(header,/href="estimation\.html"[^>]*>Demander une estimation<\/a>/);
 });
 test('Maison du portfolio MIR utilisée, aucune image IA nouvelle ni palmiers',()=>{

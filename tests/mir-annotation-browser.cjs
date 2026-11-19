@@ -26,7 +26,7 @@ const server = http.createServer((req,res) => {
     assert.equal(await page.locator('meta[name="robots"]').getAttribute('content'),'noindex,nofollow');
     assert.equal(await page.locator('iframe').count(),0,'real screen must be in the main DOM');
     await page.getByRole('button',{name:'Annoter',exact:true}).click();
-    await page.getByRole('link',{name:'Voir notre boutique',exact:true}).click();
+    await page.locator('.mir-annotation-surface .mir-home-service[href="boutique.html"]').click();
     assert.equal(new URL(page.url()).pathname,'/annoter.html','annotation click must not navigate');
     await page.getByPlaceholder('Qu’aimerais-tu changer ?').fill('PREUVE LOCALE — modifier le bouton Boutique');
     await page.getByRole('button',{name:'Ajouter l’annotation au tableau',exact:true}).click();

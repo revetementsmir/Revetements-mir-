@@ -27,6 +27,7 @@
  const navigation=[['boutique.html','Boutique',['boutique.html','produit.html','materiaux.html']],['pliage.html','Pliages sur mesure',['pliage.html','production.html']],['plan.html','Studio 3D',['plan.html','studio.html']],['realisations.html','Réalisations',['realisations.html']],['chantier.html?view=orders&clientLocale=1','Mes commandes',['chantier.html']],['aide.html','Aide',['aide.html']],['contact.html','Contact',['contact.html']],['estimation.html','Estimation',['estimation.html']]];
  let nav=header.querySelector('nav.mir-client-links');if(!nav){nav=document.createElement('nav');header.append(nav);}nav.className='mir-client-links mir-prestige-nav';nav.id='mir-prestige-desktop-nav';nav.setAttribute('aria-label',t('Navigation principale'));nav.hidden=false;
  nav.replaceChildren(...navigation.map(([href,label,active])=>{const a=document.createElement('a');a.href=url(href);a.textContent=t(label);a.dataset.fr=label;a.dataset.en=english[label]||label;if((active.includes(file)&&(!account||q.get('view')==='orders'))||file==='studio-public.html'&&active.includes('plan.html'))a.setAttribute('aria-current','page');return a;}));
+ const estimateAction=actions.querySelector('.mir-home-estimate');if(estimateAction){estimateAction.textContent=t('Estimation');estimateAction.title='Demander une estimation';}
  header.querySelector('.mir-client-menu-toggle')?.remove();
  if(file==='selection.html')cart.setAttribute('aria-current','page');
  if(account&&q.get('view')!=='orders')avatar.setAttribute('aria-current','page');
@@ -44,9 +45,10 @@
  menu.setAttribute('aria-controls',nav.id);menu.setAttribute('aria-expanded','false');
  menu.setAttribute('aria-label',t('Ouvrir le menu'));actions.prepend(menu);
  const mobileMenu=matchMedia('(max-width:1100px)');
+ const mobileViewport=()=>{const viewport=header.closest('[data-mir-responsive-viewport]');return viewport?viewport.clientWidth<=1100:mobileMenu.matches;};
  function closeMenu(restore=false){
   header.classList.remove('mir-client-menu-open');menu.setAttribute('aria-expanded','false');
-  menu.setAttribute('aria-label',t('Ouvrir le menu'));if(mobileMenu.matches)nav.hidden=true;
+  menu.setAttribute('aria-label',t('Ouvrir le menu'));if(mobileViewport())nav.hidden=true;
   if(restore)menu.focus({preventScroll:true});
  }
  function openMenu(){nav.hidden=false;header.classList.add('mir-client-menu-open');menu.setAttribute('aria-expanded','true');menu.setAttribute('aria-label',t('Fermer le menu'));}
@@ -54,18 +56,19 @@
   locale=header.querySelector('.mir-client-locale-switch,.languages');
   if(!locale)return;
   locale.classList.add('mir-client-locale-switch');
-  if(mobileMenu.matches){if(locale.parentElement!==nav)nav.append(locale);}
+  if(mobileViewport()){if(locale.parentElement!==nav)nav.append(locale);}
   else if(locale.parentElement!==actions||locale.nextElementSibling!==avatar)actions.insertBefore(locale,avatar);
  }
  function syncMenu(){
-  menu.hidden=!mobileMenu.matches;closeMenu();nav.hidden=mobileMenu.matches;
+  const mobile=mobileViewport();menu.hidden=!mobile;closeMenu();nav.hidden=mobile;
   placeLocale();
  }
  menu.addEventListener('click',()=>menu.getAttribute('aria-expanded')==='true'?closeMenu():openMenu());
  document.addEventListener('keydown',event=>{if(event.key==='Escape'&&menu.getAttribute('aria-expanded')==='true'){event.preventDefault();closeMenu(true);}});
  document.addEventListener('pointerdown',event=>{if(!header.contains(event.target))closeMenu();});
- nav.addEventListener('click',event=>{if(event.target.closest('a')&&mobileMenu.matches)closeMenu();});
+ nav.addEventListener('click',event=>{if(event.target.closest('a')&&mobileViewport())closeMenu();});
  if(mobileMenu.addEventListener)mobileMenu.addEventListener('change',syncMenu);else mobileMenu.addListener(syncMenu);
+ document.addEventListener('mir:responsive-viewport',syncMenu);
  syncMenu();
  // Account localization is inserted asynchronously after the public header.
  new MutationObserver(placeLocale).observe(header,{childList:true,subtree:true});

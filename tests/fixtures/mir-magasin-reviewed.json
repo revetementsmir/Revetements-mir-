@@ -1,8 +1,8 @@
 {
   "baseCommit": "cdb4d7df51ba3a52b69673d75186ba115de20114",
   "review": "PR39 — Magasin / 8 annotations, 14 novembre 2026",
-  "reason": "SHA-256 complet revu pour la modification volontaire et strictement ciblée du modèle magasin : primaire photo PRIME 40713, ADSEAL contenant 90 et libellé de demande Kaycan incertaine. Le fichier reste couvert par les contrats mir-magasin-merge, mir-phase9-catalogue et par la vérification SHA complète mir-today. Les empreintes historiques existantes ne sont pas modifiées.",
+  "reason": "SHA-256 complet revu pour la modification volontaire et strictement ciblée du modèle magasin : primaire photo PRIME 40713, ADSEAL contenant 90 et libellé de demande Kaycan incertaine. Le fichier reste couvert par les contrats mir-magasin-merge, mir-phase9-catalogue et par la vérification SHA complète mir-today. Les empreintes historiques existantes ne sont pas modifiées. Actualisation du SHA historique après déplacement de la branche de base : ce fichier est byte-identique au BASE PR46 74d94d4f4eaeb8ad88e50399ab17e5ea1270bf68 et n’est pas modifié dans la PR46. Aucun changement fonctionnel magasin.",
   "files": {
-    "dist/employee-store-model.js": "53c77f551d490c63b190ebf710cbf2f4dce754c8abd53f4f262e68a11cc60603"
+    "dist/employee-store-model.js": "cb980dfe924ec64838411e607efb7b5d63fcbc365177d91db921b790026095d0"
   }
 }

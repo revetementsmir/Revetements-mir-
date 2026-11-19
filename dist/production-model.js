@@ -795,7 +795,7 @@ function profileDrawingSection(points,bends){
  return section;
 }
 
-function profileSideMarkers(section,model,handles,annotationBounds,[left,right]=[0,800],[top,bottom]=[0,520],lineObstacles=[]){
+function profileSideMarkers(section,model,handles,annotationBounds,[left,right]=[0,800],[top,bottom]=[0,520],lineObstacles=[],hemBends,markerIndices,horizontalMeasurements=false){
  const {segments}=section,center=segments.flat().reduce((s,p)=>[s[0]+p[0]/(segments.length*2),s[1]+p[1]/(segments.length*2)],[0,0]);
  const used=[],ink=[],rendered=new Map(),candidateCache=new Map();
  const cross=(a,b,c)=>(b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0]);
@@ -813,7 +813,30 @@ function profileSideMarkers(section,model,handles,annotationBounds,[left,right]=
   }
   return true;
  };
- const order=[...segments.entries()].sort((a,b)=>Math.hypot(a[1][1][0]-a[1][0][0],a[1][1][1]-a[1][0][1])-Math.hypot(b[1][1][0]-b[1][0][0],b[1][1][1]-b[1][0][1])||a[0]-b[0]);
+ // The field screen reads measurements horizontally. Its callouts must never
+ // pass through another side, including the visible semicircle of a hem.
+ const foldLines=[];
+ if(horizontalMeasurements)for(let i=0;i<segments.length-1;i++){
+  if((hemBends||model.bends)?.[i]?.mode!=='hem')continue;
+  const [start,end]=segments[i],next=segments[i+1][0],center=[(end[0]+next[0])/2,(end[1]+next[1])/2];
+  const radius=Math.hypot(end[0]-next[0],end[1]-next[1])/2,length=Math.hypot(end[0]-start[0],end[1]-start[1]);
+  if(radius<1e-5||length<1e-5)continue;
+  const normal=[(end[0]-center[0])/radius,(end[1]-center[1])/radius],tangent=[(end[0]-start[0])/length,(end[1]-start[1])/length];
+  let previous=end;
+  for(let step=1;step<=24;step++){
+   const angle=step*Math.PI/24,point=center.map((value,axis)=>value+radius*(normal[axis]*Math.cos(angle)+tangent[axis]*Math.sin(angle)));
+   foldLines.push([previous,point]);previous=point;
+  }
+ }
+ const touches=(line,other)=>{
+  if(intersects(line,other))return true;
+  const distance=(point,[a,b])=>{
+   const dx=b[0]-a[0],dy=b[1]-a[1],t=Math.max(0,Math.min(1,((point[0]-a[0])*dx+(point[1]-a[1])*dy)/(dx*dx+dy*dy||1)));
+   return Math.hypot(point[0]-a[0]-t*dx,point[1]-a[1]-t*dy);
+  };
+  return Math.min(distance(line[0],other),distance(line[1],other),distance(other[0],line),distance(other[1],line))<1;
+ };
+ const order=[...segments.entries()].filter(([index])=>!Array.isArray(markerIndices)||markerIndices.includes(index)).sort((a,b)=>Math.hypot(a[1][1][0]-a[1][0][0],a[1][1][1]-a[1][0][1])-Math.hypot(b[1][1][0]-b[1][0][0],b[1][1][1]-b[1][0][1])||a[0]-b[0]);
  let visits=0;
  function place(depth){
   if(depth===order.length)return true;
@@ -822,27 +845,42 @@ function profileSideMarkers(section,model,handles,annotationBounds,[left,right]=
   let output='';
   const length=Math.hypot(b[0]-a[0],b[1]-a[1])||1,t=[(b[0]-a[0])/length,(b[1]-a[1])/length],n=[-t[1],t[0]],mid=[(a[0]+b[0])/2,(a[1]+b[1])/2];
   const label=model.segments?.[index]?.label||String.fromCharCode(65+index),mm=model.segments?.[index]?.lengthMM,caption=Number.isFinite(mm)?label+' · '+formatMeasurement(mm,model.unit):label;
-  let angle=Math.atan2(t[1],t[0])*180/Math.PI;if(angle>90)angle-=180;if(angle<=-90)angle+=180;
+  let angle=horizontalMeasurements?0:Math.atan2(t[1],t[0])*180/Math.PI;if(angle>90)angle-=180;if(angle<=-90)angle+=180;
   const width=Math.max(24,caption.length*7.5+12),rad=angle*Math.PI/180,bw=Math.abs(Math.cos(rad))*width+Math.abs(Math.sin(rad))*24,bh=Math.abs(Math.sin(rad))*width+Math.abs(Math.cos(rad))*24;
-  const neighbour=segments.find(([s,e],j)=>j!==index&&Math.abs((e[0]-s[0])*t[0]+(e[1]-s[1])*t[1])>Math.hypot(e[0]-s[0],e[1]-s[1])*.98&&Math.abs(((s[0]+e[0])/2-mid[0])*n[0]+((s[1]+e[1])/2-mid[1])*n[1])>2&&Math.hypot((s[0]+e[0])/2-mid[0],(s[1]+e[1])/2-mid[1])<40);
+  // An actual hem is identified by its bend, not by the distance between
+  // segment midpoints: unequal return lengths can put those far apart.
+  // Keep each annotation outside its own physical side of the folded pair.
+  const hemNeighbour=hemBends&&[hemBends[index-1]?.mode==='hem'?segments[index-1]:null,hemBends[index]?.mode==='hem'?segments[index+1]:null].find(pair=>{
+   if(!pair)return false;
+   const [s,e]=pair;
+   return Math.abs((e[0]-s[0])*t[0]+(e[1]-s[1])*t[1])>Math.hypot(e[0]-s[0],e[1]-s[1])*.98&&Math.abs(((s[0]+e[0])/2-mid[0])*n[0]+((s[1]+e[1])/2-mid[1])*n[1])>1e-5;
+  });
+  const neighbour=hemNeighbour||segments.find(([s,e],j)=>j!==index&&Math.abs((e[0]-s[0])*t[0]+(e[1]-s[1])*t[1])>Math.hypot(e[0]-s[0],e[1]-s[1])*.98&&Math.abs(((s[0]+e[0])/2-mid[0])*n[0]+((s[1]+e[1])/2-mid[1])*n[1])>2&&Math.hypot((s[0]+e[0])/2-mid[0],(s[1]+e[1])/2-mid[1])<40);
   const reference=neighbour?[(neighbour[0][0]+neighbour[1][0])/2,(neighbour[0][1]+neighbour[1][1])/2]:center;
   const outward=(mid[0]-reference[0])*n[0]+(mid[1]-reference[1])*n[1]>=0?1:-1;
   let chosen;const candidates=candidateCache.get(index)||[];
   const longitudinal=(mid[0]-center[0])*t[0]+(mid[1]-center[1])*t[1]>=0?1:-1;
-  if(!candidateCache.has(index))for(const side of [outward,-outward])for(const gap of [32,48,64,80,96,112])for(const slide of length<width+20?[24*longitudinal,0,-24*longitudinal,48*longitudinal,-48*longitudinal,72,-72]:[0,24,-24,48,-48]){
+  const gaps=horizontalMeasurements?[16,24,32,40,48,64,80,96,112]:[32,48,64,80,96,112];
+  const slides=horizontalMeasurements?[0,16,-16,32,-32,48,-48,64,-64,80,-80,96,-96]:length<width+20?[24*longitudinal,0,-24*longitudinal,48*longitudinal,-48*longitudinal,72,-72]:[0,24,-24,48,-48];
+  if(!candidateCache.has(index))for(const side of hemNeighbour?[outward]:[outward,-outward])for(const gap of gaps)for(const slide of slides){
    const p=[mid[0]+n[0]*gap*side+t[0]*slide,mid[1]+n[1]*gap*side+t[1]*slide],box={x:p[0]-bw/2,y:p[1]-bh/2,w:bw,h:bh,cx:p[0],cy:p[1]};
    const hit=q=>q[0]>=box.x-6&&q[0]<=box.x+box.w+6&&q[1]>=box.y-6&&q[1]<=box.y+box.h+6;
    if(box.x<left+8||box.x+box.w>right-8||box.y<top+8||box.y+box.h>bottom-8||handles.some(p=>box.x<p[0]+25&&box.x+box.w>p[0]-25&&box.y<p[1]+25&&box.y+box.h>p[1]-25))continue;
-   if(segments.some(([s,e])=>Array.from({length:41},(_,i)=>[s[0]+(e[0]-s[0])*i/40,s[1]+(e[1]-s[1])*i/40]).some(hit)))continue;
-   const classic=length>=width+20&&slide===0;
-   const offset=q=>[q[0]+n[0]*gap*side,q[1]+n[1]*gap*side],lines=classic?[[a,offset(a)],[b,offset(b)],[offset(a),offset(b)]]:[[p,mid]];
+   if(horizontalMeasurements?segments.concat(foldLines).some(line=>hitsBox(line,box)):segments.some(([s,e])=>Array.from({length:41},(_,i)=>[s[0]+(e[0]-s[0])*i/40,s[1]+(e[1]-s[1])*i/40]).some(hit)))continue;
+   const classic=!horizontalMeasurements&&length>=width+20&&slide===0;
+   const delta=[mid[0]-p[0],mid[1]-p[1]],edgeRatio=Math.min((bw/2+3)/Math.max(1e-9,Math.abs(delta[0])),(bh/2+3)/Math.max(1e-9,Math.abs(delta[1])));
+   const edge=horizontalMeasurements?p.map((value,axis)=>value+delta[axis]*edgeRatio):p;
+   const offset=q=>[q[0]+n[0]*gap*side,q[1]+n[1]*gap*side],lines=classic?[[a,offset(a)],[b,offset(b)],[offset(a),offset(b)]]:[[edge,mid]];
+   if(horizontalMeasurements&&lines.some(line=>segments.some((segment,j)=>j!==index&&touches(line,segment))||foldLines.some(fold=>touches(line,fold))))continue;
+   if(hemNeighbour&&lines.some(line=>segments.some((segment,j)=>j!==index&&intersects(line,segment))))continue;
    if(lines.some(line=>lineObstacles.some(p=>hitsBox(line,{x:p[0]-25,y:p[1]-25,w:50,h:50}))))continue;
-   candidates.push({p,box,side,gap,lines,classic});
+   candidates.push({p,box,side,gap,lines,classic,distance:Math.hypot(gap,slide)});
   }
+  if(horizontalMeasurements)candidates.sort((a,b)=>a.distance-b.distance);
   candidateCache.set(index,candidates);
   for(const candidate of candidates){
    const {box,p,lines}=candidate;
-   if(used.some(q=>Math.hypot(p[0]-q.cx,p[1]-q.cy)<50||box.x<q.x+q.w+6&&box.x+box.w+6>q.x&&box.y<q.y+q.h+6&&box.y+box.h+6>q.y))continue;
+   if(used.some(q=>!horizontalMeasurements&&Math.hypot(p[0]-q.cx,p[1]-q.cy)<50||box.x<q.x+q.w+6&&box.x+box.w+6>q.x&&box.y<q.y+q.h+6&&box.y+box.h+6>q.y))continue;
    if(ink.some(line=>hitsBox(line,box))||lines.some(line=>used.some(box=>hitsBox(line,box))||ink.some(other=>intersects(line,other))))continue;
    used.push(box);ink.push(...lines);if(place(depth+1)){chosen=candidate;break;}used.pop();ink.splice(ink.length-lines.length);
   }
@@ -851,7 +889,8 @@ function profileSideMarkers(section,model,handles,annotationBounds,[left,right]=
   const xy=p=>p.map(decimal).join(','),offset=q=>[q[0]+n[0]*gap*side,q[1]+n[1]*gap*side];
   if(chosen.classic){
    output+=`<path class="profile-dimension-line" data-segment-index="${index}" d="M${xy(a)}L${xy(offset(a))} M${xy(b)}L${xy(offset(b))} M${xy(offset(a))}L${xy(offset(b))}" fill="none" stroke="#667e60" stroke-width="1.3"/>`;
-  }else output+=`<path class="profile-measure-leader" data-segment-index="${index}" d="M${xy(p)}L${xy(mid)}" fill="none" stroke="#667e60" stroke-width="1.3"/>`;
+  }else output+=`<path class="profile-measure-leader" data-segment-index="${index}" d="M${xy(lines[0][0])}L${xy(mid)}" fill="none" stroke="#667e60" stroke-width="1.3"/>`;
+  if(horizontalMeasurements)output+=`<circle class="profile-measure-anchor" data-segment-index="${index}" cx="${decimal(mid[0])}" cy="${decimal(mid[1])}" r="2" fill="#bda889" pointer-events="none"/>`;
   output+=`<g class="profile-side-marker" data-marker-label="${esc(label)}" data-segment-index="${index}" data-anchor-x="${decimal(mid[0])}" data-anchor-y="${decimal(mid[1])}" data-segment-start-x="${decimal(a[0])}" data-segment-start-y="${decimal(a[1])}" data-segment-end-x="${decimal(b[0])}" data-segment-end-y="${decimal(b[1])}" pointer-events="none" aria-hidden="true"><g transform="translate(${xy(p)}) rotate(${decimal(angle)})"><rect x="${-width/2}" y="-12" width="${width}" height="24" rx="3" fill="white"/><text x="0" y="5" text-anchor="middle" font-size="15" fill="#263d30">${esc(caption)}</text></g></g>`;
   rendered.set(index,output);
   return true;
@@ -860,7 +899,7 @@ function profileSideMarkers(section,model,handles,annotationBounds,[left,right]=
  return segments.map((_,index)=>rendered.get(index)).join('');
 }
 
-function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=true, markerModel=model, handles=[], illustrative=false, togglePaintedFace=false, horizontalBounds, verticalBounds, angleOverlay, paintedMarker='stripe', highContrast=false,starPosition=0,section:explicitSection}={}){
+function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=true, markerModel=model, markerIndices, handles=[], illustrative=false, showMeasurements=!illustrative, hemSideMarkers=false, horizontalMeasurements=false, togglePaintedFace=false, horizontalBounds, verticalBounds, angleOverlay, paintedMarker='stripe', highContrast=false,starPosition=0,section:explicitSection}={}){
  const section=explicitSection||profileDrawingSection(mapped,bends);
  let output=`<path d="${section.path}" fill="none" stroke="${highContrast?'#304b3d':'#97a68b'}" stroke-width="9" stroke-linejoin="miter"/><path d="${section.path}" fill="none" stroke="${highContrast?'#dfe8e3':'#dbe3d4'}" stroke-width="4" stroke-linejoin="miter"/>`;
  const reserved=[...handles];
@@ -902,9 +941,9 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
  output+=`<g${action}>${togglePaintedFace?`<path d="${stripe}" fill="none" stroke="transparent" stroke-width="38" stroke-linecap="round"/>`:''}<path class="profile-painted-stripe" d="${stripe}" fill="none" stroke="#175b94" stroke-width="5" stroke-linecap="round"/></g>`;}
  });
  const annotationBounds=angleOverlay?[]:null;
- if(markers)try{output+=profileSideMarkers(section,illustrative?{...markerModel,segments:markerModel.segments?.map(({label})=>({label}))}:markerModel,reserved,annotationBounds,horizontalBounds,verticalBounds,paintedMarker==='star'?reserved.slice(handles.length):[]);}catch(error){
+ if(markers)try{output+=profileSideMarkers(section,showMeasurements?markerModel:{...markerModel,segments:markerModel.segments?.map(({label})=>({label}))},reserved,annotationBounds,horizontalBounds,verticalBounds,paintedMarker==='star'?reserved.slice(handles.length):[],hemSideMarkers?bends:undefined,markerIndices,horizontalMeasurements);}catch(error){
   if(paintedMarker!=='star'||!model.coloredFace?.side||starPosition>=11)throw error;
-  return profileDiagramContent(model,mapped,{bends,markers,markerModel,handles,illustrative,togglePaintedFace,horizontalBounds,verticalBounds,angleOverlay,paintedMarker,highContrast,starPosition:starPosition+1,section:explicitSection});
+  return profileDiagramContent(model,mapped,{bends,markers,markerModel,markerIndices,handles,illustrative,showMeasurements,hemSideMarkers,horizontalMeasurements,togglePaintedFace,horizontalBounds,verticalBounds,angleOverlay,paintedMarker,highContrast,starPosition:starPosition+1,section:explicitSection});
  }
  if(angleOverlay)output+=angleOverlay(section,annotationBounds,reserved);
  return output;
