@@ -132,7 +132,24 @@ public class MirRealRolesTest extends MirDeviceSetup {
   }
  }
  private String drawingTargetExpression(String selector){
-  return "(()=>{const f=document.querySelector('#field-drawing-frame'),d=f?.contentDocument,n=d?.querySelector("+JSONObject.quote(selector)+");if(!f||!d||!n||!n.isConnected||n.matches(':disabled'))return{ready:false};const r=n.getBoundingClientRect(),frame=f.getBoundingClientRect();if(f.offsetWidth<=0||f.offsetHeight<=0||frame.width<=0||frame.height<=0)return{ready:false};const cx=r.left+r.width/2,cy=r.top+r.height/2,sx=frame.width/f.offsetWidth,sy=frame.height/f.offsetHeight,x=frame.left+(f.clientLeft+cx)*sx,y=frame.top+(f.clientTop+cy)*sy,hit=d.elementFromPoint(cx,cy),parentHit=document.elementFromPoint(x,y);return{ready:r.width>0&&r.height>0&&cx>=0&&cy>=0&&cx<f.contentWindow.innerWidth&&cy<f.contentWindow.innerHeight&&x>=0&&y>=0&&x<innerWidth&&y<innerHeight&&!!hit&&(hit===n||n.contains(hit))&&parentHit===f,x,y,width:innerWidth,height:innerHeight,w:r.width,h:r.height,childHit:!!hit&&(hit===n||n.contains(hit)),parentHit:parentHit===f};})()";
+  return "(()=>{const f=document.querySelector('#field-drawing-frame'),d=f?.contentDocument,n=d?.querySelector("+JSONObject.quote(selector)+");if(!f||!d||!n||!n.isConnected||n.matches(':disabled'))return{ready:false};const r=n.getBoundingClientRect(),frame=f.getBoundingClientRect();if(f.offsetWidth<=0||f.offsetHeight<=0||frame.width<=0||frame.height<=0)return{ready:false};const cx=r.left+r.width/2,cy=r.top+r.height/2,sx=frame.width/f.offsetWidth,sy=frame.height/f.offsetHeight,x=frame.left+(f.clientLeft+cx)*sx,y=frame.top+(f.clientTop+cy)*sy,hit=d.elementFromPoint(cx,cy),parentHit=document.elementFromPoint(x,y);return{ready:r.width>0&&r.height>0&&cx>=0&&cy>=0&&cx<f.contentWindow.innerWidth&&cy<f.contentWindow.innerHeight&&x>=0&&y>=0&&x<innerWidth&&y<innerHeight&&!!hit&&(hit===n||n.contains(hit))&&parentHit===f,x,y,width:innerWidth,height:innerHeight,w:r.width,h:r.height,frameLeft:frame.left,frameTop:frame.top,frameWidth:frame.width,frameHeight:frame.height,childWidth:f.contentWindow.innerWidth,childHeight:f.contentWindow.innerHeight,childHit:!!hit&&(hit===n||n.contains(hit)),parentHit:parentHit===f};})()";
+ }
+ private JSONObject stableDrawingTarget(ActivityScenario<MainActivity>s,String selector,int[] nativeLocation)throws Exception{
+  long deadline=SystemClock.uptimeMillis()+30000;JSONObject anchor=null,last=null;int[] anchorNative=null;int stableSamples=0;
+  while(SystemClock.uptimeMillis()<deadline){
+   JSONObject point=(JSONObject)js(s,drawingTargetExpression(selector));last=point;
+   int[] bounds=new int[7];s.onActivity(a->{android.webkit.WebView web=a.getBridge().getWebView();web.getLocationOnScreen(bounds);bounds[2]=web.getWidth();bounds[3]=web.getHeight();androidx.core.view.WindowInsetsCompat insets=androidx.core.view.ViewCompat.getRootWindowInsets(web);bounds[4]=insets==null?0:insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.ime()).bottom;bounds[5]=insets!=null&&insets.isVisible(androidx.core.view.WindowInsetsCompat.Type.ime())?1:0;bounds[6]=web.isShown()&&web.hasWindowFocus()?1:0;});
+   if(point.getBoolean("ready")&&bounds[2]>0&&bounds[3]>0&&bounds[6]==1){
+    boolean same=anchor!=null&&java.util.Arrays.equals(anchorNative,bounds);
+    if(same)for(String key:new String[]{"x","y","w","h","width","height","frameLeft","frameTop","frameWidth","frameHeight","childWidth","childHeight"})if(Math.abs(point.getDouble(key)-anchor.getDouble(key))>.25){same=false;break;}
+    // Compare to the first sample, not only the preceding one: slow movement
+    // must not accumulate into a supposedly stable native tap location.
+    if(same)stableSamples++;else{anchor=point;anchorNative=bounds;stableSamples=1;}
+    if(stableSamples>=3){System.arraycopy(bounds,0,nativeLocation,0,4);return point;}
+   }else{anchor=null;anchorNative=null;stableSamples=0;}
+   SystemClock.sleep(150);
+  }
+  throw new AssertionError("Drawing target did not remain presented and stable: "+selector+"; last sample="+last);
  }
  private int drawingTapSequence=0,compactTracePointIndex=0;
  private JSONObject writeDrawingTapDiagnostic(ActivityScenario<MainActivity>s,String selector,int sequence,String phase,boolean capture)throws Exception{
@@ -160,10 +177,8 @@ public class MirRealRolesTest extends MirDeviceSetup {
   js(s,"document.querySelector('#field-drawing-frame').contentDocument.querySelector("+JSONObject.quote(selector)+").scrollIntoView({block:'nearest',inline:'nearest',behavior:'instant'});true");
   presentFrame(s);
   writeDrawingTapDiagnostic(s,selector,sequence,"before-tap",false);
-  waitFor(s,"drawing target presented without child or parent interception "+selector,"("+drawingTargetExpression(selector)+").ready");
-  JSONObject point=(JSONObject)js(s,drawingTargetExpression(selector));
+  int[] loc=new int[4];JSONObject point=stableDrawingTarget(s,selector,loc);
   assertTrue("Drawing native target is still presented and enabled",point.getBoolean("ready"));
-  int[] loc=new int[4];s.onActivity(a->{android.webkit.WebView web=a.getBridge().getWebView();web.getLocationOnScreen(loc);loc[2]=web.getWidth();loc[3]=web.getHeight();});
   assertTrue("Native drawing tap delivered",androidx.test.uiautomator.UiDevice.getInstance(InstrumentationRegistry.getInstrumentation()).click(loc[0]+(int)Math.round(point.getDouble("x")*loc[2]/point.getDouble("width")),loc[1]+(int)Math.round(point.getDouble("y")*loc[3]/point.getDouble("height"))));
   }catch(AssertionError|Exception failure){
    try{JSONObject diagnostic=writeDrawingTapDiagnostic(s,selector,sequence,"failed",true);failure.addSuppressed(new AssertionError("Native drawing tap evidence="+diagnostic.toString()));}catch(AssertionError|Exception diagnosticFailure){failure.addSuppressed(diagnosticFailure);}throw failure;
