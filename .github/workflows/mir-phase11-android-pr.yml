@@ -40,6 +40,8 @@ jobs:
           node tests/mir-pliage03-field-contract.cjs
           node --test tests/mir-field-catalogue-context.cjs
           node tests/mir-field-drawing-loader-browser.cjs
+          node tests/mir-pliage03-field-browser.cjs
+          node tests/mir-field-drawing-refresh-browser.cjs
       - name: Connexion native 08 — formulaire, Google et récupération
         env:
           MIR_CHROMIUM_BIN: /usr/bin/google-chrome
@@ -73,7 +75,6 @@ jobs:
         run: |
           result=0
           node tests/mir-app-selection-browser.cjs || result=1
-          node tests/mir-pliage03-field-browser.cjs || result=1
           node tests/mir-field-stepper-browser.cjs || result=1
           node tests/mir-pliage03-field-contract.cjs || result=1
           node --test tests/mir-field-pliage-measurements.cjs || result=1
@@ -130,7 +131,6 @@ jobs:
           mir_check node tests/mir-samsung-ui.cjs
           mir_check node tests/mir-punch-approved-browser.cjs
           mir_check node tests/mir-field-choice-refresh-browser.cjs
-          mir_check node tests/mir-field-drawing-refresh-browser.cjs
           mir_check node tests/mir-team-enrollment-integration.cjs
           mir_check node mobile/tools/test-enrollment-web.cjs
           mir_check node tests/mir-team-invitation-email.cjs

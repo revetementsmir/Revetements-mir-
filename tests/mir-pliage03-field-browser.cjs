@@ -143,7 +143,7 @@ async function main(){
   }
   report.blocked.push({url:req.url(),method:req.method()});return route.abort();
  });
- const page=await context.newPage();page.setDefaultTimeout(15000);page.on('pageerror',e=>report.pageErrors.push(e.message));
+ const page=await context.newPage();page.setDefaultTimeout(15000);page.on('pageerror',e=>report.pageErrors.push(e.stack||e.message));
  async function open(data,options={}){current=data;fixtureOptions=options;await page.goto(srv.base+'/__field-fixture.html',{waitUntil:'networkidle'});assert.deepEqual(await page.evaluate(()=>window.MIRFieldDrawingContext?.()),data,'fixture publishes the exact parent context');const frame=page.frames().find(f=>f.url().includes('production.html'));assert.ok(frame);await ready(frame);return frame;}
  async function untouched(frame){
   const data=await frame.evaluate(publicKey=>({reads:window.__qaStorageReads.slice(),publicDraft:window.__qaRead(publicKey),publicOrder:window.__qaRead('mir_production_client_dossier_v1')}),publicKey);

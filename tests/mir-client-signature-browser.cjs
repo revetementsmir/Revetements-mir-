@@ -67,9 +67,11 @@ async function checkBrandCards(browser,base){
       assert.ok(layout.pageWidth<=width+2,'Pas de débordement horizontal à '+width);
       if(width<=430)assert.ok(layout.height>=180&&layout.height<=650,'Cartes Prestige complètes, sans hauteur démesurée à '+width+' : '+layout.height);
       const kaycan=cards.filter({has:page.getByRole('heading',{name:'Kaycan',exact:true})});
-      assert.match(await kaycan.locator('img').getAttribute('src'),/kaycan-soffit-installed/);
+      const kaycanImage=kaycan.locator('img');
+      assert.match(await kaycanImage.getAttribute('src'),/\/assets\/(?:catalogue-swatches|products)\/kaycan-[a-z0-9._-]+\.(?:webp|png|jpe?g)$/i,'Kaycan keeps a real local branded image');
+      assert.equal(await kaycanImage.evaluate(img=>img.naturalWidth>0&&img.naturalHeight>0),true,'Kaycan photo decodes');
       const jdp=cards.filter({has:page.getByRole('heading',{name:'JDP / Juste du Pin',exact:true})});
-      assert.equal(await jdp.locator('.brand-collection-image').getAttribute('data-framing'),'sample-crop');
+      assert.equal(await jdp.locator('img').evaluate(img=>img.naturalWidth>0&&img.naturalHeight>0),true,'JDP local photo decodes instead of an obsolete framing flag');
       if([390,1024,1440,2560].includes(width)){
         await cards.first().scrollIntoViewIfNeeded();
         await page.screenshot({path:path.resolve(__dirname,'../artifacts/mir-boutique-fabricants-'+width+'x'+height+'.png')});
