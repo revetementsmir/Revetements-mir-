@@ -29,6 +29,16 @@ jobs:
           if ! git cat-file -e "${MIR_APP_REFERENCE_SHA}^{commit}" 2>/dev/null; then
             git fetch --no-tags --depth=1 origin "$MIR_APP_REFERENCE_SHA"
           fi
+      # Fail early on an actual Pliages defect; the full browser, security and
+      # Android suites still run on passing release candidates.
+      - name: Contrôle rapide Pliages et chargement — avant la longue recette
+        env:
+          MIR_CHROMIUM_BIN: /usr/bin/google-chrome
+          NODE_PATH: ./mobile/node_modules
+        run: |
+          node tests/mir-pliage03-field-contract.cjs
+          node --test tests/mir-field-catalogue-context.cjs
+          node tests/mir-field-drawing-loader-browser.cjs
       - name: Connexion native 08 — formulaire, Google et récupération
         env:
           MIR_CHROMIUM_BIN: /usr/bin/google-chrome
@@ -120,7 +130,6 @@ jobs:
           mir_check node tests/mir-punch-approved-browser.cjs
           mir_check node tests/mir-field-choice-refresh-browser.cjs
           mir_check node tests/mir-field-drawing-refresh-browser.cjs
-          mir_check node tests/mir-field-drawing-loader-browser.cjs
           mir_check node tests/mir-team-enrollment-integration.cjs
           mir_check node mobile/tools/test-enrollment-web.cjs
           mir_check node tests/mir-team-invitation-email.cjs

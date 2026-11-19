@@ -673,7 +673,7 @@ function compactClientProfileSVG(model,{illustrative=false,painted=false,width:g
   labels.push('<g class="client-compact-side" data-marker-label="'+esc(label)+'"><path d="M'+mid.map(fmt).join(',')+'L'+p.map(fmt).join(',')+'" stroke="#8a8b80" stroke-width=".7"/><rect x="'+fmt(p[0]-10)+'" y="'+fmt(p[1]-10)+'" width="20" height="20" rx="3" fill="#ece8df"/><text x="'+fmt(p[0])+'" y="'+fmt(p[1]+4.5)+'" text-anchor="middle" font-size="13" font-weight="600" fill="#242522">'+esc(label)+'</text></g>');
  }
  // Render the existing physical model; only the screen projection and labels are compact.
- const profile=publicProfileDiagramContent(model,mapped,{markers:false,illustrative:!painted,highContrast:true,horizontalBounds:[0,width],verticalBounds:[0,height]})
+ const profile=publicProfileDiagramContent(model,mapped,{markers:false,illustrative:!painted,showMeasurements:false,highContrast:true,horizontalBounds:[0,width],verticalBounds:[0,height]})
   .replace('stroke-width="9"','stroke-width="4"')
   .replace(/(<path[^>]*stroke="#dfe8e3"[^>]*stroke-width=")4"/,(_,prefix)=>prefix+'1.5"');
  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+width+' '+height+'" role="img" aria-label="'+esc(model.name)+'"><title>'+esc(model.name)+(illustrative?' — proportions du modèle, cotes à saisir':' — cotes de la pièce')+'</title>'+profile+(publicPliage03()&&painted?'':labels.join(''))+'</svg>';

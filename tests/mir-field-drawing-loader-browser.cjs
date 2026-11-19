@@ -31,14 +31,15 @@ const snapshot=()=>{const section=document.querySelector('.mir-app-drawing'),fra
     const page=await browser.newPage({viewport:{width:390,height:796},hasTouch:true});
     page.setDefaultTimeout(10000);
     await page.route('**/*',r=>r.request().url().startsWith(origin)?r.continue():r.abort());
-    const delayed=new Promise(resolve=>releaseDelayed=resolve);let held=0;
-    await page.route('**/production-app.js*',async route=>{held++;await delayed;await route.continue();});
+    const delayed=new Promise(resolve=>releaseDelayed=resolve);let held=0,markHeld;const wasHeld=new Promise(resolve=>markHeld=resolve);
+    await page.route('**/production-app.js*',async route=>{held++;markHeld();await delayed;await route.continue();});
     await page.goto(origin+'/chantier.html');
     await page.locator('#field-header').waitFor();
     await page.locator('#portal-navigation [data-view=command]').click();
     assert.equal(await page.locator('.mir-app-c02 .mir-app-segments button').count(),2);
     await page.locator('[data-field-catalogue=fold]').click();
     await page.waitForFunction(()=>document.querySelector('#field-drawing-frame')?.contentDocument?.documentElement.dataset.fieldDrawing==='true');
+    await Promise.race([wasHeld,new Promise((_,reject)=>setTimeout(()=>reject(new Error('Deferred editor script was not requested within 10 seconds.')),10000))]);
     const whileHeld=await page.evaluate(snapshot);
     assert.equal(held,1,'the deferred editor bootstrap was actually delayed');checks++;
     assert.deepEqual(whileHeld.tabs,['Magasin','Pliages']);checks++;

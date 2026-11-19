@@ -51,7 +51,7 @@ function mounting({ready=true}={}){
   window:{addEventListener(){},removeEventListener(){}},
   MutationObserver:class{observe(){}disconnect(){}},
   requestAnimationFrame:fn=>fn(),
-  clearTimeout(){},setTimeout(fn){this.timeout=fn;return 1;},
+  clearTimeout(){},setTimeout(){return 1;},
   $:key=>key==='#portal-navigation'?{getBoundingClientRect:()=>({top:740})}:key==='#portal-content'?{}:null,
   terrainRole:()=>true,toast(){},URL,console};
  box.currentJobId=()=>box.job;
