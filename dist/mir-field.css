@@ -59,3 +59,7 @@ body[data-field-shell=true] #lead-report-form label:has(input[type=checkbox]){di
 body[data-field-shell=true] .employee-tabs button{background:var(--field-surface)!important;color:var(--field-text)!important;border:1px solid var(--field-border)!important;min-height:44px}body[data-field-shell=true] .employee-tabs button[aria-selected=true]{background:var(--field-accent)!important;color:var(--field-surface)!important}body[data-field-shell=true] :is(.expense-compose,.field-form-details) summary{min-height:44px;display:flex;align-items:center;padding:10px 4px}
 
 body[data-field-shell=true] .absence-compose summary{min-height:44px;display:flex;align-items:center;padding:10px 4px}body[data-field-shell=true] :is(.expense-compose,.absence-compose,.field-form-details) summary::after{content:'⌄';margin-left:auto;padding-left:12px}body[data-field-shell=true] :is(.expense-compose,.absence-compose,.field-form-details)[open]>summary::after{content:'⌃'}
+
+body[data-field-shell=true] .field-punch-context .field-temporary-job{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;min-height:44px;margin:6px 0 0;padding:6px 10px;font-size:.8125rem;line-height:1.2;color:var(--field-accent);border:1px solid var(--field-border);background:var(--field-surface)}
+body[data-field-shell=true] .field-punch-context .field-temporary-job svg{width:18px;height:18px;flex:0 0 18px}
+body[data-field-shell=true] [data-temporary-job-state]:empty{display:none}

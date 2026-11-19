@@ -43,7 +43,7 @@ function verify(env, args) {
   if (!sdk || !path.isAbsolute(sdk)) throw Error('SDK Android requis pour vérifier la signature.');
   const tools = path.join(sdk, 'build-tools/36.0.0');
   const [before, after, test, reportFile] = args;
-  const proofs = [verifyOne(before, 130007, expected, tools), verifyOne(after, 130008, expected, tools), verifyOne(test, null, expected, tools, true)];
+  const proofs = [verifyOne(before, 130009, expected, tools), verifyOne(after, 130010, expected, tools), verifyOne(test, null, expected, tools, true)];
   const report = {sourceSha: env.MIR_PREVIEW_SOURCE_SHA, applicationId: APPLICATION_ID, signature: 'durable MIR TEST Aperçu', expectedCertificateSha256: expected, buildType: 'debug', production: false, existingInstallationReplaced: false, previousApplicationId: 'ca.revetementsmir.equipe.test', proofs};
   fs.mkdirSync(path.dirname(reportFile), {recursive: true});
   fs.writeFileSync(reportFile, JSON.stringify(report, null, 2) + '\n');

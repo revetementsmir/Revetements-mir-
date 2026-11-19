@@ -2,7 +2,7 @@
 // Actual embedded production UI with a labelled local parent fixture. No backend
 // mutations, accounts, customer drafts or external requests are used by this test.
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
-const {chromium}=require('playwright'),{serve}=require('./helpers/mir-static-http.cjs');
+const {chromium}=require('playwright'),{serve}=require('./helpers/mir-static-http.cjs'),{tapTraceFraction}=require('./helpers/mir-field-trace-touch.cjs');
 const root=path.resolve(__dirname,'..');
 const out=path.resolve(process.env.MIR_FIELD_PLIAGE_OUT||'/tmp/mir-pliage03-field-proof');
 const publicKey='mir_client_active_profile_v1';
@@ -27,20 +27,20 @@ async function stage(frame,n){await frame.waitForFunction(n=>document.body.datas
 async function layout(frame){const info=await frame.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth,body:document.body.scrollWidth}));assert.ok(info.scroll<=info.width+1&&info.body<=info.width+1,'no horizontal overflow '+JSON.stringify(info));return info;}
 async function shot(page,name){await page.screenshot({path:path.join(out,name+'.png'),animations:'disabled',caret:'hide'});report.captures.push(name+'.png');}
 async function settled(frame){await frame.evaluate(async()=>{await document.fonts.ready;await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));});}
-async function traceFocusLayout(frame,height){
+async function traceLayout(frame,height,{expanded=false}={}){
  await settled(frame);
  const proof=await frame.evaluate(()=>{
-  const input=document.querySelector('#client-point-x'),tools=document.querySelector('#drawing-tools'),r=input.getBoundingClientRect(),clipped=[];
-  for(let p=input.parentElement;p;p=p.parentElement){const s=getComputedStyle(p),b=p.getBoundingClientRect();if(/hidden|clip|auto|scroll/.test(s.overflowY)&&(r.top<b.top+p.clientTop-1||r.bottom>b.top+p.clientTop+p.clientHeight+1))clipped.push(p.id||p.className||p.tagName);}
-  const hit=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);
-  return{width:innerWidth,height:innerHeight,active:document.activeElement?.id,input:{top:r.top,bottom:r.bottom,left:r.left,right:r.right,height:r.height,hit:hit===input,clipped,value:input.value,scrollMargin:getComputedStyle(input).scrollMarginBottom},y:document.querySelector('#client-point-y').value,tools:{top:tools.scrollTop,height:tools.clientHeight,scroll:tools.scrollHeight},wrappers:['html','body','#production-main','.production-workspace','#production-preview'].map(selector=>({selector,top:document.querySelector(selector).scrollTop})),steps:[...document.querySelectorAll('#client-step-list button')].map(node=>{const b=node.getBoundingClientRect();return{top:b.top,bottom:b.bottom};})};
+  const rect=node=>{const r=node.getBoundingClientRect();return{top:r.top,bottom:r.bottom,left:r.left,right:r.right,width:r.width,height:r.height};};
+  const controls=[...document.querySelectorAll('#field-trace-toolbar select,#field-trace-expand,.client-trace-actions button')].map(node=>{const r=rect(node),hit=document.elementFromPoint((r.left+r.right)/2,(r.top+r.bottom)/2);return{id:node.id||node.getAttribute('aria-label')||node.textContent.trim(),rect:r,hit:hit===node||node.contains(hit),disabled:node.disabled};});
+  const svg=document.querySelector('#production-drawing svg'),view=svg.viewBox.baseVal,m=svg.getScreenCTM();
+  return{width:innerWidth,height:innerHeight,expanded:document.body.dataset.fieldTraceExpanded==='true',toolbar:rect(document.querySelector('#field-trace-toolbar')),grid:rect(document.querySelector('#production-drawing')),projection:{width:view.width*Math.hypot(m.a,m.b),height:view.height*Math.hypot(m.c,m.d)},controls,fullscreen:!!document.fullscreenElement,overflow:document.documentElement.scrollWidth>innerWidth+1,removed:document.querySelectorAll('#client-point-x,#client-point-y,.client-keyboard-trace,.client-trace-options,#client-example-l').length};
  });
- assert.equal(proof.width,355);assert.equal(proof.height,height);assert.equal(proof.active,'client-point-x','adding a point keeps the next X field focused');
- assert.equal(proof.input.scrollMargin,'8px','the actual native field style replaces the former 100px scroll margin');
- assert.equal(proof.input.hit,true,'the focused X field has a real unobstructed hit target');assert.deepEqual(proof.input.clipped,[],'the complete focused field is visible in the internal scroller');
- assert.ok(proof.input.top>=0&&proof.input.bottom<=height&&proof.input.height>=44);
- for(const wrapper of proof.wrappers)assert.equal(wrapper.top,0,wrapper.selector+' stays anchored while only the tools can scroll');
- for(const step of proof.steps)assert.ok(step.top>=0&&step.bottom<=height,'the four step buttons stay fully inside the child viewport');
+ assert.equal(proof.width,355);assert.equal(proof.height,height);assert.equal(proof.expanded,expanded);
+ assert.equal(proof.removed,0,'X/Y, keyboard points, trace options and example are absent from the field UI');
+ assert.equal(proof.fullscreen,false,'expansion stays in the iframe and preserves Android system data');
+ assert.equal(proof.overflow,false);assert.ok(proof.toolbar.bottom<=proof.grid.top+1,'scale and expand sit above the grid');
+ assert.ok(proof.grid.height>=100,'a usable drawing surface stays visible');
+ for(const control of proof.controls){assert.ok(control.rect.height>=44,control.id+' has a touch-sized target');assert.ok(control.rect.top>=0&&control.rect.bottom<=height+1&&control.rect.left>=0&&control.rect.right<=355+1,control.id+' is inside the iframe');if(!control.disabled)assert.equal(control.hit,true,control.id+' is unobstructed');}
  return proof;
 }
 async function seedPersonalProfile(frame,spec){
@@ -70,7 +70,7 @@ async function compactLayout(frame,{expectHem=false,width=393}={}){
  assert.ok(proof.controls.length>=7,'measures, angles and navigation are actually rendered');
  for(const control of proof.controls){assert.ok(control.rect.width>0&&control.rect.height>0,control.id+' has a hit target');assert.ok(control.rect.left>=-1&&control.rect.right<=proof.width+1&&control.rect.top>=-1&&control.rect.bottom<=proof.height+1,control.id+' stays inside the real iframe: '+JSON.stringify(control.rect));assert.deepEqual(control.clipped,[],control.id+' is not hidden by a clipped ancestor');}
  assert.equal(await frame.locator('[data-client-angle-nudge]').count(),0,'no angle +/- remains in the field DOM');
- for(const input of await frame.locator('[data-client-bend-angle]:visible').all()){assert.equal(await input.getAttribute('inputmode'),'decimal');assert.equal(await input.getAttribute('step'),'any');}
+ for(const input of await frame.locator('[data-client-bend-angle]:visible').all()){assert.equal(await input.getAttribute('inputmode'),'numeric');assert.equal(await input.getAttribute('step'),'1');}
  if(expectHem){
   assert.equal(proof.presentation,'dimensions','the three requested measurements are shown directly on the drawing');
   assert.deepEqual(proof.visibleSides,[0,1,2]);assert.deepEqual(proof.visibleAngles,[0,1]);
@@ -94,7 +94,7 @@ async function bankContrast(frame){
  for(const card of cards){assert.equal(card.ink,card.text,card.id+' uses the app text ink');assert.equal(card.stroke,card.ink,card.id+' renders its actual currentColor path');assert.ok(contrast(card.stroke,card.canvas)>=3,card.id+' profile contrast');assert.ok(contrast(card.text,card.background)>=4.5,card.id+' title contrast');}
  return{models:cards.length,minProfileContrast:Math.min(...cards.map(c=>contrast(c.stroke,c.canvas))),minTextContrast:Math.min(...cards.map(c=>contrast(c.text,c.background))),ink:cards[0].ink,canvas:cards[0].canvas};
 }
-async function chooseModel(frame){await frame.locator('#client-choose-model').click();const bank=await bankContrast(frame);await frame.locator('[data-client-profile="l"]').click();await stage(frame,2);await frame.locator('[data-measure="A"]').fill('3.5');await frame.locator('[data-measure="B"]').fill('2.25');await frame.locator('[data-client-bend-angle="0"]').fill('112.5');return bank;}
+async function chooseModel(frame){await frame.locator('#client-choose-model').click();const bank=await bankContrast(frame);await frame.locator('[data-client-profile="l"]').click();await stage(frame,2);await frame.locator('[data-measure="A"]').fill('3.5');await frame.locator('[data-measure="B"]').fill('2.25');await frame.locator('[data-client-bend-angle="0"]').fill('112.5');await frame.locator('[data-client-bend-angle="0"]').press('Tab');assert.equal(await frame.locator('[data-client-bend-angle="0"]').inputValue(),'113','pasted decimal angles become whole degrees');assert.equal((await state(frame)).model.bends[0].angle,113,'the model matches the visible integer angle');return bank;}
 async function finish(frame){
  await frame.locator('#client-step-next').click();await stage(frame,3);
  await frame.locator('#material-type').selectOption('aluminium');
@@ -206,7 +206,7 @@ async function main(){
   await seedPersonalProfile(frame,compactSpec);
   const compactBefore=await compactLayout(frame,{expectHem:true});await shot(page,'field-compact-hem-393x500');
   assert.equal(await frame.locator('[data-client-bend-angle="1"]').getAttribute('readonly'),'');
-  await frame.locator('[data-client-bend-angle="0"]').fill('91.25');assert.equal((await state(frame)).model.bends[0].angle,91.25,'decimal angle is entered directly at the keyboard');
+  await frame.locator('[data-client-bend-angle="0"]').fill('91.25');await frame.locator('[data-client-bend-angle="0"]').press('Tab');assert.equal((await state(frame)).model.bends[0].angle,91,'the keyboard commits whole degrees');assert.equal(await frame.locator('[data-client-bend-angle="0"]').inputValue(),'91');
   await frame.locator('[data-client-bend-angle="0"]').fill('90');await frame.locator('[data-segment-length="2"]').fill('0.75');
   assert.ok(Math.abs((await state(frame)).model.segments[2].lengthMM-19.05)<1e-7);const compactQuarter=await compactLayout(frame,{expectHem:true});await shot(page,'field-compact-hem-three-quarter-393x500');
   const archiveBefore=await frame.evaluate(()=>({order:MIRProductionWorkspace.getEstimationDossier(),cart:MIRUnifiedOrderCart.list()}));
@@ -228,7 +228,7 @@ async function main(){
    await settled(frame);const visible=await frame.evaluate(()=>({sides:[...document.querySelectorAll('.client-measure-field:not([hidden])')].map(n=>Number(n.dataset.fieldMeasureIndex)),angles:[...document.querySelectorAll('.client-angle-field:not([hidden])')].map(n=>Number(n.dataset.angleIndex))}));
    assert.ok(visible.sides.length<=3&&visible.angles.length<=2,'pagination bounds the number of simultaneous controls');
    for(const index of visible.sides){const input=frame.locator('[data-segment-length="'+index+'"]');if(sideValues.has(index))assert.equal(await input.inputValue(),sideValues.get(index),'shared page-boundary dimension stays unchanged');else{const value=String(Number(longSpec.segments[index].length)+.125);await input.fill(value);sideValues.set(index,value);}}
-   for(const index of visible.angles){const input=frame.locator('[data-client-bend-angle="'+index+'"]');if(angleValues.has(index))assert.equal(await input.inputValue(),angleValues.get(index));else{const value=String(90+index/10);await input.fill(value);angleValues.set(index,value);}}
+   for(const index of visible.angles){const input=frame.locator('[data-client-bend-angle="'+index+'"]');if(angleValues.has(index))assert.equal(await input.inputValue(),angleValues.get(index));else{const value=String(90+index);await input.fill(value);angleValues.set(index,value);}}
    pageProof.push(await compactLayout(frame));await shot(page,'field-compact-seven-sides-page-'+(pageIndex+1));
    const next=frame.locator('[data-field-measure-page-step="1"]');if(await next.isDisabled())break;await next.click();
   }
@@ -248,40 +248,35 @@ async function main(){
   const tabletSecondPage=await compactLayout(frame,{width:834});assert.deepEqual(tabletSecondPage.visibleSides,[2,3,4]);await untouched(frame);await shot(page,'field-compact-tablet-834x500');
   report.checks.push({name:'field-breakpoint-834-height-500-keeps-readable-cotes-and-bounded-pages',passed:true,measures:tabletCompact,firstPage:tabletFirstPage,secondPage:tabletSecondPage});
   await page.setViewportSize({width:393,height:755});
-  frame=await open(contextData('worker-native-ime-qa','job-native-ime-qa',{entry:'draw',entryRequestId:'native-ime-qa'}),{width:355,height:524,native:true});
+  frame=await open(contextData('worker-native-trace-qa','job-native-trace-qa',{entry:'draw',entryRequestId:'native-trace-qa'}),{width:355,height:524,native:true});
   await stage(frame,1);assert.equal((await state(frame)).drawPointsMM.length,0);
   const nativeArchive=await frame.evaluate(()=>({order:MIRProductionWorkspace.getEstimationDossier(),cart:MIRUnifiedOrderCart.list()})),nativeResizeProof=[];
-  await frame.locator('.client-trace-options>summary').click();await frame.locator('.client-keyboard-trace>summary').click();
-  const keyboardPoints=[[2,2],[2,7.5],[5,7.5],[4.25,7.5]];
-  for(let i=0;i<keyboardPoints.length;i++){
-   const [x,y]=keyboardPoints[i];
-   await frame.locator('#client-point-x').fill(String(x));await frame.locator('#client-point-y').fill(String(y));await frame.locator('#client-keyboard-point').click();
-   if(i===3){
-    await frame.locator('#trace-hem-form').waitFor();
-    assert.equal(await frame.evaluate(()=>document.querySelector('#production-dialog').contains(document.activeElement)),true,'the underlying X input never steals focus from the hem choice');
-    await frame.locator('#trace-hem-form label:has(input[value="left"])').click();await frame.locator('#trace-hem-form button[type=submit]').click();
-   }else{
-    await frame.waitForFunction(()=>document.activeElement?.id==='client-point-x');
-    nativeResizeProof.push(await traceFocusLayout(frame,524));
-    // Resize only the labelled fixture's iframe, as adjustResize does when the
-    // Android IME appears. Product CSS, input values and focus remain untouched.
-    await page.locator('#drawing').evaluate(node=>node.style.height='240px');
-    nativeResizeProof.push(await traceFocusLayout(frame,240));
-    assert.equal(await frame.locator('#client-point-x').inputValue(),String(x));assert.equal(await frame.locator('#client-point-y').inputValue(),String(y));
-    if(i===0)await shot(page,'field-native-trace-ime-355x240');
-    await page.locator('#drawing').evaluate(node=>node.style.height='524px');
-    nativeResizeProof.push(await traceFocusLayout(frame,524));
-    if(i===0)await shot(page,'field-native-trace-ime-return-355x524');
-   }
-   const points=(await state(frame)).drawPointsMM;assert.equal(points.length,i+1,'each keyboard Add appends exactly one actual point');
-   points.forEach((point,index)=>point.forEach((value,axis)=>assert.ok(Math.abs(value-keyboardPoints[index][axis]*25.4)<1e-7,'keyboard coordinates survive resize without replacement')));
+  const normal=await traceLayout(frame,524);nativeResizeProof.push(normal);await shot(page,'field-native-trace-compact-355x524');
+  await frame.locator('#field-trace-expand').click();
+  const expanded=await traceLayout(frame,524,{expanded:true});nativeResizeProof.push(expanded);
+  assert.ok(expanded.projection.width*expanded.projection.height>normal.projection.width*normal.projection.height*1.1,'expand increases the actual projected drawing area, not only a letterboxed container');
+  assert.equal(await frame.locator('#field-trace-expand').getAttribute('aria-expanded'),'true');
+  await shot(page,'field-native-trace-expanded-355x524');
+  const touchPoints=[[.35,.72],[.35,.28],[.65,.28],[.52,.28]];
+  for(let i=0;i<touchPoints.length;i++){
+   await tapTraceFraction(frame,touchPoints[i]);
+   if(i===3){await frame.locator('#trace-hem-form').waitFor();await frame.locator('#trace-hem-form label:has(input[value="left"])').click();await frame.locator('#trace-hem-form button[type=submit]').click();}
+   await frame.waitForFunction(n=>MIRProductionWorkspace.getLivePreviewState().drawPointsMM.length===n,i+1);
   }
-  if(await frame.locator('.client-trace-options').evaluate(node=>node.open))await frame.locator('.client-trace-options>summary').click();
+  const traced=(await state(frame)).drawPointsMM;
+  await frame.locator('#field-trace-expand').click();await traceLayout(frame,524);
+  assert.deepEqual((await state(frame)).drawPointsMM,traced,'reduce preserves every actual touch point');
+  for(const height of[360,524]){await page.locator('#drawing').evaluate((node,height)=>node.style.height=height+'px',height);nativeResizeProof.push(await traceLayout(frame,height));assert.deepEqual((await state(frame)).drawPointsMM,traced,'viewport resize does not alter drawing geometry');}
+  await frame.locator('#trace-height').selectOption('12');assert.deepEqual((await state(frame)).drawPointsMM,traced,'changing scale preserves dimensions and points');
+  await frame.locator('#trace-height').selectOption('10');assert.deepEqual((await state(frame)).drawPointsMM,traced);
+  await frame.locator('#field-trace-expand').click();await frame.locator('#field-trace-expand').press('Escape');await traceLayout(frame,524);
+  assert.deepEqual((await state(frame)).drawPointsMM,traced,'Escape exits expanded drawing without clearing it');
   for(const selector of ['[data-drawing-undo]','#client-new-trace','[data-draw-tool="draw"]'])assert.equal(await frame.locator(selector).isEnabled(),true,'real trace action remains available '+selector);
   await frame.getByRole('button',{name:'Suivant — terminer le dessin',exact:true}).click();await stage(frame,2);
   const nativeModel=(await state(frame)).model;assert.equal(nativeModel.valid,true);assert.equal(nativeModel.bends[1].mode,'hem');
-  assert.deepEqual(await frame.evaluate(()=>({order:MIRProductionWorkspace.getEstimationDossier(),cart:MIRUnifiedOrderCart.list()})),nativeArchive,'native input and resizing preserve saved orders and the common cart');await untouched(frame);
-  report.checks.push({name:'native-css-keyboard-points-355x524-to-240-to-524',passed:true,nativeStyleSource:'mobile/web/bootstrap.js mount + mobile/web/team.css',keyboard:'Playwright input with real iframe resize; Android IME is verified separately',views:nativeResizeProof});
+  assert.equal(await frame.locator('#field-trace-toolbar').count(),0,'drawing display tools leave the measurements step');
+  assert.deepEqual(await frame.evaluate(()=>({order:MIRProductionWorkspace.getEstimationDossier(),cart:MIRUnifiedOrderCart.list()})),nativeArchive,'touch drawing, resizing and scale preserve saved orders and the common cart');await untouched(frame);
+  report.checks.push({name:'native-css-touch-trace-scale-expand-reduce-and-resize',passed:true,nativeStyleSource:'mobile/web/bootstrap.js mount + mobile/web/team.css',input:'real touchscreen taps on the SVG; native Android gestures are verified separately',views:nativeResizeProof});
   for(const candidate of [contextData('worker-c','job-c',{presentation:'legacy'}),contextData('','job-c'),contextData('   ','job-c'),{personal:false,ownerId:'worker-c',jobId:'job-c',presentation:'pliage03'}]){
    frame=await open(candidate);assert.equal(await frame.locator('body.mir-pliage03').count(),0);assert.equal(await frame.locator('.mir-pliage03-heading').count(),0);assert.equal(await frame.evaluate(()=>MIRProductionWorkspace.editFieldOrderItem('M001')),false);
   }

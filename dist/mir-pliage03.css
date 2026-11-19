@@ -52,6 +52,43 @@ html body.mir-pliage03.mir-prestige[data-client-entry] #client-step-list button[
 html body.mir-pliage03.mir-prestige[data-client-entry] #client-step-list button[aria-current=step]>span:first-child{color:var(--p03-bg);border-color:var(--p03-sand);background:var(--p03-sand)}
 html body.mir-pliage03.mir-prestige[data-client-entry] #client-step-list button.is-complete>span:first-child{border-color:var(--p03-sand);color:var(--p03-sand)}
 html body.mir-pliage03.mir-prestige[data-client-entry] #client-step-list button:disabled{color:#a7a79d;cursor:default}
+
+/* The field journey keeps one step component in the bank and drawing views.
+   A revisited step may be both current and complete: current ink must win.
+   Match the shared disabled-control surface without changing availability. */
+html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-entry] #client-step-list{
+ display:grid!important;gap:6px!important;align-items:stretch;
+}
+html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-entry] #client-step-list button{
+ box-sizing:border-box;display:flex;align-items:center;justify-content:center;width:100%;min-width:0;min-height:58px;height:58px;
+ padding:8px 6px;gap:8px;border:1px solid var(--p03-line)!important;border-radius:3px;
+ background:var(--p03-panel)!important;color:var(--p03-muted)!important;text-align:center;font-size:13px;line-height:1.2;opacity:1!important;
+}
+html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-entry] #client-step-list button:disabled{
+ color:var(--field-disabled-text,#a8a69e)!important;cursor:default;
+}
+html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-entry] #client-step-list button>span:first-child{
+ box-sizing:border-box;display:grid;place-items:center;flex:0 0 26px;width:26px;height:26px;min-width:26px;margin:0;
+ border:1px solid var(--p03-line)!important;border-radius:50%;background:transparent!important;color:inherit!important;font-size:12px;line-height:1;
+}
+html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-entry] #client-step-list button.is-complete:not([aria-current=step])>span:first-child{
+ color:var(--p03-sand)!important;border-color:var(--p03-sand)!important;
+}
+html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-entry] #client-step-list button[aria-current=step]{
+ background:var(--field-selection,#444238)!important;border-color:var(--p03-sand)!important;color:var(--p03-text)!important;
+}
+html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-entry] #client-step-list button[aria-current=step]>span:first-child{
+ background:var(--p03-sand)!important;border-color:var(--p03-sand)!important;color:var(--p03-bg)!important;
+}
+@media(max-width:959px){
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-entry] #client-step-list{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:3px!important;height:44px}
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-entry] #client-step-list button{
+  flex-direction:column;min-height:44px;height:44px;padding:3px 1px;gap:2px;font-size:11px;line-height:1.1;
+ }
+ html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-entry] #client-step-list button>span:first-child{
+  flex:0 0 16px;width:16px;height:16px;min-width:16px;font-size:10px;line-height:1;
+ }
+}
 html body.mir-pliage03.mir-prestige[data-client-entry] .mir-production-steps>p{margin:22px 8px 0;color:var(--p03-muted);font-size:12px;line-height:1.6;max-width:250px}
 
 /* Entry and model bank use the actual available profile illustrations. */

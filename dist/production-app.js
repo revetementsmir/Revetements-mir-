@@ -29,6 +29,7 @@ let rightAngleSnap=true;
 let freeformRedo=[];
 const traceHeights=[6,8,10,12,14];
 let traceHeight=14,traceGridDivisor=4;
+let fieldTraceExpanded=false;
 let activeDefaultLocks={},M,materials=[],ral={colors:[]},draft,kind=client||params.get('kind')==='panel'?'panel':'profile',view='face',workflow='configure',authoring=false,editingTemplateId=null,editingItemId=null,selectedTemplate=null,templates=[],requests=[],order,tool='select',snap=true,drawPoints=[],drawTransform=null,drag=null,orbit=-35,pitch=23,zoom=1,viewPan={x:0,y:0},pointers=new Map(),busy=false,colorSystem='manufacturer',colorId='',materialId='',colorQuery='',toastTimer,suppressClick=false;
 let clientStep=1,clientUnlocked=1,clientProfileSelected=false,clientWizardPlaces=[],clientEntry='choice';
 let clientDraftReady=false,legacyQuickId=null;
@@ -185,19 +186,40 @@ function clientProfileBends(){
  if(draft.template==='custom')return draft.bends||[];
  return (M.TEMPLATES[draft.template]?.turns||[]).map(turn=>({mode:'interior',angle:180-Math.abs(turn),direction:turn>0?'left':'right'}));
 }
+function normalizeFieldBendAngles(bends){
+ if(!fieldPliage03||!Array.isArray(bends))return;
+ for(const bend of bends){
+  if(!bend||bend.mode==='hem'||bend.angle===''||bend.angle===null||bend.angle===undefined)continue;
+  const angle=Number(String(bend.angle).replace(',','.'));
+  const interior=bend.mode==='signed'?180-Math.abs(angle):angle;
+  // Invalid/incomplete entries stay invalid. Do not silently create a repli
+  // or change its direction when rounding an ordinary angle.
+  if(!Number.isFinite(interior)||interior<=0||interior>180)continue;
+  const rounded=Math.max(1,Math.round(interior));
+  if(bend.mode==='signed'&&rounded===180&&angle!==0)bend.direction=angle<0?'right':'left';
+  bend.angle=bend.mode==='signed'?(rounded===180?0:(180-rounded)*(angle<0?-1:1)):rounded;
+ }
+}
+function normalizeFieldProfileAngles(){
+ if(!fieldPliage03||kind!=='profile'||!draft)return;
+ if(draft.template==='custom')normalizeFieldBendAngles(draft.bends);
+ normalizeFieldBendAngles(clientModelAngles);
+}
 function rememberClientAngles(force=false){
  if(!clientProfileWizard())return;
  const bends=clientProfileBends();
  if(force||!Array.isArray(clientModelAngles)||clientModelAngles.length!==bends.length){
   const source=selectedTemplate?.kind==='profile'&&selectedTemplate.topology?.bends;
   clientModelAngles=copy(Array.isArray(source)&&source.length===bends.length?source:bends);
+  if(tool!=='draw')normalizeFieldBendAngles(clientModelAngles);
  }
 }
 function clientInteriorAngle(bend){
  if(bend?.mode==='hem')return 180;
  if(bend?.angle===''||bend?.angle===null||bend?.angle===undefined)return '';
  const angle=Number(String(bend.angle).replace(',','.'));
- return Number.isFinite(angle)?bend.mode==='signed'?180-Math.abs(angle):angle:'';
+ const interior=bend.mode==='signed'?180-Math.abs(angle):angle;
+ return Number.isFinite(interior)?fieldPliage03?Math.round(interior):interior:'';
 }
 function editableClientBends(){
  if(draft.template==='custom')return draft.bends;
@@ -237,7 +259,7 @@ function renderClientMeasurements(){
  const sides=segments.map((segment,index)=>`<label class="client-measure-field"><span class="letter-label"><b>${esc(segment.label)}</b><span>${esc(segment.name||'Côté '+segment.label)}</span><small>${unit}</small></span><input ${draft.template==='custom'?`data-segment-length="${index}"`:`data-measure="${esc(segment.label)}"`} type="text" inputmode="text" value="${esc(segment.length??'')}" placeholder="ex. ${unit==='po'?'2¼':'57,15'}" aria-label="Côté ${esc(segment.label)} — ${esc(segment.name||'mesure')} (${unit})"></label>`).join('');
  const angles=bends.map((bend,index)=>{
   const label=segments[index].label+'–'+segments[index+1].label,hem=bend.mode==='hem',value=clientInteriorAngle(bend);
-  return `<div class="client-angle-field${hem?' client-hem-angle':''}" data-angle-index="${index}"><label><span>${publicPliage03()?'Angle ':''}${esc(label)} <small>${hem?'Repli':'°'}</small></span><input data-client-bend-angle="${index}" type="number"${fieldPliage03?' inputmode="decimal"':''} min="0.001" max="180" step="any" value="${esc(value)}" aria-label="${hem?'Retour écrasé':'Angle intérieur'} ${esc(label)} en degrés"${hem?' readonly aria-readonly="true" title="Repli 180° conservé du modèle"':''}></label>${publicPliage03()&&!fieldPliage03&&!hem?`<div class="client-angle-nudges"><button type="button" data-client-angle-nudge="${index}" data-delta="-1" aria-label="Diminuer l’angle ${esc(label)}">−</button><button type="button" data-client-angle-nudge="${index}" data-delta="1" aria-label="Augmenter l’angle ${esc(label)}">+</button></div>`:''}</div>`;
+  return `<div class="client-angle-field${hem?' client-hem-angle':''}" data-angle-index="${index}"><label><span>${publicPliage03()?'Angle ':''}${esc(label)} <small>${hem?'Repli':'°'}</small></span><input data-client-bend-angle="${index}" type="number"${fieldPliage03?' inputmode="numeric" min="1" max="180" step="1"':' min="0.001" max="180" step="any"'} value="${esc(value)}" aria-label="${hem?'Retour écrasé':'Angle intérieur'} ${esc(label)} en degrés"${hem?' readonly aria-readonly="true" title="Repli 180° conservé du modèle"':''}></label>${publicPliage03()&&!fieldPliage03&&!hem?`<div class="client-angle-nudges"><button type="button" data-client-angle-nudge="${index}" data-delta="-1" aria-label="Diminuer l’angle ${esc(label)}">−</button><button type="button" data-client-angle-nudge="${index}" data-delta="1" aria-label="Augmenter l’angle ${esc(label)}">+</button></div>`:''}</div>`;
  }).join('');
  return `<div class="client-measures-grid" data-client-side-count="${segments.length}">${sides}</div><section class="client-angle-controls" aria-label="Angles de votre modèle"><div class="client-angle-heading"><h3>Angles du modèle</h3><button type="button" id="client-reset-model-angles" class="plain-button">Rétablir les angles</button>${bends.some(bend=>bend.mode==='hem')?'<button type="button" id="client-hem-options" class="plain-button">Options des replis</button>':''}</div><div class="client-angles-grid" data-client-angle-count="${bends.length}">${angles}</div></section>`;
 }
@@ -510,13 +532,43 @@ function drawingModel(){const actual=build();if(actual.valid)return {model:actua
   if(preview.valid)return {model:preview,illustrative:true};
  }const example=selectedTemplate&&M.templatePreview(selectedTemplate);return {model:example?.ok?example.model:build(sampleSpec(kind,kind==='profile'?draft.template:draft.shape)),illustrative:true};}
 function traceGridStepMM(unit=draft.unit){return unit==='mm'?1:25.4/traceGridDivisor;}
-function traceGridSVG(unit){
+function fieldTraceViewport(){
+ const compact=matchMedia('(max-width:600px)').matches,width=compact?440:800;
+ const stage=$('#production-drawing'),w=stage?.clientWidth,h=stage?.clientHeight;
+ // A fixed logical width keeps the projection uniform. A taller canvas adds
+ // usable drawing room above and below instead of letterboxing the same SVG.
+ const height=w>0&&h>0?width*h/w:520;
+ return {x:compact?100:0,y:(520-height)/2,width,height};
+}
+function refreshFieldTraceCanvas(){
+ if(!fieldPliage03||!canDrawProfile()||drag)return;
+ const viewport=fieldTraceViewport(),margin=24,tr=drawTransform;
+ if(tr&&drawPoints.length){
+  const model=build(),origin=drawPoints[0];
+  const points=model.valid&&model.pointsMM.length===drawPoints.length?model.pointsMM.map(([x,y])=>[x+origin[0],y+origin[1]]):drawPoints;
+  const xs=points.map(p=>p[0]),ys=points.map(p=>p[1]);
+  const minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);
+  if(tr.ox+minX*tr.scale<viewport.x+margin||tr.ox+maxX*tr.scale>viewport.x+viewport.width-margin||tr.oy-maxY*tr.scale<viewport.y+margin||tr.oy-minY*tr.scale>viewport.y+viewport.height-margin){
+   const scale=Math.min(tr.scale,Math.max(1,viewport.width-2*margin)/Math.max(.001,maxX-minX),Math.max(1,viewport.height-2*margin)/Math.max(.001,maxY-minY));
+   const cx=(minX+maxX)/2,cy=(minY+maxY)/2,halfW=(maxX-minX)*scale/2,halfH=(maxY-minY)*scale/2;
+   const centerX=Math.max(viewport.x+margin+halfW,Math.min(viewport.x+viewport.width-margin-halfW,tr.ox+cx*scale));
+   const centerY=Math.max(viewport.y+margin+halfH,Math.min(viewport.y+viewport.height-margin-halfH,tr.oy-cy*scale));
+   // Reframe only the projection when reducing/resizing the canvas. Authored
+   // points, their origin, lengths and angles remain exactly as entered.
+   drawTransform={scale,ox:centerX-cx*scale,oy:centerY+cy*scale};
+  }
+ }
+ const shown=drawingModel();
+ $('#production-drawing').innerHTML=diagramSVG(shown.model,{illustrative:shown.illustrative});
+}
+function traceGridSVG(unit,viewport){
  if(!snap||!drawTransform)return '';
  const {scale,ox,oy}=drawTransform;
  const spacing=traceGridStepMM(unit)*scale,step=fmt(spacing);
  if(clientProfileWizard()){
   const major=fmt(spacing*(unit==='mm'?10:traceGridDivisor));
-  return `<defs><pattern id="mir-trace-minor" width="${step}" height="${step}" x="${fmt(ox)}" y="${fmt(oy)}" patternUnits="userSpaceOnUse"><path d="M${step} 0H0V${step}" fill="none" stroke="#a8b5ad" stroke-opacity=".75"/></pattern><pattern id="mir-trace-major" width="${major}" height="${major}" x="${fmt(ox)}" y="${fmt(oy)}" patternUnits="userSpaceOnUse"><path d="M${major} 0H0V${major}" fill="none" stroke="#71877c" stroke-opacity=".75" stroke-width="1.3"/></pattern></defs><g aria-hidden="true" pointer-events="none"><rect width="800" height="520" fill="#fff"/><rect width="800" height="520" fill="url(#mir-trace-minor)"/><rect width="800" height="520" fill="url(#mir-trace-major)"/></g>`;
+  const bounds=viewport?`x="${fmt(viewport.x)}" y="${fmt(viewport.y)}" width="${fmt(viewport.width)}" height="${fmt(viewport.height)}"`:'width="800" height="520"';
+  return `<defs><pattern id="mir-trace-minor" width="${step}" height="${step}" x="${fmt(ox)}" y="${fmt(oy)}" patternUnits="userSpaceOnUse"><path d="M${step} 0H0V${step}" fill="none" stroke="#a8b5ad" stroke-opacity=".75"/></pattern><pattern id="mir-trace-major" width="${major}" height="${major}" x="${fmt(ox)}" y="${fmt(oy)}" patternUnits="userSpaceOnUse"><path d="M${major} 0H0V${major}" fill="none" stroke="#71877c" stroke-opacity=".75" stroke-width="1.3"/></pattern></defs><g aria-hidden="true" pointer-events="none"><rect ${bounds} fill="#fff"/><rect ${bounds} fill="url(#mir-trace-minor)"/><rect ${bounds} fill="url(#mir-trace-major)"/></g>`;
  }
  return `<defs><pattern id="mir-trace-grid" width="${step}" height="${step}" x="${fmt(ox)}" y="${fmt(oy)}" patternUnits="userSpaceOnUse"><path d="M${step} 0H0V${step}" fill="none" stroke="#c3cebc" stroke-opacity=".58" stroke-width="1"/></pattern></defs><g aria-hidden="true" pointer-events="none"><rect width="800" height="520" fill="#fcfcf8"/><rect width="800" height="520" fill="url(#mir-trace-grid)"/></g>`;
 }
@@ -529,10 +581,10 @@ function bendAngleLabel(bend){
   // La rotation du tracé n'est PAS l'angle intérieur entre deux côtés.
   // Exemple : rotation de 30° => angle intérieur réel de 150°.
   const turn=Number(bend.angle);
-  return Number.isFinite(turn)?fmt(180-Math.abs(turn))+'°':'À préciser';
+  return Number.isFinite(turn)?fmt(fieldPliage03?Math.round(180-Math.abs(turn)):180-Math.abs(turn))+'°':'À préciser';
  }
  const angle=Number(bend?.angle);
- return Number.isFinite(angle)?fmt(angle)+'°':'À préciser';
+ return Number.isFinite(angle)?fmt(fieldPliage03?Math.round(angle):angle)+'°':'À préciser';
 }
 function profileAnglesOverlay(model,{segments,folds},labels,handles,[leftEdge,rightEdge],[topEdge,bottomEdge]=[0,520]){
  const pointBounds=[...folds,...handles].map(([x,y])=>[x,y,9,9]);
@@ -590,7 +642,7 @@ function publicProfileDiagramContent(model,mapped,options={}){
  const section=M.profileSectionPath(mapped,options.bends||model.bends||[]);
  // Public illustrations retain their original presentation. The chantier
  // preview also shows the entered dimensions without duplicating painted marks.
- let base=M.profileDiagramContent(model,mapped,{...options,section,illustrative:true,showMeasurements:fieldPliage03&&!options.illustrative&&options.showMeasurements!==false&&tool==='select',hemSideMarkers:fieldPliage03});
+ let base=M.profileDiagramContent(model,mapped,{...options,section,illustrative:true,showMeasurements:fieldPliage03&&!options.illustrative&&options.showMeasurements!==false&&tool==='select',hemSideMarkers:fieldPliage03,horizontalMeasurements:fieldPliage03&&tool==='select'});
  // This blue offset identifies the physical left/right surface; it is not a
  // product colour, a new profile, nor a fabricated bending radius.
  if(model.coloredFace?.side&&tool!=='draw'){
@@ -667,11 +719,13 @@ function diagramSVG(model,{illustrative=false,small=false,interactive=true}={}){
  if(clientProfileWizard()&&!publicPliage03()&&model.kind==='profile'&&interactive&&!small&&clientStep===2&&innerWidth<780&&tool==='select')return compactClientProfileSVG(model,{illustrative});
  if(model.kind==='panel'&&window.MIRProductionVolume)return panelDiagramSVG(model,{illustrative,small,interactive});
  const freehand=interactive&&tool==='draw'&&model.kind==='profile';
- const grid=freehand?traceGridSVG(model.unit):'';
+ const traceViewport=fieldPliage03&&freehand?fieldTraceViewport():null;
+ const grid=freehand?traceGridSVG(model.unit,traceViewport):'';
  const publicProfile=clientProfileWizard()&&model.kind==='profile';
  const compactTrace=freehand&&publicProfile&&matchMedia('(max-width:600px)').matches;
  const horizontalBounds=compactTrace?[100,540]:[0,800];
- const [left,right]=horizontalBounds,viewBox=left+' 0 '+(right-left)+' 520';
+ const [left,right]=horizontalBounds,verticalBounds=traceViewport?[traceViewport.y,traceViewport.y+traceViewport.height]:[0,520];
+ const viewBox=traceViewport?[traceViewport.x,traceViewport.y,traceViewport.width,traceViewport.height].map(fmt).join(' '):left+' 0 '+(right-left)+' 520';
  const points=freehand?(drawPoints.length>=3&&model.pointsMM.length===drawPoints.length
   ?model.pointsMM.map(([x,y])=>[x+drawPoints[0][0],y+drawPoints[0][1]]):drawPoints):model.pointsMM||[];if(!points.length)return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}">${grid}<text x="${(left+right)/2}" y="250" text-anchor="middle" font-family="Arial" font-size="${compactTrace?13:19}" fill="#7b8b6c">${clientProfileWizard()?esc(clientTracePrompt()):'Glisse pour tracer le premier côté.'}</text></svg>`;
  const tr=(tool==='draw'||drag?.type==='point')&&drawTransform?drawTransform:fitModel({...model,pointsMM:points});
@@ -681,7 +735,7 @@ function diagramSVG(model,{illustrative=false,small=false,interactive=true}={}){
  const mapped=points.map(p=>pointOnView(p,tr)),polygon=model.kind==='panel',pointString=mapped.map(p=>p.map(fmt).join(',')).join(' '),hex=/^#[0-9a-f]{6}$/i.test(model.finish?.hex||'')?model.finish.hex:'#dce5d4';let output=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}" role="group" aria-label="${esc(model.name)} — ${illustrative?'illustration du modèle':'cotes de la pièce finie'}" font-family="Arial,sans-serif"><title>${esc(model.name)} — ${illustrative?'proportions illustratives, sans cotes de fabrication':'dimensions de la pièce finie'}</title>${grid}`;
  if(polygon)output+=`<polygon points="${pointString}" fill="${hex}" fill-opacity=".65" stroke="#546b4a" stroke-width="2"/>`;else {
  output+=publicProfileDiagramContent(model,mapped,{bends:freehand&&drawPoints.length<3?[]:model.bends||[],markers:!small,markerModel:freehand||publicProfile&&(!fieldPliage03||illustrative)?{segments:model.segments?.map(({label})=>({label}))}:model,paintedMarker:publicProfile?'star':'stripe',highContrast:publicProfile,handles:tool==='draw'||tool==='edit'?mapped:[],illustrative:illustrative||(interactive&&tool!=='select'),togglePaintedFace:interactive&&!small&&tool==='select'&&!illustrative&&(!clientProfileWizard()||clientStep===3),
-  horizontalBounds,angleOverlay:!small&&(!illustrative||publicProfile)?(section,labels,handles)=>profileAnglesOverlay(model,section,labels,handles,horizontalBounds):undefined});
+  horizontalBounds,verticalBounds,angleOverlay:!small&&(!illustrative||publicProfile)?(section,labels,handles)=>profileAnglesOverlay(model,section,labels,handles,horizontalBounds,verticalBounds):undefined});
  }
  const count=polygon?points.length:Math.max(0,points.length-1);for(let i=0;i<count;i++){const a=mapped[i],b=mapped[(i+1)%mapped.length],delta=[b[0]-a[0],b[1]-a[1]],len=Math.hypot(...delta)||1,mid=[(a[0]+b[0])/2,(a[1]+b[1])/2],normal=[-delta[1]/len,delta[0]/len];if(polygon){const edge=model.edges?.[i],bottom=edge?.id===model.bottomEdgeId;if(bottom&&!illustrative)output+=`<line x1="${fmt(a[0])}" y1="${fmt(a[1])}" x2="${fmt(b[0])}" y2="${fmt(b[1])}" stroke="${model.perforation?.enabled?'#26758d':'#54863f'}" stroke-width="6"${model.perforation?.enabled?' stroke-dasharray="11 6"':''}/>`;output+=`<g${interactive&&edge&&!authoring?` data-select-bottom="${esc(edge.id)}" role="button" tabindex="0" aria-label="Choisir ${esc(edge.name)} comme bas"`:''}><circle cx="${fmt(mid[0])}" cy="${fmt(mid[1])}" r="13" fill="#fff" stroke="#b2c4a1"/><text x="${fmt(mid[0])}" y="${fmt(mid[1]+4.5)}" text-anchor="middle" font-size="13" fill="#4f6c3c">${i+1}</text></g>`;}
  }
@@ -842,7 +896,39 @@ function volumeSVG(model,{illustrative=false}={}){
  if(model.kind==='panel')out+=`<polyline points="${[...front,front[0]].map(pixel).map(p=>p.map(fmt).join(',')).join(' ')}" fill="none" stroke="#4b6440" stroke-width="2.5"/>`;
  out+=`<text x="400" y="482" text-anchor="middle" font-size="13" fill="#7c8e6b">${esc(illustrative?'Proportions du modèle · aucune cote de fabrication renseignée':model.kind==='profile'?'Longueur : '+M.formatMeasurement(model.lengthMM,model.unit):'Projection C : '+M.formatMeasurement(model.reliefMM,model.unit)+' · lips cotés séparément')}</text></svg>`;return out;
 }
+function setFieldTraceExpanded(expanded,{focus=false}={}){
+ if(!fieldPliage03)return;
+ const previous=fieldTraceExpanded;
+ fieldTraceExpanded=!!expanded&&canDrawProfile();
+ document.body.dataset.fieldTraceExpanded=String(fieldTraceExpanded);
+ const button=$('#field-trace-expand');
+ if(button){
+  button.textContent=fieldTraceExpanded?'Réduire':'Agrandir';
+  button.setAttribute('aria-expanded',String(fieldTraceExpanded));
+  button.setAttribute('aria-label',fieldTraceExpanded?'Réduire le tableau de traçage':'Agrandir le tableau de traçage');
+  if(focus)button.focus({preventScroll:true});
+ }
+ if(previous!==fieldTraceExpanded)requestAnimationFrame(refreshFieldTraceCanvas);
+ // This is a layout change inside the employee iframe only. SVG projection,
+ // points and draft dimensions stay untouched; Android keeps its system bars.
+}
+function syncFieldTraceToolbar(){
+ if(!fieldPliage03)return;
+ let toolbar=$('#field-trace-toolbar');
+ if(!canDrawProfile()){
+  toolbar?.remove();setFieldTraceExpanded(false);return;
+ }
+ if(!toolbar){
+  toolbar=document.createElement('div');toolbar.id='field-trace-toolbar';
+  toolbar.setAttribute('role','group');toolbar.setAttribute('aria-label','Affichage du tableau de traçage');
+  toolbar.innerHTML='<label for="trace-height">Échelle<select id="trace-height" aria-label="Échelle de référence en pouces">'+traceHeights.map(height=>'<option value="'+height+'">'+height+' po</option>').join('')+'</select></label><button type="button" id="field-trace-expand" aria-controls="production-drawing" aria-expanded="false">Agrandir</button>';
+  $('#production-preview').insertBefore(toolbar,$('#production-preview>.mir-panel-synced-views')||$('#production-drawing'));
+ }
+ toolbar.querySelector('#trace-height').value=String(traceHeight);
+ setFieldTraceExpanded(fieldTraceExpanded);
+}
 function renderTools(){
+ syncFieldTraceToolbar();
  const el=$('#drawing-tools');
  if(kind==='panel'){
   el.hidden=!!editingItemId;
@@ -861,7 +947,7 @@ function renderTools(){
  if(clientProfileWizard()){
   const instruction=!drawPoints.length?clientTracePrompt():drawPoints.length<3?'Placez au moins trois points pour créer deux côtés.':build().valid?'Ajoutez un côté ou terminez le dessin.':'Annulez le dernier point et réessayez.';
   if(fieldPliage03){
-   el.innerHTML=`<div class="client-trace-actions" role="group" aria-label="Actions du tracé"><button type="button" data-drawing-undo${!drawPoints.length?' disabled':''}>Annuler le dernier point</button><button type="button" id="client-new-trace"${!drawPoints.length?' disabled':''}>Recommencer</button><button type="button" class="draw-primary" data-draw-tool="draw"${drawPoints.length<3||!build().valid?' disabled':''} aria-label="Suivant — terminer le dessin">Suivant</button></div><p class="client-trace-help" role="status">${esc(instruction)}</p><details class="client-trace-options"><summary>Options du tracé</summary>${!drawPoints.length?'<button type="button" id="client-example-l">Essayer un L en trois points</button>':''}<details class="client-keyboard-trace"><summary>Saisir les points au clavier</summary><p>Coordonnées absolues en ${draft.unit==='mm'?'mm':'po'} : X vers la droite, Y vers le haut.</p><label>X<input id="client-point-x" inputmode="decimal" value="0"></label><label>Y<input id="client-point-y" inputmode="decimal" value="0"></label><button type="button" id="client-keyboard-point">Ajouter ce point</button></details><label class="client-trace-scale">Échelle de la grille<select id="trace-height">${traceHeights.map(height=>`<option value="${height}"${height===traceHeight?' selected':''}>${height} po de haut</option>`).join('')}</select></label></details>`;
+   el.innerHTML=`<div class="client-trace-actions" role="group" aria-label="Actions du tracé"><button type="button" data-drawing-undo${!drawPoints.length?' disabled':''}>Annuler le dernier point</button><button type="button" id="client-new-trace"${!drawPoints.length?' disabled':''}>Recommencer</button><button type="button" class="draw-primary" data-draw-tool="draw"${drawPoints.length<3||!build().valid?' disabled':''} aria-label="Suivant — terminer le dessin">Suivant</button></div><p class="client-trace-help" role="status">${esc(instruction)}</p>`;
    return;
   }
   el.innerHTML=`<p class="client-trace-help">${esc(instruction)}</p>${!drawPoints.length?'<button type="button" id="client-example-l">Essayer un L en trois points</button>':''}<details class="client-keyboard-trace"><summary>Saisir les points au clavier</summary><p>Coordonnées absolues en ${draft.unit==='mm'?'mm':'po'} : X vers la droite, Y vers le haut.</p><label>X<input id="client-point-x" inputmode="decimal" value="0"></label><label>Y<input id="client-point-y" inputmode="decimal" value="0"></label><button type="button" id="client-keyboard-point">Ajouter ce point</button></details><button type="button" id="client-new-trace">Nouveau tracé</button><label class="client-trace-scale">Échelle de la grille<select id="trace-height">${traceHeights.map(height=>`<option value="${height}"${height===traceHeight?' selected':''}>${height} po de haut</option>`).join('')}</select></label><button type="button" data-drawing-undo${!drawPoints.length?' disabled':''}>Annuler le point</button><button type="button" class="draw-primary" data-draw-tool="draw"${drawPoints.length<3||!build().valid?' disabled':''} aria-label="Suivant — terminer le dessin">Suivant</button>`;
@@ -1094,6 +1180,12 @@ function goClientStep(step,{confirm=false}={}){
  const issues=clientStepIssues(build(),blockJ);
  if(step>clientUnlocked&&(!confirm||step!==clientStep+1))return;
  if(Array.from({length:step-1},(_,i)=>issues[i+1]).some(Boolean))return;
+ if(fieldPliage03&&step===2){
+  // Commit whole degrees on entering measurements, never during canvas taps
+  // or responsive redraws. Existing lengths and authored points are retained.
+  if(tool==='draw')tool='select';
+  normalizeFieldProfileAngles();renderDimensions();
+ }
  clientStep=step;if(step===1)clientEntry='choice';
  clientUnlocked=Math.max(clientUnlocked,step);
  if(step===2||step===3){view='face';zoom=1;viewPan={x:0,y:0};}
@@ -1121,7 +1213,7 @@ function updateDrawing({keepForm=false}={}){
  const geometryErrors=mesh&&!mesh.valid?mesh.errors:[];
  const waiting=clientProfileWizard()&&!clientProfileSelected&&tool!=='draw';
  $('#drawing-title').textContent=waiting?'Aperçu de la moulure':authoring?'Modèle · '+(draft.name||actual.name):draft.name||actual.name;
- const stage=$('#production-drawing');if(tool!=='draw'||view!=='face')closeMobileTrace();stage.dataset.tool=tool;stage.dataset.view=view;stage.dataset.kind=kind;stage.style.touchAction=tool==='panel-trace'||canDrawProfile()||view==='volume'||(!client&&kind==='profile')?'none':'';$('#trace-readout').hidden=!canDrawProfile();
+ const stage=$('#production-drawing');if(tool!=='draw'||view!=='face')closeMobileTrace();stage.dataset.tool=tool;stage.dataset.view=view;stage.dataset.kind=kind;stage.style.touchAction=tool==='panel-trace'||canDrawProfile()||view==='volume'||(!client&&kind==='profile')?'none':'';$('#trace-readout').hidden=fieldPliage03||!canDrawProfile();
  stage.innerHTML=tool==='panel-trace'&&kind==='panel'?window.MIRPanelSketch.svg(panelSketchPoints,panelSketchHover):
   waiting?'<div class="drawing-hint">Choisissez une moulure pour voir son profil ici.</div>':
   view==='volume'?volumeSVG(shown.model,{illustrative:shown.illustrative}):diagramSVG(shown.model,{illustrative:shown.illustrative});
@@ -1679,6 +1771,7 @@ function editPiece(id){panelDirectUndo=[];panelDirectRedo=[];const item=order.it
  clientProfileSelected=true;
  clientStep=clientUnlocked=2;
  draft.length=draft.length||unitValue(120*25.4,draft.unit);
+ normalizeFieldProfileAngles();
  }render();$('.production-workspace').scrollIntoView({behavior:'smooth',block:'start'});toast(`${id} : la correction sera enregistrée comme une nouvelle révision.`);}
 function reconcilePanelStageDOM(){
  // Les moulures doivent garder le dessin DIRECTEMENT dans la carte, comme
@@ -1738,6 +1831,7 @@ workflow='configure';authoring=false;editingTemplateId=null;editingItemId=null;s
  draft.material.type='';
  materialId='';
  }
+normalizeFieldProfileAngles();
 activeStoreColorLock=!!storeColorResult.locked;
 if(activeStoreColorLock){
  draft.material.type=storeColorResult.metalType;
@@ -1999,7 +2093,7 @@ function drawDragPreview(segment, gesture){
   const r=Math.min(38*scale,size*.36), mid=incoming+sweep/2;
   const ray=(direction,distance)=>[x+Math.cos(direction)*distance,y+Math.sin(direction)*distance];
   const [ax,ay]=ray(mid,r+9*scale);
-  angle=`<path d="M ${ray(incoming,r).map(fmt).join(' ')} A ${fmt(r)} ${fmt(r)} 0 0 ${sweep>=0?1:0} ${ray(outgoing,r).map(fmt).join(' ')}" fill="none" stroke="#9c5a22" stroke-width="2"/>`+label(ax,ay,segment.angle+'°',2.5);
+  angle=`<path d="M ${ray(incoming,r).map(fmt).join(' ')} A ${fmt(r)} ${fmt(r)} 0 0 ${sweep>=0?1:0} ${ray(outgoing,r).map(fmt).join(' ')}" fill="none" stroke="#9c5a22" stroke-width="2"/>`+label(ax,ay,(fieldPliage03?Math.round(segment.angle):segment.angle)+'°',2.5);
  }
  const line=`<line x1="${fmt(x)}" y1="${fmt(y)}" x2="${fmt(ex)}" y2="${fmt(ey)}" stroke="#9c5a22" stroke-width="3" stroke-dasharray="8 6" vector-effect="non-scaling-stroke"/>`;
  const guide=segment.guide?pointOnView(segment.guide,drawTransform):null;
@@ -2433,11 +2527,13 @@ function toggleProfilePaintedFace(){
  updateDrawing();
 }
 function closeMobileTrace(){
+ if(fieldPliage03)setFieldTraceExpanded(false);
  const card=$('.drawing-card');
  card.classList.remove('mobile-trace');
  if(document.fullscreenElement===card)document.exitFullscreen().catch(()=>{});
 }
 async function openMobileTrace(card){
+ if(fieldPliage03){setFieldTraceExpanded(true);return;}
  card.classList.add('mobile-trace');
  try{
   await card.requestFullscreen?.();
@@ -2599,6 +2695,7 @@ function applyPanelDirect(){
  panelDirectUndo.push(copy(draft));panelDirectRedo=[];draft=next;panelDirectEdit=null;closeDialog();renderDimensions();renderPanelOptions();updateDrawing();toast('Cote appliquée au dessin. Enregistrez la pièce pour mettre à jour le dossier.',{quiet:true});
 }
 function handleClick(event){if(event.target.closest('[data-toggle-painted-face]'))return toggleProfilePaintedFace();const button=event.target.closest('button,[data-select-bottom],[data-edit-panel-measure],[data-edit-panel-edge],[data-edit-profile-measure]');if(!button)return;const d=button.dataset;
+ if(fieldPliage03&&button.id==='field-trace-expand'){setFieldTraceExpanded(!fieldTraceExpanded,{focus:true});return;}
  if(kind==='panel'&&(button.id==='panel-flat'||button.id==='panel-no-folds')){
   if(button.id==='panel-flat'){const input=$('[data-measure="relief"]');if(input?.readOnly)return;draft.relief='0';}
   else{if($('#panel-lip')?.readOnly)return;draft.lip='0';draft.lips=Object.fromEntries(Object.keys(draft.lips||{}).map(id=>[id,'0']));}
@@ -2638,11 +2735,13 @@ function handleClick(event){if(event.target.closest('[data-toggle-painted-face]'
    const segments=clientProfileSegments();
    const options=clientProfileBends().map((bend,index)=>bend.mode==='hem'?'<option value="'+index+'">'+esc(segments[index].label+'–'+segments[index+1].label)+' · Repli 180°</option>':'').join('');
    if(!options)return;
-   dialog('Ouvrir un repli du modèle','Le repli à 180° est conservé tant que vous ne choisissez pas explicitement un angle ouvert. La modification concerne cette pièce.', '<label>Repli à modifier<select id="client-hem-index">'+options+'</select></label><label>Nouvel angle intérieur (°)<input id="client-hem-interior" type="number"'+(fieldPliage03?' inputmode="decimal"':'')+' min="0.001" max="180" step="any" value="90"></label><div class="dialog-actions"><button type="button" class="secondary-button" data-close-production-dialog>Conserver le repli</button><button type="button" class="primary-button" id="client-open-model-hem">Appliquer l’angle ouvert</button></div>');
+   dialog('Ouvrir un repli du modèle','Le repli à 180° est conservé tant que vous ne choisissez pas explicitement un angle ouvert. La modification concerne cette pièce.', '<label>Repli à modifier<select id="client-hem-index">'+options+'</select></label><label>Nouvel angle intérieur (°)<input id="client-hem-interior" type="number"'+(fieldPliage03?' inputmode="numeric" min="1" max="180" step="1"':' min="0.001" max="180" step="any"')+' value="90"></label><div class="dialog-actions"><button type="button" class="secondary-button" data-close-production-dialog>Conserver le repli</button><button type="button" class="primary-button" id="client-open-model-hem">Appliquer l’angle ouvert</button></div>');
    return;
   }
   if(button.id==='client-open-model-hem'){
-   const index=Number($('#client-hem-index')?.value),angle=Number($('#client-hem-interior')?.value),bends=clientProfileBends();
+   const index=Number($('#client-hem-index')?.value),bends=clientProfileBends();
+   let angle=Number($('#client-hem-interior')?.value);
+   if(fieldPliage03&&Number.isFinite(angle)&&angle>0&&angle<=180)angle=Math.max(1,Math.round(angle));
    if(!Number.isInteger(index)||bends[index]?.mode!=='hem'||!Number.isFinite(angle)||angle<=0||angle>180)return messageError('Entrez un angle intérieur supérieur à 0° et inférieur ou égal à 180°.');
    rememberClientAngles();
    const editable=editableClientBends(),direction=clientBendDirection(editable[index],index);
@@ -2821,12 +2920,18 @@ function handleInput(event){const e=event.target,d=e.dataset;
   updateDrawing({keepForm:true});
   return;
  }
+ if(fieldPliage03&&e.id==='client-hem-interior'){
+  if(e.value!==''){const angle=Number(e.value);if(Number.isFinite(angle))e.value=String(angle>0&&angle<=180?Math.max(1,Math.round(angle)):Math.round(angle));}
+  return;
+ }
  if(d.clientBendAngle!==undefined&&clientProfileWizard()){
   const index=Number(d.clientBendAngle),current=clientProfileBends()[index];
   selectedClientAngle=index;
   if(!current||current.mode==='hem')return;
   rememberClientAngles();
-  const bends=editableClientBends(),source=clientModelAngles[index],angle=e.value===''?'':Number(e.value.replace(',','.'));
+  const bends=editableClientBends(),source=clientModelAngles[index];
+  let angle=e.value===''?'':Number(e.value.replace(',','.'));
+  if(fieldPliage03&&Number.isFinite(angle)){angle=angle>0&&angle<=180?Math.max(1,Math.round(angle)):Math.round(angle);e.value=String(angle);}
   if(source?.mode!=='hem'&&angle!==''&&angle===clientInteriorAngle(source))bends[index]=copy(source);
   else if(bends[index].mode==='signed')bends[index].angle=angle===''?'':(180-angle)*(clientBendDirection(bends[index],index)==='left'?1:-1);
   else bends[index].angle=angle;
@@ -3001,7 +3106,7 @@ function handleSubmit(event){
  if(nextPOAction==='existing')existingPOChoice();
  if(nextPOAction==='new')createNewPOFromCurrent();
 }
-function handleKey(event){const direct=event.target.closest('[data-edit-panel-measure],[data-edit-panel-edge],[data-edit-profile-measure]');if(direct&&['Enter',' '].includes(event.key)){event.preventDefault();direct.dispatchEvent(new MouseEvent('click',{bubbles:true}));return;}if(event.target.matches('[data-toggle-painted-face]')&&['Enter',' '].includes(event.key)){event.preventDefault();toggleProfilePaintedFace();$('[data-toggle-painted-face]')?.focus();return;}if(event.target.id==='production-drawing'&&(kind==='panel'||(!client&&kind==='profile'&&tool!=='draw'))){if(['+','=','-','0','ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key)){event.preventDefault();if(event.key==='+'||event.key==='=')setZoom(zoom*1.2);else if(event.key==='-')setZoom(zoom/1.2);else if(event.key==='0'){zoom=1;orbit=-35;pitch=23;updateDrawing();}else if(view==='volume'){if(event.key==='ArrowLeft')orbit-=10;if(event.key==='ArrowRight')orbit+=10;if(event.key==='ArrowUp')pitch=Math.min(85,pitch+10);if(event.key==='ArrowDown')pitch=Math.max(-85,pitch-10);updateDrawing();}return;}}const point=event.target.closest('[data-draw-point]');if(point&&tool==='edit'&&!client&&!editingItemId&&['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key)){event.preventDefault();const model=build();if(!model.valid)return;const points=copy(model.pointsMM),i=Number(point.dataset.drawPoint),step=draft.unit==='mm'?(event.shiftKey?10:1):(event.shiftKey?25.4:25.4/16);if(event.key==='ArrowLeft')points[i][0]-=step;if(event.key==='ArrowRight')points[i][0]+=step;if(event.key==='ArrowUp')points[i][1]+=step;if(event.key==='ArrowDown')points[i][1]-=step;const spec=toCustom(points);if(spec){draft=spec;renderDimensions();updateDrawing();$(`[data-draw-point="${i}"]`)?.focus();}}const edge=event.target.closest('[data-select-bottom]');if(edge&&['Enter',' '].includes(event.key)){event.preventDefault();edge.dispatchEvent(new MouseEvent('click',{bubbles:true}));}}
+function handleKey(event){if(fieldPliage03&&fieldTraceExpanded&&event.key==='Escape'&&!document.querySelector('dialog[open]')){event.preventDefault();setFieldTraceExpanded(false,{focus:true});return;}const direct=event.target.closest('[data-edit-panel-measure],[data-edit-panel-edge],[data-edit-profile-measure]');if(direct&&['Enter',' '].includes(event.key)){event.preventDefault();direct.dispatchEvent(new MouseEvent('click',{bubbles:true}));return;}if(event.target.matches('[data-toggle-painted-face]')&&['Enter',' '].includes(event.key)){event.preventDefault();toggleProfilePaintedFace();$('[data-toggle-painted-face]')?.focus();return;}if(event.target.id==='production-drawing'&&(kind==='panel'||(!client&&kind==='profile'&&tool!=='draw'))){if(['+','=','-','0','ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key)){event.preventDefault();if(event.key==='+'||event.key==='=')setZoom(zoom*1.2);else if(event.key==='-')setZoom(zoom/1.2);else if(event.key==='0'){zoom=1;orbit=-35;pitch=23;updateDrawing();}else if(view==='volume'){if(event.key==='ArrowLeft')orbit-=10;if(event.key==='ArrowRight')orbit+=10;if(event.key==='ArrowUp')pitch=Math.min(85,pitch+10);if(event.key==='ArrowDown')pitch=Math.max(-85,pitch-10);updateDrawing();}return;}}const point=event.target.closest('[data-draw-point]');if(point&&tool==='edit'&&!client&&!editingItemId&&['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key)){event.preventDefault();const model=build();if(!model.valid)return;const points=copy(model.pointsMM),i=Number(point.dataset.drawPoint),step=draft.unit==='mm'?(event.shiftKey?10:1):(event.shiftKey?25.4:25.4/16);if(event.key==='ArrowLeft')points[i][0]-=step;if(event.key==='ArrowRight')points[i][0]+=step;if(event.key==='ArrowUp')points[i][1]+=step;if(event.key==='ArrowDown')points[i][1]-=step;const spec=toCustom(points);if(spec){draft=spec;renderDimensions();updateDrawing();$(`[data-draw-point="${i}"]`)?.focus();}}const edge=event.target.closest('[data-select-bottom]');if(edge&&['Enter',' '].includes(event.key)){event.preventDefault();edge.dispatchEvent(new MouseEvent('click',{bubbles:true}));}}
 async function boot(){M=window.MIRProduction;if(!M?.createTemplate)throw new Error('Le moteur de modèles n’est pas disponible.');if(!window.MIRBendingLengths?.check)throw new Error('Les longueurs de vente MIR sont indisponibles.');const fetched=await Promise.allSettled([fetch('catalogue-fd6866b49d21.json').then(r=>{if(!r.ok)throw new Error('catalogue');return r.json();}),fetch('ral-classic.json').then(r=>{if(!r.ok)throw new Error('nuancier RAL');return r.json();})]);if(fetched[0].status==='fulfilled'){const raw=fetched[0].value;const catalogue=Array.isArray(raw)?raw:raw.materials||[];materials=window.MIRBendingFinishes.catalogue(catalogue);}if(fetched[1].status==='fulfilled'&&Array.isArray(fetched[1].value.colors))ral=fetched[1].value;
  const unico=window.MIRUnico;if(unico)for(const palette of unico.palettes){const usable=palette.colors.filter(c=>!c.publishedGauges||c.publishedGauges.some(g=>[18,20,22].includes(g)));if(!usable.length)continue;materials.push({id:'unico-palette-'+palette.id,brand:'Unico',name:'U-P1 · '+palette.label,architecturalPanel:true,metalType:palette.materialId,family:palette.materialId,allowedGauges:palette.id==='signature'?[22]:null,sourceUrl:palette.sourceUrl,colors:usable.map(c=>({...c,availabilityNote:c.uP1Compatibility.note+' Écran indicatif.'}))});}materialId=materials[0]?.id||'';
  reloadLocalTemplates();const savedRequests=read(KEYS.requests,{version:1,requests:[]});requests=Array.isArray(savedRequests.requests)?savedRequests.requests.filter(request=>request?.id&&Array.isArray(request.items)&&request.items.every(item=>item.spec&&item.snapshot?.schema==='mir-production-instance-1')):[];
@@ -3037,7 +3142,7 @@ async function boot(){M=window.MIRProduction;if(!M?.createTemplate)throw new Err
   // never inherit a draft merely because they use the same device.
   const active=read(KEYS.activeProfile,null);
   if(active?.version===1&&active.draft?.kind==='profile'&&Array.isArray(active.drawPoints)&&(Array.isArray(active.draft.segments)||active.draft.dimensions&&typeof active.draft.dimensions==='object')){
-   editingItemId=order.items.some(item=>item.id===active.editingItemId)?active.editingItemId:null;selectedTemplate=active.selectedTemplate||null;legacyQuickId=active.legacyQuickId||null;draft=copy(active.draft);drawPoints=copy(active.drawPoints);const restoredStage=Number(active.clientStep)||1,restoredUnlocked=Number(active.clientUnlocked)||1;clientStep=active.journeyVersion===2?Math.min(4,Math.max(1,restoredStage)):Math.min(3,Math.max(1,restoredStage));clientUnlocked=active.journeyVersion===2?Math.min(4,Math.max(clientStep,restoredUnlocked)):Math.min(3,Math.max(clientStep,restoredUnlocked));clientModelAngles=Array.isArray(active.clientModelAngles)?copy(active.clientModelAngles):null;clientProfileSelected=!!active.clientProfileSelected;clientEntry=active.clientEntry||'choice';tool=active.tool==='draw'?'draw':'select';colorSystem=active.colorSystem||'manufacturer';colorId=active.colorId||'';materialId=active.materialId||'';render();restoredClientDraft=true;
+   editingItemId=order.items.some(item=>item.id===active.editingItemId)?active.editingItemId:null;selectedTemplate=active.selectedTemplate||null;legacyQuickId=active.legacyQuickId||null;draft=copy(active.draft);drawPoints=copy(active.drawPoints);const restoredStage=Number(active.clientStep)||1,restoredUnlocked=Number(active.clientUnlocked)||1;clientStep=active.journeyVersion===2?Math.min(4,Math.max(1,restoredStage)):Math.min(3,Math.max(1,restoredStage));clientUnlocked=active.journeyVersion===2?Math.min(4,Math.max(clientStep,restoredUnlocked)):Math.min(3,Math.max(clientStep,restoredUnlocked));clientModelAngles=Array.isArray(active.clientModelAngles)?copy(active.clientModelAngles):null;clientProfileSelected=!!active.clientProfileSelected;clientEntry=active.clientEntry||'choice';tool=active.tool==='draw'?'draw':'select';colorSystem=active.colorSystem||'manufacturer';colorId=active.colorId||'';materialId=active.materialId||'';if(tool!=='draw')normalizeFieldProfileAngles();render();restoredClientDraft=true;
   }
  }
  if(publicPliage03()&&params.get('start')&&!params.get('quick')&&!linked&&!params.get('profile')){clientStep=1;clientEntry=params.get('start')==='models'?'models':'choice';if(params.get('start')==='draw'){if(draft.template==='custom'&&drawPoints.length)resumeClientTrace();else{choose('profile','custom');startProfileDrawing({fullscreen:false});}}render();const entered=new URL(location.href);entered.searchParams.delete('start');history.replaceState(history.state,'',entered.href);params.delete('start');}
@@ -3094,7 +3199,7 @@ async function boot(){M=window.MIRProduction;if(!M?.createTemplate)throw new Err
   window.addEventListener('mir:field-measure-page',redrawFieldMeasures);
   if(typeof ResizeObserver==='function'){
    let previewSize='';
-   new ResizeObserver(entries=>{const box=entries[0]?.contentRect;if(!box)return;const size=Math.round(box.width)+':'+Math.round(box.height);if(size===previewSize)return;previewSize=size;requestAnimationFrame(redrawFieldMeasures);}).observe($('#production-drawing'));
+   new ResizeObserver(entries=>{const box=entries[0]?.contentRect;if(!box)return;const size=Math.round(box.width)+':'+Math.round(box.height);if(size===previewSize)return;previewSize=size;requestAnimationFrame(()=>{if(canDrawProfile())refreshFieldTraceCanvas();else redrawFieldMeasures();});}).observe($('#production-drawing'));
   }
  }
  if(publicClientDossier()){

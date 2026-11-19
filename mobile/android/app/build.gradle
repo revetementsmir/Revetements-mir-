@@ -17,8 +17,8 @@ android {
         applicationId "ca.revetementsmir.equipe.test.preview"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode Integer.parseInt(System.getenv('MIR_ANDROID_VERSION_CODE') ?: '130007')
-        versionName "0.13.4-test"
+        versionCode Integer.parseInt(System.getenv('MIR_ANDROID_VERSION_CODE') ?: '130009')
+        versionName "0.13.5-test"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
