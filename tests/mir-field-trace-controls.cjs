@@ -92,3 +92,13 @@ test('retour au tracé : le vrai SVG et ses trois labels tiennent dès le premie
   assert.equal(JSON.stringify({draft,model,points:ctx.drawPoints}),before,'retour sans changement de cotes, angle, origine ni points');
  }
 });
+
+
+test('les styles Pliage du personnel restent actifs sans la classe mir-prestige des rôles authentifiés',()=>{
+ const pliageCss=fs.readFileSync(require.resolve('../dist/mir-pliage03.css'),'utf8');
+ const traceCss=fs.readFileSync(require.resolve('../dist/mir-field-trace.css'),'utf8');
+ const obsolete=/html\[data-field-pliage03=true\]\s+body\.mir-pliage03\.mir-prestige/;
+ assert.doesNotMatch(pliageCss,obsolete,'les styles Pliage terrain ne doivent pas dépendre de mir-prestige');
+ assert.doesNotMatch(traceCss,obsolete,'la barre de tracé terrain ne doit pas dépendre de mir-prestige');
+ assert.match(traceCss,/html\[data-field-pliage03=true\] body\.mir-pliage03\[data-client-entry="draw"\] #production-preview>#field-trace-toolbar/,'la barre doit être mise en page dans le vrai mode dessin terrain');
+});
