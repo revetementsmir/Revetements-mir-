@@ -168,7 +168,7 @@ async function main(){
    });
    assert.ok(result.mode&&result.steps,'Parcours client '+width);
    assert.equal(result.color,'#348511','Couleur MIR '+width);
-   assert.equal(result.bg,'rgb(250, 250, 247)','Fond MIR '+width);
+   assert.equal(result.bg,'rgb(244, 241, 234)','Fond MIR '+width);
    assert.ok(result.scroll<=result.inner+2,'Débordement client '+width+': '+result.scroll+' ; éléments: '+JSON.stringify(result.overflowers));
    if(width===390||width===1440||width===3440)await page.screenshot({path:path.resolve(__dirname,'../artifacts/mir-production-signature-'+width+'.png'),fullPage:true});
    await page.close();console.log('PASS Production client '+width+' px');
