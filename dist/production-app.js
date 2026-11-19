@@ -741,13 +741,37 @@ function diagramSVG(model,{illustrative=false,small=false,interactive=true}={}){
  if(interactive&&!drag)drawTransform=tr;
  const mapped=points.map(p=>pointOnView(p,tr)),polygon=model.kind==='panel',pointString=mapped.map(p=>p.map(fmt).join(',')).join(' '),hex=/^#[0-9a-f]{6}$/i.test(model.finish?.hex||'')?model.finish.hex:'#dce5d4';let output=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}" role="group" aria-label="${esc(model.name)} — ${illustrative?'illustration du modèle':'cotes de la pièce finie'}" font-family="Arial,sans-serif"><title>${esc(model.name)} — ${illustrative?'proportions illustratives, sans cotes de fabrication':'dimensions de la pièce finie'}</title>${grid}`;
  if(polygon)output+=`<polygon points="${pointString}" fill="${hex}" fill-opacity=".65" stroke="#546b4a" stroke-width="2"/>`;else {
- output+=publicProfileDiagramContent(model,mapped,{bends:freehand&&drawPoints.length<3?[]:model.bends||[],
+ const profileOptions={bends:freehand&&drawPoints.length<3?[]:model.bends||[],
   // The field's select-stage measurements and review use fieldProfileDiagramSVG.
   // On other field select stages this secondary canvas can be hidden or tiny;
   // placing technical side markers there causes "Cotation technique sans espace".
   // Keep markers in actual trace/edit mode, never alter points or entered cotes.
   markers:!small&&(!fieldPliage03||tool==='draw'||tool==='edit'),markerModel:freehand||publicProfile&&(!fieldPliage03||illustrative)?{segments:model.segments?.map(({label})=>({label}))}:model,paintedMarker:publicProfile?'star':'stripe',highContrast:publicProfile,handles:tool==='draw'||tool==='edit'?mapped:[],illustrative:illustrative||(interactive&&tool!=='select'),togglePaintedFace:interactive&&!small&&tool==='select'&&!illustrative&&(!clientProfileWizard()||clientStep===3),
-  horizontalBounds,verticalBounds,showMeasurements:fieldPliage03?false:undefined,angleOverlay:!small&&(!illustrative||publicProfile)?(section,labels,handles)=>profileAnglesOverlay(model,section,labels,handles,horizontalBounds,verticalBounds):undefined});
+  horizontalBounds,verticalBounds,showMeasurements:fieldPliage03?false:undefined,angleOverlay:!small&&(!illustrative||publicProfile)?(section,labels,handles)=>profileAnglesOverlay(model,section,labels,handles,horizontalBounds,verticalBounds):undefined};
+   try{output+=publicProfileDiagramContent(model,mapped,profileOptions);}
+   catch(error){
+     // Only the field freehand surface has a compact grid that can shrink when
+     // its reference scale changes. Preserve the original model/points/bends;
+     // draw a readable indexed legend if the collision-avoiding side-marker
+     // placement has no room. Other public/workshop errors still propagate.
+     if(!fieldPliage03||!freehand||!String(error?.message||'').startsWith('Cotation technique sans espace'))throw error;
+     output+=publicProfileDiagramContent(model,mapped,{...profileOptions,markers:false,showMeasurements:false});
+     const segments=(model.segments||[]).slice(0,Math.max(0,mapped.length-1));
+     if(segments.length){
+       const cols=Math.min(3,segments.length),rows=Math.ceil(segments.length/cols),cell=(right-left)/cols;
+       const panelHeight=rows*23+12,panelTop=verticalBounds[1]-panelHeight-5;
+       output+='<g class="mir-field-trace-label-fallback" aria-label="Cotes du tracé" pointer-events="none">';
+       output+='<rect x="'+fmt(left+3)+'" y="'+fmt(panelTop)+'" width="'+fmt(right-left-6)+'" height="'+fmt(panelHeight)+'" rx="4" fill="#242522" fill-opacity="0.96"/>';
+       for(const [index,segment] of segments.entries()){
+         const col=index%cols,row=Math.floor(index/cols),label=segment.label||String.fromCharCode(65+index);
+         const length=Number.isFinite(segment.lengthMM)?M.formatMeasurement(segment.lengthMM,model.unit):'';
+         const textValue=label+(length?' · '+length:'');
+         const x=left+cell*(col+.5),y=panelTop+17+row*23;
+         output+='<text x="'+fmt(x)+'" y="'+fmt(y)+'" text-anchor="middle" font-size="13" font-weight="600" fill="#f4f1ea">'+esc(textValue)+'</text>';
+       }
+       output+='</g>';
+     }
+   }
  }
  const count=polygon?points.length:Math.max(0,points.length-1);for(let i=0;i<count;i++){const a=mapped[i],b=mapped[(i+1)%mapped.length],delta=[b[0]-a[0],b[1]-a[1]],len=Math.hypot(...delta)||1,mid=[(a[0]+b[0])/2,(a[1]+b[1])/2],normal=[-delta[1]/len,delta[0]/len];if(polygon){const edge=model.edges?.[i],bottom=edge?.id===model.bottomEdgeId;if(bottom&&!illustrative)output+=`<line x1="${fmt(a[0])}" y1="${fmt(a[1])}" x2="${fmt(b[0])}" y2="${fmt(b[1])}" stroke="${model.perforation?.enabled?'#26758d':'#54863f'}" stroke-width="6"${model.perforation?.enabled?' stroke-dasharray="11 6"':''}/>`;output+=`<g${interactive&&edge&&!authoring?` data-select-bottom="${esc(edge.id)}" role="button" tabindex="0" aria-label="Choisir ${esc(edge.name)} comme bas"`:''}><circle cx="${fmt(mid[0])}" cy="${fmt(mid[1])}" r="13" fill="#fff" stroke="#b2c4a1"/><text x="${fmt(mid[0])}" y="${fmt(mid[1]+4.5)}" text-anchor="middle" font-size="13" fill="#4f6c3c">${i+1}</text></g>`;}
  }

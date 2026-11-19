@@ -111,19 +111,32 @@ async function main(){
         const box=footer?.getBoundingClientRect();
         const hero=document.querySelector('.shop-hero'),copy=hero?.querySelector('.shop-hero-copy');
         const frame=hero?.getBoundingClientRect(),content=copy?.getBoundingClientRect();
-        return {compact:innerWidth<=1100&&!!document.querySelector('header[data-mir-public-shell]'),theme:document.body.classList.contains('mir-signature'),css,
+        const prestige=document.body.classList.contains('mir-prestige');
+        const footerNavCount=footer?.querySelectorAll('nav a').length||0;
+        return {compact:innerWidth<=1100&&!!document.querySelector('header[data-mir-public-shell]'),theme:document.body.classList.contains('mir-signature'),css,prestige,
           accent:getComputedStyle(document.body).getPropertyValue('--mir-accent').trim(),
           paper:getComputedStyle(document.body).getPropertyValue('--mir-surface').trim(),
-          footer:box?.width>0&&box.left>=0&&box.right<=innerWidth&&footer.querySelectorAll('nav a').length===5,
+          // Prestige intentionally uses only logo and signature in the footer.
+          // The classic client shell keeps its five footer destinations.
+          footer:box?.width>0&&box.left>=0&&box.right<=innerWidth&&(prestige?footerNavCount===0:footerNavCount===5),
           heroFits:!hero||(content.top>=frame.top&&content.bottom<=frame.bottom&&content.left>=frame.left&&content.right<=frame.right),
           logo:!!logo,estimate:(()=>{
-            const b=document.querySelector('header.mir-client-header .mir-home-estimate');
-            const rect=b?.getBoundingClientRect();
-            return !!(b&&rect&&rect.width>0&&getComputedStyle(b).display!=='none'&&rect.left>=-2&&rect.right<=innerWidth+2);
+            if(prestige){
+              const link=document.querySelector('#mir-prestige-header nav.mir-prestige-nav a[href*="estimation.html"]');
+              if(!link)return false;
+              if(innerWidth<=1100){
+                const toggle=document.querySelector('#mir-client-menu-button'),rect=toggle?.getBoundingClientRect();
+                return !!(toggle&&rect?.width>=44&&getComputedStyle(toggle).display!=='none'&&toggle.getAttribute('aria-controls')===link.parentElement.id);
+              }
+              const rect=link.getBoundingClientRect();
+              return rect.width>0&&rect.left>=-2&&rect.right<=innerWidth+2;
+            }
+            const button=document.querySelector('header.mir-client-header .mir-home-estimate'),rect=button?.getBoundingClientRect();
+            return !!(button&&rect?.width>0&&getComputedStyle(button).display!=='none'&&rect.left>=-2&&rect.right<=innerWidth+2);
           })()};
       });
       assert.ok(result.theme&&result.css&&result.logo,name+' '+size.id+': thème ou logo absent');
-      assert.equal(result.accent,'#348511',name+' '+size.id+': accent');
+      assert.equal(result.accent,result.prestige?'#bda889':'#348511',name+' '+size.id+': approved accent for the actual public shell');
       assert.equal(result.paper,'#fafaf7',name+' '+size.id+': fond');
       assert.ok(result.compact||result.estimate,name+' '+size.id+': bouton Estimation masqué ou hors écran');
       assert.ok(result.footer,name+' '+size.id+': pied de page commun absent ou hors écran');
