@@ -2508,6 +2508,15 @@ function freeformFinish(){
 function resumeClientTrace(){
  const model=build();
  if(model.valid){const origin=drawPoints[0]||[0,0];drawPoints=model.pointsMM.map(([x,y])=>[x+origin[0],y+origin[1]]);}
+ if(fieldPliage03&&model.valid){
+  // Measurements use CSS-sized SVG coordinates; the trace uses its own fixed
+  // viewBox. Reproject the existing points when returning to that coordinate
+  // space instead of reusing the last compact measurement transform.
+  const compact=matchMedia('(max-width:600px)').matches,xs=drawPoints.map(point=>point[0]),ys=drawPoints.map(point=>point[1]);
+  const minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);
+  const scale=Math.min((compact?300:580)/Math.max(1,maxX-minX),340/Math.max(1,maxY-minY));
+  drawTransform={scale,ox:(compact?320:400)-(minX+maxX)*scale/2,oy:255+(minY+maxY)*scale/2};
+ }
  clientStep=1;clientEntry='draw';tool='draw';view='face';
  renderDimensions();updateDrawing();focusClientEntry('#production-drawing');
 }

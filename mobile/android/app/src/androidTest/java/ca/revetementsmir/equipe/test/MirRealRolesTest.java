@@ -41,11 +41,11 @@ public class MirRealRolesTest extends MirDeviceSetup {
   String body=expression.endsWith(";true")?expression.substring(0,expression.length()-4)+"return true;":"return ("+expression+");";
   String script="(()=>{try{return {ok:true,value:(()=>{"+body+"})()};}catch(e){return {ok:false,error:e.message};}})()";
   s.onActivity(a->a.getBridge().getWebView().evaluateJavascript(script,r->{value[0]=r;done.countDown();}));assertTrue(done.await(10,TimeUnit.SECONDS));
-  assertNotNull("JavaScript test returned no result",value[0]);JSONObject result=new JSONObject(value[0]);if(!result.getBoolean("ok")){screenshotSystem("failed-real-roles-js");fail("JavaScript test: "+result.optString("error"));}
+  assertNotNull("JavaScript test returned no result",value[0]);JSONObject result=new JSONObject(value[0]);if(!result.getBoolean("ok")){failWithScreenshot("failed-real-roles-js","JavaScript test: "+result.optString("error"));}
   Object resultValue=result.opt("value");return resultValue==JSONObject.NULL?null:resultValue;
  }
  private void waitFor(ActivityScenario<MainActivity>s,String expression)throws Exception{waitFor(s,"condition",expression);}
- private void waitFor(ActivityScenario<MainActivity>s,String step,String expression)throws Exception{long end=SystemClock.uptimeMillis()+30000;while(SystemClock.uptimeMillis()<end){if(Boolean.TRUE.equals(js(s,expression)))return;SystemClock.sleep(150);}js(s,"window.nativeAuthDiagnostic={status:'requested'};if(window.MIRAndroidSession?.diagnostic)window.MIRAndroidSession.diagnostic().then(value=>window.nativeAuthDiagnostic=value).catch(()=>window.nativeAuthDiagnostic={status:'failed'});else navigator.locks?.query().then(value=>window.nativeAuthDiagnostic={locks:value});true");long diagnosticEnd=SystemClock.uptimeMillis()+1500;while(SystemClock.uptimeMillis()<diagnosticEnd&&Boolean.TRUE.equals(js(s,"window.nativeAuthDiagnostic?.status==='requested'")))SystemClock.sleep(50);screenshotSystem("failed-real-roles");fail("MIR TEST Android : étape non confirmée "+step+"; état="+js(s,"JSON.stringify({proof:window.realProof,code:window.realProofCode,view:document.body.dataset.fieldView,heading:document.querySelector('#portal-content h1')?.textContent,sheetOpen:!!document.querySelector('.mir-choice-sheet[open]'),selectedHome:document.querySelector('[data-field-home-job]')?.value,homeLabel:document.querySelector('[data-field-home-job]')?.nextElementSibling?.textContent,homeAddress:document.querySelector('.field-job-address')?.textContent,selection:window.getSelection()?.toString().slice(0,80),phase:window.MIRPortalActiveClient?.getStatus().phase,error:window.MIRPortalActiveClient?.getStatus().error?.code,online:navigator.onLine,project:window.MIRPortalConfig?.projectRef,roleIndex:window.realRoleIndex,expectedRole:window.realExpectedRole,authDiagnostic:window.nativeAuthDiagnostic,lastTap:window.nativeLastTap,drawing:(()=>{const f=document.querySelector('#field-drawing-frame');if(!f)return null;try{const d=f.contentDocument,w=f.contentWindow,p=d?.querySelector('#client-draw-profile'),t=d?.querySelector('#trace-height'),b=t?.nextElementSibling;return{route:new URL(f.src).pathname,ready:d?.readyState,sameFrame:f===window.nativeDrawingFrame,sameDocument:d===window.nativeDrawingDocument,entry:d?.body?.dataset.clientEntry,profilePresent:!!p,profileDisabled:p?.disabled,profileVisible:!!p?.getClientRects().length,tracePresent:!!t,traceValue:t?.value,triggerPresent:!!b,triggerVisible:!!b?.getClientRects().length,choicesPresent:!!w?.MIRFieldChoices,choiceOpen:w?.MIRFieldChoices?.isOpen(),activeTag:d?.activeElement?.tagName,activeId:d?.activeElement?.id,activeClass:d?.activeElement?.className,sourceFocused:d?.activeElement===b};}catch(e){return{error:e.message};}})()})"));}
+ private void waitFor(ActivityScenario<MainActivity>s,String step,String expression)throws Exception{long end=SystemClock.uptimeMillis()+30000;while(SystemClock.uptimeMillis()<end){if(Boolean.TRUE.equals(js(s,expression)))return;SystemClock.sleep(150);}js(s,"window.nativeAuthDiagnostic={status:'requested'};if(window.MIRAndroidSession?.diagnostic)window.MIRAndroidSession.diagnostic().then(value=>window.nativeAuthDiagnostic=value).catch(()=>window.nativeAuthDiagnostic={status:'failed'});else navigator.locks?.query().then(value=>window.nativeAuthDiagnostic={locks:value});true");long diagnosticEnd=SystemClock.uptimeMillis()+1500;while(SystemClock.uptimeMillis()<diagnosticEnd&&Boolean.TRUE.equals(js(s,"window.nativeAuthDiagnostic?.status==='requested'")))SystemClock.sleep(50);failWithScreenshot("failed-real-roles","MIR TEST Android : étape non confirmée "+step+"; état="+js(s,"JSON.stringify({proof:window.realProof,code:window.realProofCode,view:document.body.dataset.fieldView,heading:document.querySelector('#portal-content h1')?.textContent,sheetOpen:!!document.querySelector('.mir-choice-sheet[open]'),selectedHome:document.querySelector('[data-field-home-job]')?.value,homeLabel:document.querySelector('[data-field-home-job]')?.nextElementSibling?.textContent,homeAddress:document.querySelector('.field-job-address')?.textContent,selection:window.getSelection()?.toString().slice(0,80),phase:window.MIRPortalActiveClient?.getStatus().phase,error:window.MIRPortalActiveClient?.getStatus().error?.code,online:navigator.onLine,project:window.MIRPortalConfig?.projectRef,roleIndex:window.realRoleIndex,expectedRole:window.realExpectedRole,authDiagnostic:window.nativeAuthDiagnostic,lastTap:window.nativeLastTap,drawing:(()=>{const f=document.querySelector('#field-drawing-frame');if(!f)return null;try{const d=f.contentDocument,w=f.contentWindow,p=d?.querySelector('#client-draw-profile'),t=d?.querySelector('#trace-height'),b=t?.nextElementSibling;return{route:new URL(f.src).pathname,ready:d?.readyState,sameFrame:f===window.nativeDrawingFrame,sameDocument:d===window.nativeDrawingDocument,entry:d?.body?.dataset.clientEntry,profilePresent:!!p,profileDisabled:p?.disabled,profileVisible:!!p?.getClientRects().length,tracePresent:!!t,traceValue:t?.value,triggerPresent:!!b,triggerVisible:!!b?.getClientRects().length,choicesPresent:!!w?.MIRFieldChoices,choiceOpen:w?.MIRFieldChoices?.isOpen(),activeTag:d?.activeElement?.tagName,activeId:d?.activeElement?.id,activeClass:d?.activeElement?.className,sourceFocused:d?.activeElement===b};}catch(e){return{error:e.message};}})()})"));}
  private final java.util.Map<String,JSONObject> nativeProofs=new java.util.LinkedHashMap<>();
  private File proofDirectory(){File dir=new File(InstrumentationRegistry.getInstrumentation().getTargetContext().getExternalFilesDir(null),"phase11-proof");assertTrue(dir.isDirectory()||dir.mkdirs());return dir;}
  private static String hex(byte[] bytes){StringBuilder out=new StringBuilder();for(byte b:bytes)out.append(String.format(java.util.Locale.ROOT,"%02x",b&255));return out.toString();}
@@ -76,6 +76,17 @@ public class MirRealRolesTest extends MirDeviceSetup {
  private JSONObject screenshotSystem(String name)throws Exception{
   androidx.test.uiautomator.UiDevice.getInstance(InstrumentationRegistry.getInstrumentation()).waitForIdle(1000);
   android.graphics.Bitmap bitmap=InstrumentationRegistry.getInstrumentation().getUiAutomation().takeScreenshot();assertNotNull(bitmap);try{return saveScreenshot(name,bitmap,null);}finally{bitmap.recycle();}
+ }
+ private void failWithScreenshot(String label,String message){
+  AssertionError failure=new AssertionError(message);
+  try{
+   // Cleanup can expose a second failure. Keep both captures and the original
+   // assertion rather than replacing it with an evidence filename collision.
+   String name=label;int suffix=2;
+   while(new File(proofDirectory(),name+".png").exists())name=label+"-"+(suffix++);
+   screenshotSystem(name);
+  }catch(AssertionError|Exception captureFailure){failure.addSuppressed(captureFailure);}
+  throw failure;
  }
  private boolean injectDeliberateNativeTap(int x,int y){
   // Use an actual finger tool, not obtain(x,y)'s TOOL_TYPE_UNKNOWN. The latter
@@ -170,7 +181,7 @@ public class MirRealRolesTest extends MirDeviceSetup {
   boolean[] visible={false};s.onActivity(a->{androidx.core.view.WindowInsetsCompat insets=androidx.core.view.ViewCompat.getRootWindowInsets(a.getBridge().getWebView());visible[0]=insets!=null&&insets.isVisible(androidx.core.view.WindowInsetsCompat.Type.ime());});return visible[0];
  }
  private void awaitDrawingKeyboard(ActivityScenario<MainActivity>s,boolean expected)throws Exception{
-  long deadline=SystemClock.uptimeMillis()+10000;while(SystemClock.uptimeMillis()<deadline){if(drawingKeyboardVisible(s)==expected)return;SystemClock.sleep(100);}screenshotSystem("failed-pliage-keyboard");fail("Pliage Android IME visible="+expected+" not observed");
+  long deadline=SystemClock.uptimeMillis()+10000;while(SystemClock.uptimeMillis()<deadline){if(drawingKeyboardVisible(s)==expected)return;SystemClock.sleep(100);}failWithScreenshot("failed-pliage-keyboard","Pliage Android IME visible="+expected+" not observed");
  }
  private void closeDrawingKeyboard(ActivityScenario<MainActivity>s)throws Exception{
   if(drawingKeyboardVisible(s)){assertTrue(androidx.test.uiautomator.UiDevice.getInstance(InstrumentationRegistry.getInstrumentation()).pressBack());awaitDrawingKeyboard(s,false);}presentFrame(s);
@@ -248,6 +259,7 @@ public class MirRealRolesTest extends MirDeviceSetup {
   waitFor(s,"measurement layout restored after closing IME","("+MirPliageCompactProbe.SCRIPT+").noScroll");JSONObject normal=compactDrawingProof(s,"v130008-"+role+"-pliage-compact-measures");assertCompactMeasurements(normal,true);proof.put("normal",normal);
   JSONArray segments=normal.getJSONObject("model").getJSONArray("segments");assertEquals(139.7,segments.getJSONObject(0).getDouble("lengthMM"),.01);assertEquals(76.2,segments.getJSONObject(1).getDouble("lengthMM"),.01);assertEquals(38.1,segments.getJSONObject(2).getDouble("lengthMM"),.01);
   String geometry=(String)js(s,"JSON.stringify(document.querySelector('#field-drawing-frame').contentWindow.MIRProductionWorkspace.getLivePreviewState().model.pointsMM)"),original=shell("settings get system font_scale");JSONArray large=new JSONArray();
+  Throwable fontTrialFailure=null;
   try{
    applyDrawingFontScale(s,"1.5");
    java.util.Set<String> sides=new java.util.HashSet<>();java.util.Set<Integer> angles=new java.util.HashSet<>();
@@ -258,7 +270,11 @@ public class MirRealRolesTest extends MirDeviceSetup {
     JSONObject next=metrics.getJSONObject("controls").getJSONObject("pageNext");if(!next.getBoolean("exists")||next.getBoolean("disabled"))break;assertDrawingControl(metrics,"pageNext");tapDrawing(s,"[data-field-measure-page-step=\"1\"]");
    }
    assertEquals("Every enlarged measurement has a visible page",new java.util.HashSet<>(java.util.Arrays.asList("A","B","C")),sides);assertEquals("Both enlarged angles have a visible page",new java.util.HashSet<>(java.util.Arrays.asList(0,1)),angles);
-  }finally{applyDrawingFontScale(s,original.matches("[0-9.]+")?original:"1.0");}
+  }catch(AssertionError|Exception failure){fontTrialFailure=failure;throw failure;}
+  finally{
+   try{applyDrawingFontScale(s,original.matches("[0-9.]+")?original:"1.0");}
+   catch(AssertionError|Exception restoreFailure){if(fontTrialFailure!=null)fontTrialFailure.addSuppressed(restoreFailure);else throw restoreFailure;}
+  }
   assertEquals("Android font changes preserve the actual profile geometry",geometry,js(s,"JSON.stringify(document.querySelector('#field-drawing-frame').contentWindow.MIRProductionWorkspace.getLivePreviewState().model.pointsMM)"));proof.put("largeTextPages",large).put("geometryPreservedAfterFontChange",true);
   return proof;
  }

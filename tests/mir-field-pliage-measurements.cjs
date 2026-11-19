@@ -131,3 +131,38 @@ test('le vrai aperçu compact agrandit le L sans réduire ou couper les mesures 
  }
  assert.throws(()=>compactFieldRenderer(377,156,[0,1,2],{...M,profileDiagramContent(){throw Error('Erreur géométrique inattendue');}})(profile()),/Erreur géométrique inattendue/);
 });
+
+test('reprendre le tracé après les mesures rétablit ses coordonnées SVG sans changer la pièce',()=>{
+ const app=fs.readFileSync(require.resolve('../dist/production-app.js'),'utf8');
+ const start=app.indexOf('function resumeClientTrace('),end=app.indexOf('\nfunction ',start+1);
+ assert.ok(start>=0);
+ const resume=app.slice(start,end);
+ // Exact native keyboard profile, including its non-zero drawing origin.
+ const model=M.buildProfile({kind:'profile',template:'custom',name:'Profil dessiné',unit:'in',
+  segments:[{label:'A',length:5.5},{label:'B',length:3},{label:'C',length:1.5}],
+  bends:[{mode:'signed',angle:-90},{mode:'hem',angle:180,direction:'left'}],startAngle:90});
+ const original=JSON.stringify(model),origin=[50.8,50.8];
+ const points=model.pointsMM.map(([x,y])=>[x+origin[0],y+origin[1]]);
+ const measured=compactFieldRenderer(340,182,[0,1,2])(model).transform;
+ const renderTrace=(tr,drawPoints,compact)=>{
+  const mapped=drawPoints.map(([x,y])=>[tr.ox+x*tr.scale,tr.oy-y*tr.scale]);
+  return M.profileDiagramContent(model,mapped,{section:M.profileSectionPath(mapped,model.bends),
+   markerModel:{segments:model.segments.map(({label})=>({label}))},illustrative:true,
+   showMeasurements:false,hemSideMarkers:true,handles:mapped,
+   horizontalBounds:compact?[100,540]:[0,800],verticalBounds:[0,520]});
+ };
+ assert.throws(()=>renderTrace(measured,points,true),/Cotation technique sans espace/,
+  'ancien transform de mesures incompatible avec le tracé mobile');
+ for(const compact of [true,false]){
+  const result=new Function('model','initialPoints','initialTransform','compact','renderTrace',
+   'const fieldPliage03=true,build=()=>model,matchMedia=()=>({matches:compact});'+
+   'const renderDimensions=()=>{},focusClientEntry=()=>{};let drawPoints=initialPoints.map(p=>p.slice()),drawTransform={...initialTransform},clientStep=2,clientEntry="draw",tool="select",view="face",svg;'+
+   'const updateDrawing=()=>{svg=renderTrace(drawTransform,drawPoints,compact);};'+resume+
+   ';resumeClientTrace();return {points:drawPoints,transform:drawTransform,step:clientStep,tool,svg};')(model,points,measured,compact,renderTrace);
+  assert.equal(result.step,1);assert.equal(result.tool,'draw');
+  assert.deepEqual(result.points,points,'origine et coordonnées réelles conservées');
+  assert.deepEqual(markers(result.svg).map(marker=>marker.caption),['A','B','C']);
+  assert.notDeepEqual(result.transform,measured,'nouvelle projection dans le viewBox de tracé');
+  assert.equal(JSON.stringify(model),original,'cotes, angles, repli et géométrie inchangés');
+ }
+});
