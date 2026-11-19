@@ -5,11 +5,15 @@ if(process.env.MIR_ANDROID_ENV&&process.env.MIR_ANDROID_ENV!=='test')throw Error
 for(const name of ['MIR_TEST_GOOGLE_ENABLED','MIR_TEST_RECOVERY_ENABLED','MIR_TEST_INVITATIONS_ENABLED','MIR_TEST_ENROLLMENT_ENABLED'])if(process.env[name]!==undefined&&!['true','false'].includes(process.env[name]))throw Error('Indicateur TEST invalide : '+name);
 const project='hxtztkmbfpmzrieccwsg',key='sb_publishable_jk8zsTWqQi6Borv44aaDJw_k7JSbzZh';
 const publicModules=new Set(['mir-estimate.js','mir-estimate-drafts.js','mir-estimate-upload.js']);
+// These are visual-verification galleries, not application resources. Their
+// HTML entry points are already outside the native route allowlist.
+const verificationDirectories=new Set(['pliage-harmonie-20261117-captures','particuliers-pc-finition-captures','prestige-captures','boutique-colours-captures','boutique-images-captures','items-20261117-captures','tools-20261117-captures']);
 const files=cp.execFileSync('git',['ls-files','-z','dist'],{cwd:root,encoding:'utf8'}).split('\0').filter(Boolean);
 fs.mkdirSync(out,{recursive:true});
 // Generated build directory only; no source, server or historical data is edited.
 for(const entry of fs.readdirSync(out))fs.rmSync(path.join(out,entry),{recursive:true,force:true});
 for(const file of files){
+ if(verificationDirectories.has(file.split('/')[1]))continue;
  if(publicModules.has(path.basename(file)))continue;
  if(file.endsWith('.html')&&!require('../web/policy.cjs').allowedRoute('https://localhost/'+file.slice(5)))continue;
  if(/atelier-essai\/.*(?:-candidate|index)\.html$/.test(file))continue;
